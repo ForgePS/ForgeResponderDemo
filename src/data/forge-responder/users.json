@@ -1,0 +1,24 @@
+[
+  {
+    "id": "USR-001",
+    "tenantId": "forge-demo",
+    "displayName": "Demo User 01",
+    "email": "user01@demo.invalid",
+    "status": "active",
+    "roleIds": [],
+    "permissions": [],
+    "createdAt": "2026-06-10T16:21:23.385Z",
+    "updatedAt": "2026-08-17T18:54:40.304Z"
+  },
+  {
+    "id": "USR-002",
+    "tenantId": "forge-demo",
+    "displayName": "Demo User 02",
+    "email": "user02@demo.invalid",
+    "status": "active",
+    "roleIds": [],
+    "permissions": [],
+    "createdAt": null,
+    "updatedAt": "2026-09-27T10:07:57.655Z"
+  }
+]

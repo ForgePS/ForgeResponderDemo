@@ -1,0 +1,67 @@
+[
+  {
+    "id": "HAE-00001",
+    "tenantId": "forge-demo",
+    "entityType": "hydrantOwnershipReview",
+    "entityId": "DEMO-ENTITY-0001",
+    "action": "ownership_review.enqueued",
+    "actorId": "demo-user-01",
+    "actorName": "Demo Administrator",
+    "reason": "",
+    "source": "hydrant_damage",
+    "createdAt": "2026-07-21T16:05:39.797Z",
+    "updatedAt": "2026-07-21T16:05:39.797Z"
+  },
+  {
+    "id": "HAE-00002",
+    "tenantId": "forge-demo",
+    "entityType": "hydrantDamageReport",
+    "entityId": "HDR-DEMO-0001",
+    "action": "damage_report.created",
+    "actorId": "demo-user-01",
+    "actorName": "Demo Administrator",
+    "reason": "",
+    "source": "hydrant_damage",
+    "createdAt": "2026-07-21T16:05:39.877Z",
+    "updatedAt": "2026-07-21T16:05:39.877Z"
+  },
+  {
+    "id": "HAE-00003",
+    "tenantId": "forge-demo",
+    "entityType": "hydrantDamageReport",
+    "entityId": "HDR-DEMO-0001",
+    "action": "damage_report.updated",
+    "actorId": "demo-user-01",
+    "actorName": "Demo Administrator",
+    "reason": "",
+    "source": "hydrant_damage",
+    "createdAt": "2026-07-21T18:19:03.217Z",
+    "updatedAt": "2026-07-21T18:19:03.217Z"
+  },
+  {
+    "id": "HAE-00004",
+    "tenantId": "forge-demo",
+    "entityType": "hydrantDamageReport",
+    "entityId": "HDR-DEMO-0001",
+    "action": "damage_report.updated",
+    "actorId": "demo-user-01",
+    "actorName": "Demo Administrator",
+    "reason": "",
+    "source": "hydrant_damage",
+    "createdAt": "2026-07-21T18:19:12.276Z",
+    "updatedAt": "2026-07-21T18:19:12.276Z"
+  },
+  {
+    "id": "HAE-00005",
+    "tenantId": "forge-demo",
+    "entityType": "hydrantDamageReport",
+    "entityId": "HDR-DEMO-0001",
+    "action": "damage_report.updated",
+    "actorId": "demo-user-01",
+    "actorName": "Demo Administrator",
+    "reason": "",
+    "source": "hydrant_damage",
+    "createdAt": "2026-07-21T18:19:22.880Z",
+    "updatedAt": "2026-07-21T18:19:22.880Z"
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "FEE-001",
+    "tenantId": "forge-demo",
+    "name": "Certificate of inspection",
+    "amount": 15.0,
+    "active": true,
+    "notes": ""
+  },
+  {
+    "id": "FEE-002",
+    "tenantId": "forge-demo",
+    "name": "Contractor test report submission",
+    "amount": 40.0,
+    "active": true,
+    "notes": ""
+  },
+  {
+    "id": "FEE-003",
+    "tenantId": "forge-demo",
+    "name": "Fire watch (daily)",
+    "amount": 100.0,
+    "active": true,
+    "notes": ""
+  },
+  {
+    "id": "FEE-004",
+    "tenantId": "forge-demo",
+    "name": "Annual inspection",
+    "amount": 75.0,
+    "active": true,
+    "notes": ""
+  },
+  {
+    "id": "FEE-005",
+    "tenantId": "forge-demo",
+    "name": "Late payment",
+    "amount": 25.0,
+    "active": true,
+    "notes": ""
+  },
+  {
+    "id": "FEE-006",
+    "tenantId": "forge-demo",
+    "name": "Reinspection",
+    "amount": 50.0,
+    "active": true,
+    "notes": ""
+  }
+]

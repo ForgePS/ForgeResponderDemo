@@ -1,0 +1,256 @@
+{
+  "ranks": [
+    {
+      "id": "fireChief",
+      "label": "Fire Chief",
+      "active": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "deputyChief",
+      "label": "Deputy Chief",
+      "active": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "battalionChief",
+      "label": "Battalion Chief",
+      "active": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "inspector",
+      "label": "Fire Inspector",
+      "active": false,
+      "sortOrder": 4
+    },
+    {
+      "id": "lieutenant",
+      "label": "Lieutenant",
+      "active": true,
+      "sortOrder": 5
+    },
+    {
+      "id": "driver",
+      "label": "Driver",
+      "active": true,
+      "sortOrder": 6
+    },
+    {
+      "id": "firefighter",
+      "label": "Firefighter",
+      "active": true,
+      "sortOrder": 7
+    },
+    {
+      "id": "firefighterII",
+      "label": "Firefighter II",
+      "active": true,
+      "sortOrder": 8
+    },
+    {
+      "id": "firefighterIII",
+      "label": "Firefighter III",
+      "active": true,
+      "sortOrder": 9
+    },
+    {
+      "id": "driverII",
+      "label": "Driver II",
+      "active": true,
+      "sortOrder": 10
+    },
+    {
+      "id": "lieutenantII",
+      "label": "Lieutenant II",
+      "active": true,
+      "sortOrder": 11
+    },
+    {
+      "id": "paramedic",
+      "label": "Paramedic",
+      "active": true,
+      "sortOrder": 12
+    },
+    {
+      "id": "emt/driver",
+      "label": "EMT/Driver",
+      "active": true,
+      "sortOrder": 13
+    }
+  ],
+  "shifts": [
+    {
+      "id": "aShift",
+      "label": "A Shift",
+      "active": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "bShift",
+      "label": "B Shift",
+      "active": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "cShift",
+      "label": "C Shift",
+      "active": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "administration",
+      "label": "Administration",
+      "active": true,
+      "sortOrder": 5
+    }
+  ],
+  "stations": [
+    {
+      "id": "station1",
+      "label": "Station 1",
+      "active": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "station2",
+      "label": "Station 2",
+      "active": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "station3",
+      "label": "Station 3",
+      "active": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "fireAdmin",
+      "label": "Fire Administration",
+      "active": true,
+      "sortOrder": 4
+    }
+  ],
+  "positions": [
+    {
+      "id": "Battalion 1",
+      "label": "Battalion 1",
+      "active": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "Officer",
+      "label": "Lieutenant",
+      "active": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "Driver",
+      "label": "Driver",
+      "active": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "Firefighter",
+      "label": "Firefighter",
+      "active": true,
+      "sortOrder": 4
+    },
+    {
+      "id": "Paramedic",
+      "label": "Paramedic",
+      "active": true,
+      "sortOrder": 5
+    },
+    {
+      "id": "EMT/Driver",
+      "label": "EMT/Driver",
+      "active": true,
+      "sortOrder": 6
+    }
+  ],
+  "districts": [
+    {
+      "id": "district1",
+      "label": "District 1",
+      "active": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "district2",
+      "label": "District 2",
+      "active": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "district3",
+      "label": "District 3",
+      "active": true,
+      "sortOrder": 3
+    }
+  ],
+  "groups": [
+    {
+      "id": "operations",
+      "label": "Operations",
+      "active": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "suppression",
+      "label": "Suppression",
+      "active": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "ems",
+      "label": "EMS",
+      "active": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "administrative",
+      "label": "Administrative",
+      "active": true,
+      "sortOrder": 4
+    }
+  ],
+  "qualifiers": [
+    {
+      "id": "administration",
+      "label": "Administration",
+      "active": true,
+      "sortOrder": 1
+    },
+    {
+      "id": "deputyChief",
+      "label": "Deputy Chief",
+      "active": true,
+      "sortOrder": 2
+    },
+    {
+      "id": "emsChief",
+      "label": "EMS Chief",
+      "active": true,
+      "sortOrder": 3
+    },
+    {
+      "id": "firefighter",
+      "label": "Firefighter",
+      "active": true,
+      "sortOrder": 4
+    },
+    {
+      "id": "instructor",
+      "label": "Instructor",
+      "active": true,
+      "sortOrder": 5
+    },
+    {
+      "id": "apparatusOperator",
+      "label": "Apparatus Operator",
+      "active": true,
+      "sortOrder": 6
+    }
+  ]
+}

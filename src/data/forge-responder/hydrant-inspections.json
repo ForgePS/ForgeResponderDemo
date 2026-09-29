@@ -1,0 +1,234 @@
+[
+  {
+    "id": "HIN-00001",
+    "tenantId": "forge-demo",
+    "hydrantId": "HYD-0045",
+    "inspectedAt": "2026-06-15T14:15:00.000Z",
+    "inspectedBy": "Demo Firefighter 02",
+    "shift": "A Shift",
+    "district": "1",
+    "status": "In Service",
+    "repairRequired": false,
+    "notes": "Caps present; no leaks; area clear",
+    "checklist": [
+      {
+        "sequence": 1,
+        "item": "Bulk Import Summary",
+        "result": "Yes",
+        "notes": "Caps present; no leaks; area clear",
+        "repairRequired": false,
+        "photoRef": ""
+      }
+    ],
+    "createdAt": "2026-06-19T17:27:30.022Z",
+    "updatedAt": "2026-06-19T17:27:30.022Z"
+  },
+  {
+    "id": "HIN-00002",
+    "tenantId": "forge-demo",
+    "hydrantId": "HYD-0046",
+    "inspectedAt": "2026-06-16T19:20:00.000Z",
+    "inspectedBy": "Demo Firefighter 04",
+    "shift": "C Shift",
+    "district": "3",
+    "status": "Needs Repair",
+    "repairRequired": true,
+    "notes": "Operating nut stiff; follow-up needed",
+    "checklist": [
+      {
+        "sequence": 1,
+        "item": "Bulk Import Summary",
+        "result": "No",
+        "notes": "Operating nut stiff; follow-up needed",
+        "repairRequired": true,
+        "photoRef": ""
+      }
+    ],
+    "createdAt": "2026-06-19T17:27:30.023Z",
+    "updatedAt": "2026-06-19T17:27:30.023Z"
+  },
+  {
+    "id": "HIN-00003",
+    "tenantId": "forge-demo",
+    "hydrantId": "HYD-0268",
+    "inspectedAt": "2026-06-15T12:00:00.000Z",
+    "inspectedBy": "Demo Firefighter 02",
+    "shift": "C Shift",
+    "district": "",
+    "status": null,
+    "repairRequired": true,
+    "notes": "",
+    "checklist": [
+      {
+        "sequence": 1,
+        "item": "No Obstructions",
+        "result": "Yes",
+        "notes": "Area clear and accessible.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 2,
+        "item": "Operable (Turns Open/Closed)",
+        "result": "Yes",
+        "notes": "Operated smoothly.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 3,
+        "item": "Caps Present",
+        "result": "Yes",
+        "notes": "All caps present.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 4,
+        "item": "Threads in Good Condition",
+        "result": "Yes",
+        "notes": "Threads clean and intact.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 5,
+        "item": "Oil Nut Provided",
+        "result": "Yes",
+        "notes": "Oil nut in place.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 6,
+        "item": "Barrel Drains Properly",
+        "result": "Yes",
+        "notes": "Drains as expected.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 7,
+        "item": "Leaks (Valve / Caps / Barrel)",
+        "result": "Yes",
+        "notes": "No leaks detected.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 8,
+        "item": "Steamer Port / Pumper Outlet Good",
+        "result": "Yes",
+        "notes": "Outlet threads good.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 9,
+        "item": "Adequate Clearance (3 ft all sides)",
+        "result": "Yes",
+        "notes": "Meets clearance requirement.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 10,
+        "item": "Other",
+        "result": "Yes",
+        "notes": "Needs Stamping",
+        "repairRequired": true,
+        "photoRef": ""
+      }
+    ],
+    "createdAt": "2026-06-19T18:26:04.193Z",
+    "updatedAt": "2026-06-19T18:26:04.194Z"
+  },
+  {
+    "id": "HIN-00004",
+    "tenantId": "forge-demo",
+    "hydrantId": "HYD-0273",
+    "inspectedAt": "2026-06-15T12:00:00.000Z",
+    "inspectedBy": "Demo Firefighter 02",
+    "shift": "C Shift",
+    "district": "",
+    "status": null,
+    "repairRequired": true,
+    "notes": "",
+    "checklist": [
+      {
+        "sequence": 1,
+        "item": "No Obstructions",
+        "result": "No",
+        "notes": "Area clear and accessible.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 2,
+        "item": "Operable (Turns Open/Closed)",
+        "result": "No",
+        "notes": "Operated smoothly.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 3,
+        "item": "Caps Present",
+        "result": "No",
+        "notes": "All caps present.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 4,
+        "item": "Threads in Good Condition",
+        "result": "No",
+        "notes": "Threads clean and intact.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 5,
+        "item": "Oil Nut Provided",
+        "result": "No",
+        "notes": "Oil nut in place.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 6,
+        "item": "Barrel Drains Properly",
+        "result": "No",
+        "notes": "Drains as expected.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 7,
+        "item": "Leaks (Valve / Caps / Barrel)",
+        "result": "Yes",
+        "notes": "Leaks from Base Flange",
+        "repairRequired": true,
+        "photoRef": ""
+      },
+      {
+        "sequence": 8,
+        "item": "Steamer Port / Pumper Outlet Good",
+        "result": "No",
+        "notes": "Outlet threads good.",
+        "repairRequired": false,
+        "photoRef": ""
+      },
+      {
+        "sequence": 9,
+        "item": "Adequate Clearance (3 ft all sides)",
+        "result": "No",
+        "notes": "Meets clearance requirement.",
+        "repairRequired": false,
+        "photoRef": ""
+      }
+    ],
+    "createdAt": "2026-06-19T18:23:11.123Z",
+    "updatedAt": "2026-06-19T18:23:11.124Z"
+  }
+]

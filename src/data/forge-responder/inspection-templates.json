@@ -1,0 +1,778 @@
+[
+  {
+    "id": "ITEMPL-001",
+    "tenantId": "forge-demo",
+    "name": "Annual fire inspection form",
+    "inspectionType": "",
+    "lifecycleStatus": "draft",
+    "version": 1,
+    "sections": [
+      {
+        "sortOrder": 0,
+        "fields": [
+          {
+            "options": [],
+            "readOnly": false,
+            "autoCreateViolation": false,
+            "sortOrder": 0,
+            "label": "Occupancy notes",
+            "required": false,
+            "type": "long_text",
+            "severity": "",
+            "helpText": "Site conditions and access notes.",
+            "id": "fld-occupancy-notes",
+            "key": "occupancy_notes",
+            "placeholder": ""
+          },
+          {
+            "required": true,
+            "label": "Overall result",
+            "sortOrder": 1,
+            "autoCreateViolation": false,
+            "options": [],
+            "readOnly": false,
+            "key": "overall_result",
+            "placeholder": "",
+            "id": "fld-overall-result",
+            "helpText": "",
+            "severity": "",
+            "type": "pass_fail"
+          }
+        ],
+        "id": "sec-general",
+        "title": "General"
+      },
+      {
+        "id": "sec-life-safety",
+        "fields": [
+          {
+            "autoCreateViolation": true,
+            "sortOrder": 0,
+            "label": "Exits clear and unobstructed",
+            "required": true,
+            "options": [],
+            "readOnly": false,
+            "key": "exits_clear",
+            "placeholder": "",
+            "severity": "high",
+            "id": "fld-exits",
+            "helpText": "",
+            "type": "pass_fail_na"
+          },
+          {
+            "sortOrder": 1,
+            "autoCreateViolation": true,
+            "required": true,
+            "label": "Fire extinguishers present and current",
+            "options": [],
+            "readOnly": false,
+            "key": "extinguishers",
+            "placeholder": "",
+            "type": "pass_fail_na",
+            "severity": "moderate",
+            "helpText": "",
+            "id": "fld-extinguishers"
+          },
+          {
+            "placeholder": "",
+            "key": "evidence_photos",
+            "helpText": "Attach photos of deficiencies.",
+            "id": "fld-photos",
+            "severity": "",
+            "type": "photo",
+            "label": "Evidence photos",
+            "required": false,
+            "sortOrder": 2,
+            "autoCreateViolation": false,
+            "options": [],
+            "readOnly": false
+          }
+        ],
+        "sortOrder": 1,
+        "title": "Life safety"
+      }
+    ],
+    "publishedAt": "",
+    "createdAt": "2026-07-21T15:47:57.181Z",
+    "updatedAt": "2026-07-21T15:47:57.474Z"
+  },
+  {
+    "id": "ITEMPL-002",
+    "tenantId": "forge-demo",
+    "name": "Commercial cooking inspection form",
+    "inspectionType": "",
+    "lifecycleStatus": "draft",
+    "version": 1,
+    "sections": [
+      {
+        "title": "General",
+        "sortOrder": 0,
+        "fields": [
+          {
+            "label": "Occupancy notes",
+            "required": false,
+            "sortOrder": 0,
+            "autoCreateViolation": false,
+            "readOnly": false,
+            "options": [],
+            "placeholder": "",
+            "key": "occupancy_notes",
+            "id": "fld-occupancy-notes",
+            "helpText": "Site conditions and access notes.",
+            "severity": "",
+            "type": "long_text"
+          },
+          {
+            "sortOrder": 1,
+            "autoCreateViolation": false,
+            "label": "Overall result",
+            "required": true,
+            "readOnly": false,
+            "options": [],
+            "key": "overall_result",
+            "placeholder": "",
+            "severity": "",
+            "id": "fld-overall-result",
+            "helpText": "",
+            "type": "pass_fail"
+          }
+        ],
+        "id": "sec-general"
+      },
+      {
+        "id": "sec-life-safety",
+        "fields": [
+          {
+            "placeholder": "",
+            "key": "exits_clear",
+            "type": "pass_fail_na",
+            "severity": "high",
+            "helpText": "",
+            "id": "fld-exits",
+            "sortOrder": 0,
+            "autoCreateViolation": true,
+            "label": "Exits clear and unobstructed",
+            "required": true,
+            "options": [],
+            "readOnly": false
+          },
+          {
+            "required": true,
+            "label": "Fire extinguishers present and current",
+            "sortOrder": 1,
+            "autoCreateViolation": true,
+            "readOnly": false,
+            "options": [],
+            "placeholder": "",
+            "key": "extinguishers",
+            "id": "fld-extinguishers",
+            "helpText": "",
+            "severity": "moderate",
+            "type": "pass_fail_na"
+          },
+          {
+            "options": [],
+            "readOnly": false,
+            "required": false,
+            "label": "Evidence photos",
+            "sortOrder": 2,
+            "autoCreateViolation": false,
+            "id": "fld-photos",
+            "helpText": "Attach photos of deficiencies.",
+            "severity": "",
+            "type": "photo",
+            "key": "evidence_photos",
+            "placeholder": ""
+          }
+        ],
+        "sortOrder": 1,
+        "title": "Life safety"
+      }
+    ],
+    "publishedAt": "",
+    "createdAt": "2026-07-21T15:47:57.181Z",
+    "updatedAt": "2026-07-21T15:47:58.693Z"
+  },
+  {
+    "id": "ITEMPL-003",
+    "tenantId": "forge-demo",
+    "name": "Complaint inspection form",
+    "inspectionType": "",
+    "lifecycleStatus": "draft",
+    "version": 1,
+    "sections": [
+      {
+        "sortOrder": 0,
+        "id": "sec-general",
+        "fields": [
+          {
+            "key": "occupancy_notes",
+            "placeholder": "",
+            "severity": "",
+            "id": "fld-occupancy-notes",
+            "helpText": "Site conditions and access notes.",
+            "type": "long_text",
+            "autoCreateViolation": false,
+            "sortOrder": 0,
+            "label": "Occupancy notes",
+            "required": false,
+            "readOnly": false,
+            "options": []
+          },
+          {
+            "options": [],
+            "readOnly": false,
+            "label": "Overall result",
+            "required": true,
+            "autoCreateViolation": false,
+            "sortOrder": 1,
+            "type": "pass_fail",
+            "helpText": "",
+            "id": "fld-overall-result",
+            "severity": "",
+            "placeholder": "",
+            "key": "overall_result"
+          }
+        ],
+        "title": "General"
+      },
+      {
+        "id": "sec-life-safety",
+        "fields": [
+          {
+            "sortOrder": 0,
+            "autoCreateViolation": true,
+            "label": "Exits clear and unobstructed",
+            "required": true,
+            "readOnly": false,
+            "options": [],
+            "placeholder": "",
+            "key": "exits_clear",
+            "type": "pass_fail_na",
+            "severity": "high",
+            "id": "fld-exits",
+            "helpText": ""
+          },
+          {
+            "sortOrder": 1,
+            "autoCreateViolation": true,
+            "label": "Fire extinguishers present and current",
+            "required": true,
+            "options": [],
+            "readOnly": false,
+            "placeholder": "",
+            "key": "extinguishers",
+            "severity": "moderate",
+            "id": "fld-extinguishers",
+            "helpText": "",
+            "type": "pass_fail_na"
+          },
+          {
+            "sortOrder": 2,
+            "autoCreateViolation": false,
+            "label": "Evidence photos",
+            "required": false,
+            "readOnly": false,
+            "options": [],
+            "placeholder": "",
+            "key": "evidence_photos",
+            "severity": "",
+            "id": "fld-photos",
+            "helpText": "Attach photos of deficiencies.",
+            "type": "photo"
+          }
+        ],
+        "sortOrder": 1,
+        "title": "Life safety"
+      }
+    ],
+    "publishedAt": "",
+    "createdAt": "2026-07-21T15:47:57.181Z",
+    "updatedAt": "2026-07-21T15:47:57.698Z"
+  },
+  {
+    "id": "ITEMPL-004",
+    "tenantId": "forge-demo",
+    "name": "Certificate of occupancy inspection form",
+    "inspectionType": "",
+    "lifecycleStatus": "draft",
+    "version": 1,
+    "sections": [
+      {
+        "title": "General",
+        "id": "sec-general",
+        "fields": [
+          {
+            "severity": "",
+            "id": "fld-occupancy-notes",
+            "helpText": "Site conditions and access notes.",
+            "type": "long_text",
+            "placeholder": "",
+            "key": "occupancy_notes",
+            "options": [],
+            "readOnly": false,
+            "autoCreateViolation": false,
+            "sortOrder": 0,
+            "required": false,
+            "label": "Occupancy notes"
+          },
+          {
+            "type": "pass_fail",
+            "severity": "",
+            "id": "fld-overall-result",
+            "helpText": "",
+            "placeholder": "",
+            "key": "overall_result",
+            "readOnly": false,
+            "options": [],
+            "sortOrder": 1,
+            "autoCreateViolation": false,
+            "label": "Overall result",
+            "required": true
+          }
+        ],
+        "sortOrder": 0
+      },
+      {
+        "title": "Life safety",
+        "sortOrder": 1,
+        "fields": [
+          {
+            "placeholder": "",
+            "key": "exits_clear",
+            "severity": "high",
+            "id": "fld-exits",
+            "helpText": "",
+            "type": "pass_fail_na",
+            "autoCreateViolation": true,
+            "sortOrder": 0,
+            "label": "Exits clear and unobstructed",
+            "required": true,
+            "options": [],
+            "readOnly": false
+          },
+          {
+            "label": "Fire extinguishers present and current",
+            "required": true,
+            "sortOrder": 1,
+            "autoCreateViolation": true,
+            "readOnly": false,
+            "options": [],
+            "placeholder": "",
+            "key": "extinguishers",
+            "id": "fld-extinguishers",
+            "helpText": "",
+            "severity": "moderate",
+            "type": "pass_fail_na"
+          },
+          {
+            "type": "photo",
+            "severity": "",
+            "helpText": "Attach photos of deficiencies.",
+            "id": "fld-photos",
+            "placeholder": "",
+            "key": "evidence_photos",
+            "readOnly": false,
+            "options": [],
+            "autoCreateViolation": false,
+            "sortOrder": 2,
+            "required": false,
+            "label": "Evidence photos"
+          }
+        ],
+        "id": "sec-life-safety"
+      }
+    ],
+    "publishedAt": "",
+    "createdAt": "2026-07-21T15:47:57.181Z",
+    "updatedAt": "2026-07-21T15:47:58.320Z"
+  },
+  {
+    "id": "ITEMPL-005",
+    "tenantId": "forge-demo",
+    "name": "Fire alarm system inspection form",
+    "inspectionType": "",
+    "lifecycleStatus": "draft",
+    "version": 1,
+    "sections": [
+      {
+        "sortOrder": 0,
+        "fields": [
+          {
+            "required": false,
+            "label": "Occupancy notes",
+            "autoCreateViolation": false,
+            "sortOrder": 0,
+            "options": [],
+            "readOnly": false,
+            "placeholder": "",
+            "key": "occupancy_notes",
+            "type": "long_text",
+            "helpText": "Site conditions and access notes.",
+            "id": "fld-occupancy-notes",
+            "severity": ""
+          },
+          {
+            "id": "fld-overall-result",
+            "helpText": "",
+            "severity": "",
+            "type": "pass_fail",
+            "key": "overall_result",
+            "placeholder": "",
+            "readOnly": false,
+            "options": [],
+            "label": "Overall result",
+            "required": true,
+            "sortOrder": 1,
+            "autoCreateViolation": false
+          }
+        ],
+        "id": "sec-general",
+        "title": "General"
+      },
+      {
+        "title": "Life safety",
+        "fields": [
+          {
+            "severity": "high",
+            "id": "fld-exits",
+            "helpText": "",
+            "type": "pass_fail_na",
+            "placeholder": "",
+            "key": "exits_clear",
+            "readOnly": false,
+            "options": [],
+            "sortOrder": 0,
+            "autoCreateViolation": true,
+            "label": "Exits clear and unobstructed",
+            "required": true
+          },
+          {
+            "label": "Fire extinguishers present and current",
+            "required": true,
+            "sortOrder": 1,
+            "autoCreateViolation": true,
+            "options": [],
+            "readOnly": false,
+            "placeholder": "",
+            "key": "extinguishers",
+            "type": "pass_fail_na",
+            "helpText": "",
+            "id": "fld-extinguishers",
+            "severity": "moderate"
+          },
+          {
+            "sortOrder": 2,
+            "autoCreateViolation": false,
+            "label": "Evidence photos",
+            "required": false,
+            "readOnly": false,
+            "options": [],
+            "placeholder": "",
+            "key": "evidence_photos",
+            "severity": "",
+            "id": "fld-photos",
+            "helpText": "Attach photos of deficiencies.",
+            "type": "photo"
+          }
+        ],
+        "id": "sec-life-safety",
+        "sortOrder": 1
+      }
+    ],
+    "publishedAt": "",
+    "createdAt": "2026-07-21T15:47:57.181Z",
+    "updatedAt": "2026-07-21T15:47:58.892Z"
+  },
+  {
+    "id": "ITEMPL-006",
+    "tenantId": "forge-demo",
+    "name": "New business inspection form",
+    "inspectionType": "",
+    "lifecycleStatus": "draft",
+    "version": 1,
+    "sections": [
+      {
+        "title": "General",
+        "id": "sec-general",
+        "fields": [
+          {
+            "readOnly": false,
+            "options": [],
+            "label": "Occupancy notes",
+            "required": false,
+            "sortOrder": 0,
+            "autoCreateViolation": false,
+            "type": "long_text",
+            "id": "fld-occupancy-notes",
+            "helpText": "Site conditions and access notes.",
+            "severity": "",
+            "placeholder": "",
+            "key": "occupancy_notes"
+          },
+          {
+            "key": "overall_result",
+            "placeholder": "",
+            "type": "pass_fail",
+            "helpText": "",
+            "id": "fld-overall-result",
+            "severity": "",
+            "required": true,
+            "label": "Overall result",
+            "sortOrder": 1,
+            "autoCreateViolation": false,
+            "options": [],
+            "readOnly": false
+          }
+        ],
+        "sortOrder": 0
+      },
+      {
+        "sortOrder": 1,
+        "id": "sec-life-safety",
+        "fields": [
+          {
+            "key": "exits_clear",
+            "placeholder": "",
+            "severity": "high",
+            "helpText": "",
+            "id": "fld-exits",
+            "type": "pass_fail_na",
+            "autoCreateViolation": true,
+            "sortOrder": 0,
+            "label": "Exits clear and unobstructed",
+            "required": true,
+            "readOnly": false,
+            "options": []
+          },
+          {
+            "key": "extinguishers",
+            "placeholder": "",
+            "id": "fld-extinguishers",
+            "helpText": "",
+            "severity": "moderate",
+            "type": "pass_fail_na",
+            "label": "Fire extinguishers present and current",
+            "required": true,
+            "sortOrder": 1,
+            "autoCreateViolation": true,
+            "readOnly": false,
+            "options": []
+          },
+          {
+            "type": "photo",
+            "severity": "",
+            "id": "fld-photos",
+            "helpText": "Attach photos of deficiencies.",
+            "placeholder": "",
+            "key": "evidence_photos",
+            "readOnly": false,
+            "options": [],
+            "autoCreateViolation": false,
+            "sortOrder": 2,
+            "label": "Evidence photos",
+            "required": false
+          }
+        ],
+        "title": "Life safety"
+      }
+    ],
+    "publishedAt": "",
+    "createdAt": "2026-07-21T15:47:57.181Z",
+    "updatedAt": "2026-07-21T15:47:58.114Z"
+  },
+  {
+    "id": "ITEMPL-007",
+    "tenantId": "forge-demo",
+    "name": "Reinspection form",
+    "inspectionType": "",
+    "lifecycleStatus": "draft",
+    "version": 1,
+    "sections": [
+      {
+        "title": "General",
+        "id": "sec-general",
+        "fields": [
+          {
+            "autoCreateViolation": false,
+            "sortOrder": 0,
+            "label": "Occupancy notes",
+            "required": false,
+            "options": [],
+            "readOnly": false,
+            "key": "occupancy_notes",
+            "placeholder": "",
+            "type": "long_text",
+            "severity": "",
+            "helpText": "Site conditions and access notes.",
+            "id": "fld-occupancy-notes"
+          },
+          {
+            "type": "pass_fail",
+            "severity": "",
+            "helpText": "",
+            "id": "fld-overall-result",
+            "key": "overall_result",
+            "placeholder": "",
+            "options": [],
+            "readOnly": false,
+            "autoCreateViolation": false,
+            "sortOrder": 1,
+            "required": true,
+            "label": "Overall result"
+          }
+        ],
+        "sortOrder": 0
+      },
+      {
+        "title": "Life safety",
+        "id": "sec-life-safety",
+        "fields": [
+          {
+            "key": "exits_clear",
+            "placeholder": "",
+            "helpText": "",
+            "id": "fld-exits",
+            "severity": "high",
+            "type": "pass_fail_na",
+            "label": "Exits clear and unobstructed",
+            "required": true,
+            "autoCreateViolation": true,
+            "sortOrder": 0,
+            "options": [],
+            "readOnly": false
+          },
+          {
+            "placeholder": "",
+            "key": "extinguishers",
+            "type": "pass_fail_na",
+            "severity": "moderate",
+            "helpText": "",
+            "id": "fld-extinguishers",
+            "sortOrder": 1,
+            "autoCreateViolation": true,
+            "required": true,
+            "label": "Fire extinguishers present and current",
+            "readOnly": false,
+            "options": []
+          },
+          {
+            "key": "evidence_photos",
+            "placeholder": "",
+            "helpText": "Attach photos of deficiencies.",
+            "id": "fld-photos",
+            "severity": "",
+            "type": "photo",
+            "required": false,
+            "label": "Evidence photos",
+            "autoCreateViolation": false,
+            "sortOrder": 2,
+            "options": [],
+            "readOnly": false
+          }
+        ],
+        "sortOrder": 1
+      }
+    ],
+    "publishedAt": "",
+    "createdAt": "2026-07-21T15:47:57.181Z",
+    "updatedAt": "2026-07-21T15:47:57.912Z"
+  },
+  {
+    "id": "ITEMPL-008",
+    "tenantId": "forge-demo",
+    "name": "Special-event inspection form",
+    "inspectionType": "",
+    "lifecycleStatus": "draft",
+    "version": 1,
+    "sections": [
+      {
+        "id": "sec-general",
+        "fields": [
+          {
+            "options": [],
+            "readOnly": false,
+            "sortOrder": 0,
+            "autoCreateViolation": false,
+            "label": "Occupancy notes",
+            "required": false,
+            "severity": "",
+            "id": "fld-occupancy-notes",
+            "helpText": "Site conditions and access notes.",
+            "type": "long_text",
+            "placeholder": "",
+            "key": "occupancy_notes"
+          },
+          {
+            "type": "pass_fail",
+            "severity": "",
+            "id": "fld-overall-result",
+            "helpText": "",
+            "key": "overall_result",
+            "placeholder": "",
+            "options": [],
+            "readOnly": false,
+            "sortOrder": 1,
+            "autoCreateViolation": false,
+            "label": "Overall result",
+            "required": true
+          }
+        ],
+        "sortOrder": 0,
+        "title": "General"
+      },
+      {
+        "title": "Life safety",
+        "sortOrder": 1,
+        "id": "sec-life-safety",
+        "fields": [
+          {
+            "type": "pass_fail_na",
+            "severity": "high",
+            "id": "fld-exits",
+            "helpText": "",
+            "placeholder": "",
+            "key": "exits_clear",
+            "readOnly": false,
+            "options": [],
+            "autoCreateViolation": true,
+            "sortOrder": 0,
+            "label": "Exits clear and unobstructed",
+            "required": true
+          },
+          {
+            "type": "pass_fail_na",
+            "helpText": "",
+            "id": "fld-extinguishers",
+            "severity": "moderate",
+            "placeholder": "",
+            "key": "extinguishers",
+            "options": [],
+            "readOnly": false,
+            "required": true,
+            "label": "Fire extinguishers present and current",
+            "autoCreateViolation": true,
+            "sortOrder": 1
+          },
+          {
+            "severity": "",
+            "helpText": "Attach photos of deficiencies.",
+            "id": "fld-photos",
+            "type": "photo",
+            "placeholder": "",
+            "key": "evidence_photos",
+            "readOnly": false,
+            "options": [],
+            "sortOrder": 2,
+            "autoCreateViolation": false,
+            "required": false,
+            "label": "Evidence photos"
+          }
+        ]
+      }
+    ],
+    "publishedAt": "",
+    "createdAt": "2026-07-21T15:47:57.181Z",
+    "updatedAt": "2026-07-21T15:47:58.510Z"
+  }
+]

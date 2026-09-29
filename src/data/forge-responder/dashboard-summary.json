@@ -1,0 +1,26 @@
+{
+  "tenantId": "forge-demo",
+  "cards": {
+    "hydrants": 345,
+    "flowTests": 207,
+    "occupancies": 5,
+    "preplans": 1,
+    "apparatus": 14,
+    "inspectionTemplates": 8,
+    "roles": 8,
+    "activityEvents": 211,
+    "auditEvents": 333
+  },
+  "hydrantStatus": {
+    "In Service": 262,
+    "Needs Repair": 3,
+    "Out of Service": 8,
+    "Unknown": 72
+  },
+  "fleetStatus": {
+    "in_service": 10,
+    "reserve": 4
+  },
+  "sourceCollections": 45,
+  "sourceDocuments": 1310
+}

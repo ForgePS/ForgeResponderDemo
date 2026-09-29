@@ -1,0 +1,2142 @@
+{
+  "fleetAssets": [
+    {
+      "id": "FLEETASSETS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Pumper",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-01",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Rescue 1",
+        "migrationBatchId": "",
+        "station": "Station 1",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-01",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:17.706Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [
+          {
+            "status": "Complete",
+            "label": "Daily cab check"
+          },
+          {
+            "status": "Complete",
+            "label": "Medical inventory"
+          },
+          {
+            "status": "Complete",
+            "label": "Pump test"
+          },
+          {
+            "status": "Complete",
+            "label": "SCBA inventory"
+          }
+        ],
+        "engineHours": "",
+        "fleetNumber": "Rescue 1",
+        "name": "Rescue 1",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "2018",
+        "fuel": "68%",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Pumper",
+        "operator": "M. Reed",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-02",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Engine 2",
+        "migrationBatchId": "",
+        "station": "Station 2",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-02",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "44,091",
+        "updatedAt": "2026-07-21T18:35:17.785Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "Jun 7, 2026",
+        "pumpHours": "591",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [
+          {
+            "status": "Complete",
+            "label": "Daily cab check"
+          },
+          {
+            "status": "Complete",
+            "label": "Medical inventory"
+          },
+          {
+            "status": "Failed",
+            "label": "Pump test"
+          },
+          {
+            "status": "Complete",
+            "label": "SCBA inventory"
+          }
+        ],
+        "engineHours": "6,104",
+        "fleetNumber": "Engine 2",
+        "name": "Engine 2",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Pumper",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-03",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Engine 3",
+        "migrationBatchId": "",
+        "station": "Station 3",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-03",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:17.896Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [
+          {
+            "status": "Complete",
+            "label": "Daily cab check"
+          },
+          {
+            "status": "Complete",
+            "label": "Aerial controls"
+          },
+          {
+            "status": "Complete",
+            "label": "Ground ladders"
+          },
+          {
+            "status": "Due",
+            "label": "Hydraulic inspection"
+          }
+        ],
+        "engineHours": "",
+        "fleetNumber": "Engine 3",
+        "name": "Engine 3",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0004",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Ambulance",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-04",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Unit 1",
+        "migrationBatchId": "",
+        "station": "Station 1",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-04",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:17.992Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [
+          {
+            "status": "Complete",
+            "label": "Daily cab check"
+          },
+          {
+            "status": "Complete",
+            "label": "Extrication tools"
+          },
+          {
+            "status": "Complete",
+            "label": "Medical inventory"
+          },
+          {
+            "status": "Complete",
+            "label": "Generator"
+          }
+        ],
+        "engineHours": "",
+        "fleetNumber": "Unit 1",
+        "name": "Unit 1",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0005",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Brush",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-05",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "FD-2",
+        "migrationBatchId": "",
+        "station": "Station 1",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-05",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.048Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [
+          {
+            "status": "Complete",
+            "label": "Weekly cab check"
+          },
+          {
+            "status": "Complete",
+            "label": "Pump test"
+          },
+          {
+            "status": "Due",
+            "label": "Wildland equipment"
+          },
+          {
+            "status": "Complete",
+            "label": "Radio check"
+          }
+        ],
+        "engineHours": "",
+        "fleetNumber": "FD-2",
+        "name": "FD-2",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0006",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Support Vehicle",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-13",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "FD-3",
+        "migrationBatchId": "",
+        "station": "Station 3",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-13",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.929Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "FD-3",
+        "name": "FD-3",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0007",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Support Vehicle",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-14",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "FD-4",
+        "migrationBatchId": "",
+        "station": "Station 3",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-14",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:19.027Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "FD-4",
+        "name": "FD-4",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0008",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Pumper",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-Engine-4",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Engine 4",
+        "migrationBatchId": "",
+        "station": "Station 1",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-Engine-4",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.798Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "Reserve",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "Engine 4",
+        "name": "Engine 4",
+        "category": "emergency_response",
+        "status": "reserve"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0009",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Aerial",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-Truck-1",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Truck 1",
+        "migrationBatchId": "",
+        "station": "Station 2",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-Truck-1",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.263Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "Reserve",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "Truck 1",
+        "name": "Truck 1",
+        "category": "emergency_response",
+        "status": "reserve"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0010",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": 2024,
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Aerial",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-Truck-3",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Truck 3",
+        "migrationBatchId": "",
+        "station": "Station 3",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-Truck-3",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.359Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "Truck 3",
+        "name": "Truck 3",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0011",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Ambulance",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-Unit-2",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Unit 2",
+        "migrationBatchId": "",
+        "station": "Station 2",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-Unit-2",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.181Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "Unit 2",
+        "name": "Unit 2",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0012",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Ambulance",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-Unit-3",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Unit 3",
+        "migrationBatchId": "",
+        "station": "Station 3",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-Unit-3",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.446Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "In Service",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "Unit 3",
+        "name": "Unit 3",
+        "category": "emergency_response",
+        "status": "in_service"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0013",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Ambulance",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-Unit-4",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Unit 4",
+        "migrationBatchId": "",
+        "station": "Station 3",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-Unit-4",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.619Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "Reserve",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "Unit 4",
+        "name": "Unit 4",
+        "category": "emergency_response",
+        "status": "reserve"
+      }
+    },
+    {
+      "id": "FLEETASSETS-0014",
+      "tenantId": "forge-demo",
+      "data": {
+        "lastCheckId": "",
+        "notes": "",
+        "year": "",
+        "fuel": "",
+        "departmentId": "forge-demo",
+        "radioDesignation": "",
+        "assetTag": "",
+        "type": "Ambulance",
+        "operator": "Unassigned",
+        "lastStatusEventId": "",
+        "legacyApparatusId": "APP-Unit-5",
+        "createdAt": "2026-07-21T18:35:17.705Z",
+        "licensePlate": "",
+        "unitDesignation": "Unit 5",
+        "migrationBatchId": "",
+        "station": "Station 3",
+        "migratedFromList": true,
+        "model": "",
+        "vin": "",
+        "fleetClassId": "",
+        "id": "APP-Unit-5",
+        "migrationUnmapped": null,
+        "make": "",
+        "mileage": "",
+        "updatedAt": "2026-07-21T18:35:18.700Z",
+        "activeRestriction": "",
+        "lastCheckResult": "",
+        "lastCheckAt": "",
+        "pmDue": "",
+        "pumpHours": "",
+        "readinessState": "",
+        "statusLabel": "Reserve",
+        "condition": "",
+        "checks": [],
+        "engineHours": "",
+        "fleetNumber": "Unit 5",
+        "name": "Unit 5",
+        "category": "emergency_response",
+        "status": "reserve"
+      }
+    }
+  ],
+  "fleetAutomations": [
+    {
+      "id": "FLEETAUTOMATIONS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "rateLimitMinutes": 60,
+        "lastRunAt": "",
+        "notes": "",
+        "departmentId": "forge-demo",
+        "description": "Escalate when a critical defect is submitted.",
+        "trigger": "critical_defect",
+        "version": "1.0",
+        "createdAt": "2026-09-27T10:06:56.058Z",
+        "requireApproval": false,
+        "name": "Escalate critical defects",
+        "action": "escalate",
+        "id": "AUTO-CRITICAL-DEFECT",
+        "runCount": 0,
+        "config": {},
+        "lastRunResult": "",
+        "status": "draft",
+        "updatedAt": "2026-09-27T10:06:56.058Z"
+      }
+    },
+    {
+      "id": "FLEETAUTOMATIONS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "rateLimitMinutes": 60,
+        "lastRunAt": "",
+        "notes": "",
+        "departmentId": "forge-demo",
+        "description": "In-app notification when PM schedules are overdue.",
+        "trigger": "pm_overdue",
+        "version": "1.0",
+        "createdAt": "2026-09-27T10:06:56.058Z",
+        "requireApproval": false,
+        "name": "Notify PM overdue",
+        "action": "notify_in_app",
+        "id": "AUTO-PM-OVERDUE",
+        "runCount": 0,
+        "config": {},
+        "lastRunResult": "",
+        "status": "draft",
+        "updatedAt": "2026-09-27T10:06:56.224Z"
+      }
+    },
+    {
+      "id": "FLEETAUTOMATIONS-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "rateLimitMinutes": 60,
+        "lastRunAt": "",
+        "notes": "",
+        "departmentId": "forge-demo",
+        "description": "Create a task when replacement score reaches urgent threshold.",
+        "trigger": "replacement_threshold",
+        "version": "1.0",
+        "createdAt": "2026-09-27T10:06:56.058Z",
+        "requireApproval": false,
+        "name": "Flag urgent replacement scores",
+        "action": "create_task",
+        "id": "AUTO-REPLACEMENT",
+        "runCount": 0,
+        "lastRunResult": "",
+        "config": {
+          "scoreThreshold": 75
+        },
+        "status": "draft",
+        "updatedAt": "2026-09-27T10:06:56.398Z"
+      }
+    }
+  ],
+  "fleetClasses": [
+    {
+      "id": "FLEETCLASSES-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-07-21T18:35:21.224Z",
+        "defaultMeterTypes": [
+          "mileage",
+          "engine_hours",
+          "aerial_hours"
+        ],
+        "departmentId": "forge-demo",
+        "name": "Aerial / Ladder",
+        "active": true,
+        "description": "Aerial ladder, tower, or quint",
+        "id": "class-aerial",
+        "category": "emergency_response",
+        "updatedAt": "2026-07-21T18:35:21.310Z"
+      }
+    },
+    {
+      "id": "FLEETCLASSES-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-07-21T18:35:21.224Z",
+        "defaultMeterTypes": [
+          "mileage",
+          "engine_hours"
+        ],
+        "departmentId": "forge-demo",
+        "name": "Ambulance / Medic",
+        "active": true,
+        "description": "EMS transport or medic unit",
+        "id": "class-ambulance",
+        "category": "ems",
+        "updatedAt": "2026-07-21T18:35:21.391Z"
+      }
+    },
+    {
+      "id": "FLEETCLASSES-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-07-21T18:35:21.224Z",
+        "defaultMeterTypes": [
+          "mileage",
+          "engine_hours"
+        ],
+        "departmentId": "forge-demo",
+        "name": "Brush / Wildland",
+        "active": true,
+        "description": "Wildland engine, brush truck, or mini-pumper",
+        "id": "class-brush",
+        "category": "emergency_response",
+        "updatedAt": "2026-07-21T18:35:21.465Z"
+      }
+    },
+    {
+      "id": "FLEETCLASSES-0004",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-07-21T18:35:21.224Z",
+        "defaultMeterTypes": [
+          "mileage",
+          "engine_hours",
+          "pump_hours"
+        ],
+        "departmentId": "forge-demo",
+        "name": "Engine / Pumper",
+        "active": true,
+        "description": "Structural fire engine / pumper apparatus",
+        "id": "class-engine",
+        "category": "emergency_response",
+        "updatedAt": "2026-07-21T18:35:21.224Z"
+      }
+    },
+    {
+      "id": "FLEETCLASSES-0005",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-07-21T18:35:21.224Z",
+        "defaultMeterTypes": [
+          "mileage"
+        ],
+        "departmentId": "forge-demo",
+        "name": "Staff / Support",
+        "active": true,
+        "description": "Staff car, SUV, pickup, or utility vehicle",
+        "id": "class-staff",
+        "category": "support",
+        "updatedAt": "2026-07-21T18:35:21.550Z"
+      }
+    }
+  ],
+  "fleetDefectCategories": [
+    {
+      "id": "FLEETDEFECTCATEGORIES-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:17.542Z",
+        "system": "Body",
+        "departmentId": "forge-demo",
+        "name": "Body / cab",
+        "active": true,
+        "id": "cat-body",
+        "updatedAt": "2026-09-27T10:05:18.428Z"
+      }
+    },
+    {
+      "id": "FLEETDEFECTCATEGORIES-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:17.542Z",
+        "system": "Chassis",
+        "departmentId": "forge-demo",
+        "name": "Brakes",
+        "active": true,
+        "id": "cat-brakes",
+        "updatedAt": "2026-09-27T10:05:17.542Z"
+      }
+    },
+    {
+      "id": "FLEETDEFECTCATEGORIES-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:17.542Z",
+        "system": "EMS",
+        "departmentId": "forge-demo",
+        "name": "EMS equipment",
+        "active": true,
+        "id": "cat-ems",
+        "updatedAt": "2026-09-27T10:05:18.618Z"
+      }
+    },
+    {
+      "id": "FLEETDEFECTCATEGORIES-0004",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:17.542Z",
+        "system": "Electrical",
+        "departmentId": "forge-demo",
+        "name": "Lights / warning",
+        "active": true,
+        "id": "cat-lights",
+        "updatedAt": "2026-09-27T10:05:18.028Z"
+      }
+    },
+    {
+      "id": "FLEETDEFECTCATEGORIES-0005",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:17.542Z",
+        "system": "General",
+        "departmentId": "forge-demo",
+        "name": "Other",
+        "active": true,
+        "id": "cat-other",
+        "updatedAt": "2026-09-27T10:05:18.720Z"
+      }
+    },
+    {
+      "id": "FLEETDEFECTCATEGORIES-0006",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:17.542Z",
+        "system": "Fire systems",
+        "departmentId": "forge-demo",
+        "name": "Pump / waterway",
+        "active": true,
+        "id": "cat-pump",
+        "updatedAt": "2026-09-27T10:05:18.293Z"
+      }
+    }
+  ],
+  "fleetFuelExceptionRules": [
+    {
+      "id": "FLEETFUELEXCEPTIONRULES-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "severity": "medium",
+        "createdAt": "2026-07-21T18:35:27.293Z",
+        "departmentId": "forge-demo",
+        "ruleType": "duplicate",
+        "name": "Duplicate transaction",
+        "description": "Flag near-duplicate transactions for the same asset within N minutes.",
+        "threshold": 15,
+        "id": "rule-duplicate",
+        "enabled": true,
+        "updatedAt": "2026-07-21T18:35:28.096Z"
+      }
+    },
+    {
+      "id": "FLEETFUELEXCEPTIONRULES-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "severity": "medium",
+        "createdAt": "2026-07-21T18:35:27.293Z",
+        "departmentId": "forge-demo",
+        "ruleType": "excess_quantity",
+        "name": "Excess quantity",
+        "description": "Flag transactions above the quantity threshold (gallons / kWh).",
+        "threshold": 100,
+        "id": "rule-excess-qty",
+        "enabled": true,
+        "updatedAt": "2026-07-21T18:35:27.523Z"
+      }
+    },
+    {
+      "id": "FLEETFUELEXCEPTIONRULES-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "severity": "high",
+        "createdAt": "2026-07-21T18:35:27.293Z",
+        "departmentId": "forge-demo",
+        "ruleType": "meter_rollback",
+        "name": "Meter rollback",
+        "description": "Flag when reported meter is lower than the previous reading.",
+        "threshold": 0,
+        "id": "rule-meter-rollback",
+        "enabled": true,
+        "updatedAt": "2026-07-21T18:35:27.293Z"
+      }
+    },
+    {
+      "id": "FLEETFUELEXCEPTIONRULES-0004",
+      "tenantId": "forge-demo",
+      "data": {
+        "severity": "low",
+        "createdAt": "2026-07-21T18:35:27.293Z",
+        "departmentId": "forge-demo",
+        "ruleType": "missing_receipt",
+        "name": "Missing receipt",
+        "description": "Flag card / vendor transactions without a receipt reference.",
+        "threshold": 0,
+        "id": "rule-missing-receipt",
+        "enabled": true,
+        "updatedAt": "2026-07-21T18:35:28.152Z"
+      }
+    },
+    {
+      "id": "FLEETFUELEXCEPTIONRULES-0005",
+      "tenantId": "forge-demo",
+      "data": {
+        "severity": "high",
+        "createdAt": "2026-07-21T18:35:27.293Z",
+        "departmentId": "forge-demo",
+        "ruleType": "above_capacity",
+        "name": "Above tank capacity",
+        "description": "Flag when quantity exceeds the fuel site remaining capacity.",
+        "threshold": 0,
+        "id": "rule-over-capacity",
+        "enabled": true,
+        "updatedAt": "2026-07-21T18:35:27.674Z"
+      }
+    },
+    {
+      "id": "FLEETFUELEXCEPTIONRULES-0006",
+      "tenantId": "forge-demo",
+      "data": {
+        "severity": "medium",
+        "createdAt": "2026-07-21T18:35:27.293Z",
+        "departmentId": "forge-demo",
+        "ruleType": "fuel_type_mismatch",
+        "name": "Fuel type mismatch",
+        "description": "Flag when transaction product does not match the selected site product.",
+        "threshold": 0,
+        "id": "rule-type-mismatch",
+        "enabled": true,
+        "updatedAt": "2026-07-21T18:35:27.841Z"
+      }
+    }
+  ],
+  "fleetFuelSites": [
+    {
+      "id": "FLEETFUELSITES-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "connectorType": "J1772",
+        "product": "electric",
+        "notes": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "vendorName": "",
+        "capacity": 0,
+        "createdAt": "2026-07-21T18:35:27.292Z",
+        "currentInventory": 0,
+        "name": "EV charger bay 1",
+        "location": "Headquarters",
+        "id": "site-ev-bay1",
+        "siteType": "ev_charger",
+        "updatedAt": "2026-07-21T18:35:27.624Z"
+      }
+    },
+    {
+      "id": "FLEETFUELSITES-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "connectorType": "",
+        "product": "diesel",
+        "notes": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "vendorName": "",
+        "capacity": 5000,
+        "createdAt": "2026-07-21T18:35:27.292Z",
+        "currentInventory": 3200,
+        "name": "HQ diesel tank",
+        "location": "Headquarters",
+        "id": "site-hq-diesel",
+        "siteType": "station_tank",
+        "updatedAt": "2026-07-21T18:35:27.292Z"
+      }
+    },
+    {
+      "id": "FLEETFUELSITES-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "connectorType": "",
+        "product": "gasoline",
+        "notes": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "vendorName": "",
+        "capacity": 2000,
+        "createdAt": "2026-07-21T18:35:27.292Z",
+        "currentInventory": 1100,
+        "name": "HQ gasoline tank",
+        "location": "Headquarters",
+        "id": "site-hq-gas",
+        "siteType": "station_tank",
+        "updatedAt": "2026-07-21T18:35:27.380Z"
+      }
+    }
+  ],
+  "fleetIntegrationAdapters": [
+    {
+      "id": "FLEETINTEGRATIONADAPTERS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "schemaVersion": "1.0",
+        "configNotes": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "adapterType": "cad",
+        "lastTestResult": "",
+        "accountMappings": "",
+        "createdAt": "2026-09-27T10:06:56.061Z",
+        "endpoint": "",
+        "name": "CAD unit sync",
+        "overwriteCadStatus": false,
+        "id": "INT-CAD",
+        "lastTestAt": "",
+        "status": "draft",
+        "updatedAt": "2026-09-27T10:06:56.333Z"
+      }
+    },
+    {
+      "id": "FLEETINTEGRATIONADAPTERS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "schemaVersion": "1.0",
+        "configNotes": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "adapterType": "accounting",
+        "lastTestResult": "",
+        "accountMappings": "fuel=6100;pm=6200;corrective=6210",
+        "createdAt": "2026-09-27T10:06:56.061Z",
+        "endpoint": "",
+        "name": "Accounting GL map",
+        "overwriteCadStatus": false,
+        "id": "INT-GL",
+        "lastTestAt": "",
+        "status": "draft",
+        "updatedAt": "2026-09-27T10:06:56.457Z"
+      }
+    },
+    {
+      "id": "FLEETINTEGRATIONADAPTERS-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "schemaVersion": "1.0",
+        "configNotes": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "adapterType": "neris",
+        "lastTestResult": "",
+        "accountMappings": "",
+        "createdAt": "2026-09-27T10:06:56.061Z",
+        "endpoint": "",
+        "name": "NERIS resource mapping",
+        "overwriteCadStatus": false,
+        "id": "INT-NERIS",
+        "lastTestAt": "",
+        "status": "draft",
+        "updatedAt": "2026-09-27T10:06:56.061Z"
+      }
+    }
+  ],
+  "fleetPmPrograms": [
+    {
+      "id": "FLEETPMPROGRAMS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "defaultVendorId": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "description": "Annual preventive service package",
+        "dueSoonValue": 30,
+        "applicableClassIds": [],
+        "priority": "high",
+        "version": 1,
+        "intervalValue": 12,
+        "defaultShopId": "",
+        "name": "Annual apparatus service",
+        "estimatedHours": 8,
+        "graceValue": 14,
+        "id": "pm-annual-service",
+        "triggerType": "calendar_months",
+        "autoCreateWorkOrder": true,
+        "tasks": [
+          {
+            "description": "Full annual inspection and service",
+            "id": "task-1"
+          },
+          {
+            "id": "task-2",
+            "description": "Lubricate chassis points"
+          }
+        ],
+        "createdAt": "2026-07-21T18:35:33.737Z",
+        "updatedAt": "2026-07-21T18:35:33.856Z"
+      }
+    },
+    {
+      "id": "FLEETPMPROGRAMS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "defaultVendorId": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "description": "Engine oil and filter change",
+        "dueSoonValue": 500,
+        "applicableClassIds": [],
+        "priority": "medium",
+        "version": 1,
+        "intervalValue": 5000,
+        "defaultShopId": "",
+        "name": "Oil & filter service",
+        "estimatedHours": 2,
+        "graceValue": 250,
+        "id": "pm-oil-filter",
+        "triggerType": "mileage",
+        "autoCreateWorkOrder": true,
+        "tasks": [
+          {
+            "description": "Drain oil and replace filter",
+            "id": "task-1"
+          },
+          {
+            "description": "Refill to spec and check for leaks",
+            "id": "task-2"
+          }
+        ],
+        "createdAt": "2026-07-21T18:35:33.737Z",
+        "updatedAt": "2026-07-21T18:35:33.737Z"
+      }
+    },
+    {
+      "id": "FLEETPMPROGRAMS-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "defaultVendorId": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "description": "Pump system service by engine pump hours",
+        "dueSoonValue": 25,
+        "applicableClassIds": [],
+        "priority": "high",
+        "version": 1,
+        "intervalValue": 200,
+        "defaultShopId": "",
+        "name": "Pump hours service",
+        "estimatedHours": 4,
+        "graceValue": 10,
+        "id": "pm-pump-service",
+        "triggerType": "pump_hours",
+        "autoCreateWorkOrder": true,
+        "tasks": [
+          {
+            "description": "Pump packing, valves, and lubrication check",
+            "id": "task-1"
+          }
+        ],
+        "createdAt": "2026-07-21T18:35:33.737Z",
+        "updatedAt": "2026-07-21T18:35:34.049Z"
+      }
+    }
+  ],
+  "fleetRecalls": [
+    {
+      "id": "FLEETRECALLS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "departmentId": "forge-demo",
+        "publishDate": "",
+        "description": "Inspect brake wear indicators at next service.",
+        "warrantyRecovery": 0,
+        "source": "tenant",
+        "manufacturer": "Department Fleet",
+        "createdAt": "2026-09-27T10:06:11.305Z",
+        "partsAvailable": true,
+        "affectedAssetIds": [],
+        "model": "",
+        "id": "recall-demo-brake",
+        "make": "",
+        "actualCost": 0,
+        "updatedAt": "2026-09-27T10:06:11.306Z",
+        "completedAssetIds": [],
+        "completedAt": "",
+        "campaignType": "service_bulletin",
+        "active": true,
+        "remedy": "Inspect and replace pads if below threshold.",
+        "estimatedCost": 0,
+        "vendorName": "",
+        "yearTo": "",
+        "component": "Brakes",
+        "yearFrom": "",
+        "oosRequired": false,
+        "safetyRisk": "moderate",
+        "campaignNumber": "DEMO-2026-001",
+        "vinRange": "",
+        "effectiveDate": "",
+        "scheduledAt": "",
+        "status": "open"
+      }
+    }
+  ],
+  "fleetReplacementModels": [
+    {
+      "id": "FLEETREPLACEMENTMODELS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:06:41.385Z",
+        "notes": "",
+        "departmentId": "forge-demo",
+        "name": "Default replacement model",
+        "id": "MODEL-DEFAULT",
+        "inflationRate": 0.03,
+        "published": true,
+        "version": "1.0",
+        "defaultLeadTimeYears": 1.5,
+        "factors": [
+          {
+            "id": "age",
+            "label": "Age",
+            "weight": 15,
+            "maxPoints": 100
+          },
+          {
+            "id": "mileage",
+            "label": "Mileage",
+            "weight": 15,
+            "maxPoints": 100
+          },
+          {
+            "id": "engine_hours",
+            "label": "Engine hours",
+            "weight": 10,
+            "maxPoints": 100
+          },
+          {
+            "id": "condition",
+            "label": "Condition",
+            "weight": 10,
+            "maxPoints": 100
+          },
+          {
+            "id": "reliability",
+            "label": "Reliability / downtime",
+            "weight": 15,
+            "maxPoints": 100
+          },
+          {
+            "id": "maintenance_cost",
+            "label": "Maintenance cost",
+            "weight": 15,
+            "maxPoints": 100
+          },
+          {
+            "id": "safety_risk",
+            "label": "Safety risk",
+            "weight": 10,
+            "maxPoints": 100
+          },
+          {
+            "id": "obsolescence",
+            "label": "Technology / support",
+            "weight": 5,
+            "maxPoints": 100
+          },
+          {
+            "id": "mission_fit",
+            "label": "Mission suitability",
+            "weight": 5,
+            "maxPoints": 100
+          }
+        ],
+        "updatedAt": "2026-09-27T10:06:41.385Z"
+      }
+    }
+  ],
+  "fleetShops": [
+    {
+      "id": "FLEETSHOPS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:24.834Z",
+        "notes": "",
+        "departmentId": "forge-demo",
+        "name": "Internal fleet shop",
+        "active": true,
+        "location": "Headquarters",
+        "bayCount": 0,
+        "id": "shop-internal",
+        "shopType": "internal",
+        "updatedAt": "2026-09-27T10:05:24.834Z"
+      }
+    }
+  ],
+  "fleetTelematicsAdapters": [
+    {
+      "id": "FLEETTELEMATICSADAPTERS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "apiBaseUrl": "",
+        "notes": "Placeholder adapter for a future vendor API connection.",
+        "lastSyncAt": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "syncFuelLevel": true,
+        "syncMeters": true,
+        "createdAt": "2026-07-21T18:35:27.293Z",
+        "pollMinutes": 15,
+        "provider": "generic_api",
+        "name": "Generic API adapter",
+        "id": "adapter-generic-api",
+        "status": "configured",
+        "updatedAt": "2026-07-21T18:35:27.586Z"
+      }
+    },
+    {
+      "id": "FLEETTELEMATICSADAPTERS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "apiBaseUrl": "",
+        "notes": "Operator-entered or file-imported telematics events.",
+        "lastSyncAt": "",
+        "departmentId": "forge-demo",
+        "active": true,
+        "syncFuelLevel": true,
+        "syncMeters": true,
+        "createdAt": "2026-07-21T18:35:27.293Z",
+        "pollMinutes": 0,
+        "provider": "manual",
+        "name": "Manual / CSV ingest",
+        "id": "adapter-manual",
+        "status": "active",
+        "updatedAt": "2026-07-21T18:35:27.294Z"
+      }
+    }
+  ],
+  "fleetTestPrograms": [
+    {
+      "id": "FLEETTESTPROGRAMS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "certificateRequired": true,
+        "programType": "aerial_device",
+        "standardReference": "NFPA 1911",
+        "departmentId": "forge-demo",
+        "createDefectOnFail": true,
+        "active": true,
+        "edition": "",
+        "createdAt": "2026-09-27T10:05:42.742Z",
+        "dueSoonDays": 45,
+        "name": "Aerial device test",
+        "blockReturnToServiceOnFail": true,
+        "id": "test-aerial",
+        "intervalMonths": 12,
+        "updatedAt": "2026-09-27T10:05:43.164Z"
+      }
+    },
+    {
+      "id": "FLEETTESTPROGRAMS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "certificateRequired": false,
+        "programType": "generator",
+        "standardReference": "Department SOP",
+        "departmentId": "forge-demo",
+        "createDefectOnFail": false,
+        "active": true,
+        "edition": "",
+        "createdAt": "2026-09-27T10:05:42.742Z",
+        "dueSoonDays": 30,
+        "name": "Generator load test",
+        "blockReturnToServiceOnFail": false,
+        "id": "test-generator",
+        "intervalMonths": 12,
+        "updatedAt": "2026-09-27T10:05:43.303Z"
+      }
+    },
+    {
+      "id": "FLEETTESTPROGRAMS-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "certificateRequired": true,
+        "programType": "hose",
+        "standardReference": "NFPA 1962",
+        "departmentId": "forge-demo",
+        "createDefectOnFail": true,
+        "active": true,
+        "edition": "",
+        "createdAt": "2026-09-27T10:05:42.742Z",
+        "dueSoonDays": 30,
+        "name": "Hose annual test",
+        "blockReturnToServiceOnFail": false,
+        "id": "test-hose",
+        "intervalMonths": 12,
+        "updatedAt": "2026-09-27T10:05:42.742Z"
+      }
+    },
+    {
+      "id": "FLEETTESTPROGRAMS-0004",
+      "tenantId": "forge-demo",
+      "data": {
+        "certificateRequired": true,
+        "programType": "ground_ladder",
+        "standardReference": "NFPA 1932",
+        "departmentId": "forge-demo",
+        "createDefectOnFail": true,
+        "active": true,
+        "edition": "",
+        "createdAt": "2026-09-27T10:05:42.742Z",
+        "dueSoonDays": 30,
+        "name": "Ground ladder test",
+        "blockReturnToServiceOnFail": false,
+        "id": "test-ladder",
+        "intervalMonths": 12,
+        "updatedAt": "2026-09-27T10:05:43.026Z"
+      }
+    },
+    {
+      "id": "FLEETTESTPROGRAMS-0005",
+      "tenantId": "forge-demo",
+      "data": {
+        "certificateRequired": true,
+        "programType": "pump_performance",
+        "standardReference": "NFPA 1911",
+        "departmentId": "forge-demo",
+        "createDefectOnFail": true,
+        "active": true,
+        "edition": "",
+        "createdAt": "2026-09-27T10:05:42.742Z",
+        "dueSoonDays": 45,
+        "name": "Pump performance test",
+        "blockReturnToServiceOnFail": true,
+        "id": "test-pump",
+        "intervalMonths": 12,
+        "updatedAt": "2026-09-27T10:05:42.877Z"
+      }
+    }
+  ],
+  "fleetTests": [
+    {
+      "id": "FLEETTESTS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "testNumber": "HT-101",
+        "fleetAssetId": "",
+        "departmentId": "forge-demo",
+        "dueDate": "May 14, 2027",
+        "tester": "",
+        "section": "Bed 1 - 1.75\" Attack",
+        "testerQualification": "",
+        "result": "pass",
+        "createdAt": "2026-09-27T10:05:42.927Z",
+        "nextDue": "May 14, 2027",
+        "programName": "Hose annual test",
+        "certificateExpiresAt": "",
+        "migratedFromList": true,
+        "id": "HT-101",
+        "legacyHoseTestId": "HT-101",
+        "measurements": "",
+        "updatedAt": "2026-09-27T10:05:42.927Z",
+        "programType": "hose",
+        "certificateIssuer": "",
+        "standardReference": "NFPA 1962",
+        "vendorName": "",
+        "exceptions": "",
+        "certificateNumber": "",
+        "fleetNumber": "Engine 1",
+        "defectId": "",
+        "programId": "test-hose",
+        "testDate": "May 14, 2026",
+        "status": "current"
+      }
+    },
+    {
+      "id": "FLEETTESTS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "testNumber": "HT-102",
+        "fleetAssetId": "APP-02",
+        "departmentId": "forge-demo",
+        "dueDate": "Apr 2, 2027",
+        "tester": "",
+        "section": "Bed 2 - 2.5\" Supply",
+        "testerQualification": "",
+        "result": "pass",
+        "createdAt": "2026-09-27T10:05:42.927Z",
+        "nextDue": "Apr 2, 2027",
+        "programName": "Hose annual test",
+        "certificateExpiresAt": "",
+        "migratedFromList": true,
+        "id": "HT-102",
+        "legacyHoseTestId": "HT-102",
+        "measurements": "",
+        "updatedAt": "2026-09-27T10:05:43.076Z",
+        "programType": "hose",
+        "certificateIssuer": "",
+        "standardReference": "NFPA 1962",
+        "vendorName": "",
+        "exceptions": "",
+        "certificateNumber": "",
+        "fleetNumber": "Engine 2",
+        "defectId": "",
+        "programId": "test-hose",
+        "testDate": "Apr 2, 2026",
+        "status": "current"
+      }
+    },
+    {
+      "id": "FLEETTESTS-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "testNumber": "HT-103",
+        "fleetAssetId": "APP-Truck-3",
+        "departmentId": "forge-demo",
+        "dueDate": "Jun 18, 2026",
+        "tester": "",
+        "section": "Crosslay - 1.75\"",
+        "testerQualification": "",
+        "result": "pass",
+        "createdAt": "2026-09-27T10:05:42.927Z",
+        "nextDue": "Jun 18, 2026",
+        "programName": "Hose annual test",
+        "certificateExpiresAt": "",
+        "migratedFromList": true,
+        "id": "HT-103",
+        "legacyHoseTestId": "HT-103",
+        "measurements": "",
+        "updatedAt": "2026-09-27T10:05:43.216Z",
+        "programType": "hose",
+        "certificateIssuer": "",
+        "standardReference": "NFPA 1962",
+        "vendorName": "",
+        "exceptions": "",
+        "certificateNumber": "",
+        "fleetNumber": "Truck 3",
+        "defectId": "",
+        "programId": "test-hose",
+        "testDate": "Mar 18, 2026",
+        "status": "due_soon"
+      }
+    },
+    {
+      "id": "FLEETTESTS-0004",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "testNumber": "HT-104",
+        "fleetAssetId": "APP-01",
+        "departmentId": "forge-demo",
+        "dueDate": "May 10, 2026",
+        "tester": "",
+        "section": "Supply - 3\"",
+        "testerQualification": "",
+        "result": "fail",
+        "createdAt": "2026-09-27T10:05:42.927Z",
+        "nextDue": "May 10, 2026",
+        "programName": "Hose annual test",
+        "certificateExpiresAt": "",
+        "migratedFromList": true,
+        "id": "HT-104",
+        "legacyHoseTestId": "HT-104",
+        "measurements": "",
+        "updatedAt": "2026-09-27T10:05:43.362Z",
+        "programType": "hose",
+        "certificateIssuer": "",
+        "standardReference": "NFPA 1962",
+        "vendorName": "",
+        "exceptions": "",
+        "certificateNumber": "",
+        "fleetNumber": "Rescue 1",
+        "defectId": "",
+        "programId": "test-hose",
+        "testDate": "Feb 10, 2026",
+        "status": "overdue"
+      }
+    },
+    {
+      "id": "FLEETTESTS-0005",
+      "tenantId": "forge-demo",
+      "data": {
+        "notes": "",
+        "testNumber": "HT-105",
+        "fleetAssetId": "APP-05",
+        "departmentId": "forge-demo",
+        "dueDate": "Jan 22, 2027",
+        "tester": "",
+        "section": "Wildland - 1\"",
+        "testerQualification": "",
+        "result": "pass",
+        "createdAt": "2026-09-27T10:05:42.927Z",
+        "nextDue": "Jan 22, 2027",
+        "programName": "Hose annual test",
+        "certificateExpiresAt": "",
+        "migratedFromList": true,
+        "id": "HT-105",
+        "legacyHoseTestId": "HT-105",
+        "measurements": "",
+        "updatedAt": "2026-09-27T10:05:43.502Z",
+        "programType": "hose",
+        "certificateIssuer": "",
+        "standardReference": "NFPA 1962",
+        "vendorName": "",
+        "exceptions": "",
+        "certificateNumber": "",
+        "fleetNumber": "FD-2",
+        "defectId": "",
+        "programId": "test-hose",
+        "testDate": "Jan 22, 2026",
+        "status": "current"
+      }
+    }
+  ],
+  "fleetTowProviders": [
+    {
+      "id": "FLEETTOWPROVIDERS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-07-23T20:48:06.823Z",
+        "notes": "",
+        "phone": "",
+        "departmentId": "forge-demo",
+        "name": "Local Light Duty Tow",
+        "active": true,
+        "id": "tow-local",
+        "services": "light duty, jump start, tire",
+        "afterHoursPhone": "",
+        "updatedAt": "2026-07-23T20:48:07.073Z"
+      }
+    },
+    {
+      "id": "FLEETTOWPROVIDERS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-07-23T20:48:06.823Z",
+        "notes": "",
+        "phone": "",
+        "departmentId": "forge-demo",
+        "name": "Mid-South Heavy Recovery",
+        "active": true,
+        "id": "tow-midsouth",
+        "services": "heavy wrecker, roadside",
+        "afterHoursPhone": "",
+        "updatedAt": "2026-07-23T20:48:06.824Z"
+      }
+    }
+  ],
+  "fleetVendors": [
+    {
+      "id": "FLEETVENDORS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:24.836Z",
+        "notes": "",
+        "phone": "",
+        "departmentId": "forge-demo",
+        "name": "Internal Fleet",
+        "active": true,
+        "id": "vendor-internal",
+        "category": "Internal",
+        "email": "",
+        "updatedAt": "2026-09-27T10:05:25.006Z"
+      }
+    },
+    {
+      "id": "FLEETVENDORS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:05:24.836Z",
+        "notes": "",
+        "phone": "",
+        "departmentId": "forge-demo",
+        "name": "Mid-South Apparatus",
+        "active": true,
+        "id": "vendor-midsouth",
+        "category": "Apparatus repair",
+        "email": "",
+        "updatedAt": "2026-09-27T10:05:24.836Z"
+      }
+    }
+  ],
+  "fleetWorkOrders": [
+    {
+      "id": "FLEETWORKORDERS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "returnToServiceApprovedBy": "",
+        "workOrderType": "manual",
+        "fleetAssetId": "",
+        "departmentId": "forge-demo",
+        "approvedBy": "",
+        "startedAt": "",
+        "vendorId": "",
+        "source": "legacy_list",
+        "openedAt": "May 28",
+        "createdAt": "2026-09-27T10:05:25.025Z",
+        "id": "WO-26035",
+        "shopId": "",
+        "closedAt": "",
+        "downtimeHours": 0,
+        "tasks": [],
+        "updatedAt": "2026-09-27T10:05:25.535Z",
+        "completedAt": "",
+        "diagnosis": "",
+        "estimatedCost": 1340,
+        "priority": "medium",
+        "vendorName": "Gateway Tire",
+        "labor": [],
+        "fleetNumber": "Engine 1",
+        "outsideCost": 0,
+        "legacyWorkOrderId": "WO-26035",
+        "parts": [],
+        "workOrderNumber": "WO-26035",
+        "correction": "",
+        "qcBy": "",
+        "roadTestPassed": null,
+        "scheduledAt": "",
+        "status": "completed",
+        "qcNotes": "",
+        "cause": "",
+        "shopName": "",
+        "qcAt": "",
+        "targetCompletionAt": "",
+        "unitDesignation": "Engine 1",
+        "downtimeEndedAt": "",
+        "migratedFromList": true,
+        "qcPassed": null,
+        "actualCost": 0,
+        "safetyImpact": "",
+        "technician": "",
+        "downtimeStartedAt": "",
+        "roadTestNotes": "",
+        "requestedBy": "",
+        "complaint": "Replace rear tire pair",
+        "oosRequired": false,
+        "defectId": "",
+        "category": "Tires"
+      }
+    },
+    {
+      "id": "FLEETWORKORDERS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "returnToServiceApprovedBy": "",
+        "workOrderType": "manual",
+        "fleetAssetId": "APP-01",
+        "departmentId": "forge-demo",
+        "approvedBy": "",
+        "startedAt": "",
+        "vendorId": "",
+        "source": "legacy_list",
+        "openedAt": "Jun 3",
+        "createdAt": "2026-09-27T10:05:25.025Z",
+        "id": "WO-26039",
+        "shopId": "",
+        "closedAt": "",
+        "downtimeHours": 0,
+        "tasks": [],
+        "updatedAt": "2026-09-27T10:05:25.386Z",
+        "completedAt": "",
+        "diagnosis": "",
+        "estimatedCost": 95,
+        "priority": "low",
+        "vendorName": "Internal Fleet",
+        "labor": [],
+        "fleetNumber": "Rescue 1",
+        "outsideCost": 0,
+        "legacyWorkOrderId": "WO-26039",
+        "parts": [],
+        "workOrderNumber": "WO-26039",
+        "correction": "",
+        "qcBy": "",
+        "roadTestPassed": null,
+        "scheduledAt": "",
+        "status": "awaiting_parts",
+        "qcNotes": "",
+        "cause": "",
+        "shopName": "",
+        "qcAt": "",
+        "targetCompletionAt": "",
+        "unitDesignation": "Rescue 1",
+        "downtimeEndedAt": "",
+        "migratedFromList": true,
+        "qcPassed": null,
+        "actualCost": 0,
+        "safetyImpact": "",
+        "technician": "",
+        "downtimeStartedAt": "",
+        "roadTestNotes": "",
+        "requestedBy": "",
+        "complaint": "Compartment light replacement",
+        "oosRequired": false,
+        "defectId": "",
+        "category": "Electrical"
+      }
+    },
+    {
+      "id": "FLEETWORKORDERS-0003",
+      "tenantId": "forge-demo",
+      "data": {
+        "returnToServiceApprovedBy": "",
+        "workOrderType": "manual",
+        "fleetAssetId": "APP-02",
+        "departmentId": "forge-demo",
+        "approvedBy": "",
+        "startedAt": "",
+        "vendorId": "",
+        "source": "legacy_list",
+        "openedAt": "Jun 7",
+        "createdAt": "2026-09-27T10:05:25.025Z",
+        "id": "WO-26041",
+        "shopId": "",
+        "closedAt": "",
+        "downtimeHours": 0,
+        "tasks": [],
+        "updatedAt": "2026-09-27T10:05:25.025Z",
+        "completedAt": "",
+        "diagnosis": "",
+        "estimatedCost": 2450,
+        "priority": "high",
+        "vendorName": "Mid-South Apparatus",
+        "labor": [],
+        "fleetNumber": "Engine 2",
+        "outsideCost": 0,
+        "legacyWorkOrderId": "WO-26041",
+        "parts": [],
+        "workOrderNumber": "WO-26041",
+        "correction": "",
+        "qcBy": "",
+        "roadTestPassed": null,
+        "scheduledAt": "",
+        "status": "in_progress",
+        "qcNotes": "",
+        "cause": "",
+        "shopName": "",
+        "qcAt": "",
+        "targetCompletionAt": "",
+        "unitDesignation": "Engine 2",
+        "downtimeEndedAt": "",
+        "migratedFromList": true,
+        "qcPassed": null,
+        "actualCost": 0,
+        "safetyImpact": "",
+        "technician": "",
+        "downtimeStartedAt": "",
+        "roadTestNotes": "",
+        "requestedBy": "",
+        "complaint": "Pump relief valve failed annual test",
+        "oosRequired": false,
+        "defectId": "",
+        "category": "Pump"
+      }
+    },
+    {
+      "id": "FLEETWORKORDERS-0004",
+      "tenantId": "forge-demo",
+      "data": {
+        "returnToServiceApprovedBy": "",
+        "workOrderType": "manual",
+        "fleetAssetId": "APP-Truck-3",
+        "departmentId": "forge-demo",
+        "approvedBy": "",
+        "startedAt": "",
+        "vendorId": "",
+        "source": "legacy_list",
+        "openedAt": "Jun 6",
+        "createdAt": "2026-09-27T10:05:25.025Z",
+        "id": "WO-26042",
+        "shopId": "",
+        "closedAt": "",
+        "downtimeHours": 0,
+        "tasks": [],
+        "updatedAt": "2026-09-27T10:05:25.267Z",
+        "completedAt": "",
+        "diagnosis": "",
+        "estimatedCost": 780,
+        "priority": "medium",
+        "vendorName": "Internal Fleet",
+        "labor": [],
+        "fleetNumber": "Truck 3",
+        "outsideCost": 0,
+        "legacyWorkOrderId": "WO-26042",
+        "parts": [],
+        "workOrderNumber": "WO-26042",
+        "correction": "",
+        "qcBy": "",
+        "roadTestPassed": null,
+        "scheduledAt": "",
+        "status": "scheduled",
+        "qcNotes": "",
+        "cause": "",
+        "shopName": "",
+        "qcAt": "",
+        "targetCompletionAt": "",
+        "unitDesignation": "Truck 3",
+        "downtimeEndedAt": "",
+        "migratedFromList": true,
+        "qcPassed": null,
+        "actualCost": 0,
+        "safetyImpact": "",
+        "technician": "",
+        "downtimeStartedAt": "",
+        "roadTestNotes": "",
+        "requestedBy": "",
+        "complaint": "Preventive maintenance and aerial inspection",
+        "oosRequired": false,
+        "defectId": "",
+        "category": "PM"
+      }
+    }
+  ],
+  "fleetWorkflows": [
+    {
+      "id": "FLEETWORKFLOWS-0001",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:06:56.060Z",
+        "nodes": [
+          {
+            "id": "n1",
+            "type": "start",
+            "label": "Defect submitted"
+          },
+          {
+            "id": "n2",
+            "type": "assignment",
+            "label": "Assign reviewer"
+          },
+          {
+            "id": "n3",
+            "type": "decision",
+            "label": "Critical?"
+          },
+          {
+            "id": "n4",
+            "type": "approval",
+            "label": "Supervisor approval"
+          },
+          {
+            "id": "n5",
+            "type": "status",
+            "label": "Create work order / close"
+          },
+          {
+            "id": "n6",
+            "type": "end",
+            "label": "Complete"
+          }
+        ],
+        "notes": "",
+        "departmentId": "forge-demo",
+        "name": "Defect review",
+        "id": "WF-DEFECT-REVIEW",
+        "templateId": "defect_review",
+        "effectiveFrom": "",
+        "version": "1.0",
+        "status": "published",
+        "updatedAt": "2026-09-27T10:06:56.060Z"
+      }
+    },
+    {
+      "id": "FLEETWORKFLOWS-0002",
+      "tenantId": "forge-demo",
+      "data": {
+        "createdAt": "2026-09-27T10:06:56.060Z",
+        "nodes": [
+          {
+            "id": "n1",
+            "type": "start",
+            "label": "OOS requested"
+          },
+          {
+            "id": "n2",
+            "type": "approval",
+            "label": "Safety / officer approval"
+          },
+          {
+            "id": "n3",
+            "type": "task",
+            "label": "Request reserve unit"
+          },
+          {
+            "id": "n4",
+            "type": "status",
+            "label": "Apply OOS status"
+          },
+          {
+            "id": "n5",
+            "type": "notification",
+            "label": "Notify station"
+          },
+          {
+            "id": "n6",
+            "type": "end",
+            "label": "Complete"
+          }
+        ],
+        "notes": "",
+        "departmentId": "forge-demo",
+        "name": "Out-of-service decision",
+        "id": "WF-OOS",
+        "templateId": "oos_decision",
+        "effectiveFrom": "",
+        "version": "1.0",
+        "status": "published",
+        "updatedAt": "2026-09-27T10:06:56.273Z"
+      }
+    }
+  ]
+}

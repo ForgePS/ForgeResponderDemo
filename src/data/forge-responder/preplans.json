@@ -1,0 +1,21 @@
+[
+  {
+    "id": "PP-0001",
+    "tenantId": "forge-demo",
+    "title": "Demo Preplan 1",
+    "occupancyId": null,
+    "publicationStatus": "unpublished",
+    "reviewStatus": "",
+    "version": 1,
+    "reviewerName": "",
+    "buildingConstruction": "",
+    "occupancyUse": "",
+    "hazards": [],
+    "accessPoints": [],
+    "fireProtectionSystems": [],
+    "utilities": [],
+    "notes": "",
+    "createdAt": "2026-07-23T14:55:25.699Z",
+    "updatedAt": "2026-07-23T14:55:25.797Z"
+  }
+]

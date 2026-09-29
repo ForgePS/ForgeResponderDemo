@@ -1,0 +1,278 @@
+{
+  "occupancySuggestedPreplan": [
+    {
+      "occupancyId": "OCC-0001",
+      "preplanId": "PP-0001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "preplanId": "PP-0001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "preplanId": "PP-0001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "preplanId": "PP-0001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "preplanId": "PP-0001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    }
+  ],
+  "occupancySuggestedInspectionType": [
+    {
+      "occupancyId": "OCC-0001",
+      "inspectionTypeId": "ITYPE-001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0001",
+      "inspectionTypeId": "ITYPE-002",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0001",
+      "inspectionTypeId": "ITYPE-003",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "inspectionTypeId": "ITYPE-001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "inspectionTypeId": "ITYPE-002",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "inspectionTypeId": "ITYPE-003",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "inspectionTypeId": "ITYPE-001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "inspectionTypeId": "ITYPE-002",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "inspectionTypeId": "ITYPE-003",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "inspectionTypeId": "ITYPE-001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "inspectionTypeId": "ITYPE-002",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "inspectionTypeId": "ITYPE-003",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "inspectionTypeId": "ITYPE-001",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "inspectionTypeId": "ITYPE-002",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "inspectionTypeId": "ITYPE-003",
+      "basis": "demo-navigation-only",
+      "sourceLinked": false
+    }
+  ],
+  "occupancySuggestedHydrantSet": [
+    {
+      "occupancyId": "OCC-0001",
+      "hydrantId": "HYD-0001",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0001",
+      "hydrantId": "HYD-0002",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0001",
+      "hydrantId": "HYD-0003",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0001",
+      "hydrantId": "HYD-0004",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0001",
+      "hydrantId": "HYD-0005",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "hydrantId": "HYD-0006",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "hydrantId": "HYD-0007",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "hydrantId": "HYD-0008",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "hydrantId": "HYD-0009",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0002",
+      "hydrantId": "HYD-0010",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "hydrantId": "HYD-0011",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "hydrantId": "HYD-0012",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "hydrantId": "HYD-0013",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "hydrantId": "HYD-0014",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0003",
+      "hydrantId": "HYD-0015",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "hydrantId": "HYD-0016",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "hydrantId": "HYD-0017",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "hydrantId": "HYD-0018",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "hydrantId": "HYD-0019",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0004",
+      "hydrantId": "HYD-0020",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "hydrantId": "HYD-0021",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "hydrantId": "HYD-0022",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "hydrantId": "HYD-0023",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "hydrantId": "HYD-0024",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    },
+    {
+      "occupancyId": "OCC-0005",
+      "hydrantId": "HYD-0025",
+      "basis": "synthetic-demo-cluster",
+      "sourceLinked": false
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+[
+  {
+    "id": "TRADE-0001",
+    "tenantId": "forge-demo",
+    "requester": "Demo Member",
+    "requestedWith": "Demo Member",
+    "shift": "",
+    "date": "",
+    "status": "Denied",
+    "reason": "",
+    "notes": "",
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "TRADE-0002",
+    "tenantId": "forge-demo",
+    "requester": "Demo Member",
+    "requestedWith": "Demo Member",
+    "shift": "",
+    "date": "",
+    "status": "Awaiting Member",
+    "reason": "",
+    "notes": "",
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "TRADE-0003",
+    "tenantId": "forge-demo",
+    "requester": "Demo Member",
+    "requestedWith": "Demo Member",
+    "shift": "",
+    "date": "",
+    "status": "Approved",
+    "reason": "",
+    "notes": "",
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "TRADE-0004",
+    "tenantId": "forge-demo",
+    "requester": "Demo Member",
+    "requestedWith": "Demo Member",
+    "shift": "",
+    "date": "",
+    "status": "Denied",
+    "reason": "",
+    "notes": "",
+    "createdAt": null,
+    "updatedAt": null
+  }
+]

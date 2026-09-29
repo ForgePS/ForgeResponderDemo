@@ -1,0 +1,82 @@
+[
+  {
+    "id": "ITYPE-001",
+    "tenantId": "forge-demo",
+    "name": "Annual fire inspection",
+    "code": "",
+    "description": "Scheduled annual occupancy fire inspection.",
+    "active": true,
+    "frequency": "Annual",
+    "feeScheduleId": null
+  },
+  {
+    "id": "ITYPE-002",
+    "tenantId": "forge-demo",
+    "name": "Commercial cooking inspection",
+    "code": "",
+    "description": "Kitchen hood and commercial cooking system inspection.",
+    "active": true,
+    "frequency": "Periodic",
+    "feeScheduleId": null
+  },
+  {
+    "id": "ITYPE-003",
+    "tenantId": "forge-demo",
+    "name": "Complaint inspection",
+    "code": "",
+    "description": "Inspection triggered by a complaint or referral.",
+    "active": true,
+    "frequency": "As needed",
+    "feeScheduleId": null
+  },
+  {
+    "id": "ITYPE-004",
+    "tenantId": "forge-demo",
+    "name": "Certificate of occupancy inspection",
+    "code": "",
+    "description": "Inspection supporting certificate of occupancy issuance.",
+    "active": true,
+    "frequency": "One-time",
+    "feeScheduleId": null
+  },
+  {
+    "id": "ITYPE-005",
+    "tenantId": "forge-demo",
+    "name": "Fire alarm system inspection",
+    "code": "",
+    "description": "Fire alarm acceptance or periodic inspection.",
+    "active": true,
+    "frequency": "Periodic",
+    "feeScheduleId": null
+  },
+  {
+    "id": "ITYPE-006",
+    "tenantId": "forge-demo",
+    "name": "New business inspection",
+    "code": "",
+    "description": "Initial inspection for a new business occupancy.",
+    "active": true,
+    "frequency": "One-time",
+    "feeScheduleId": null
+  },
+  {
+    "id": "ITYPE-007",
+    "tenantId": "forge-demo",
+    "name": "Reinspection",
+    "code": "",
+    "description": "Follow-up inspection after violations or corrective actions.",
+    "active": true,
+    "frequency": "As needed",
+    "feeScheduleId": null
+  },
+  {
+    "id": "ITYPE-008",
+    "tenantId": "forge-demo",
+    "name": "Special-event inspection",
+    "code": "",
+    "description": "Temporary event, tent, or special assembly inspection.",
+    "active": true,
+    "frequency": "As needed",
+    "feeScheduleId": null
+  }
+]

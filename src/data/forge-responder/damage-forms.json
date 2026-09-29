@@ -1,0 +1,162 @@
+[
+  {
+    "id": "DF-001",
+    "tenantId": "forge-demo",
+    "name": "Unit 3 \u2014 Unit 3",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-002",
+    "tenantId": "forge-demo",
+    "name": "Unit 3 \u2014 Unit 3",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-003",
+    "tenantId": "forge-demo",
+    "name": "Rescue 1 \u2014 Rescue 1",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-004",
+    "tenantId": "forge-demo",
+    "name": "Unit 4 \u2014 Unit 4",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-005",
+    "tenantId": "forge-demo",
+    "name": "Rescue 1 \u2014 Rescue 1",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-006",
+    "tenantId": "forge-demo",
+    "name": "Rescue 1 \u2014 Rescue 1",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-007",
+    "tenantId": "forge-demo",
+    "name": "Truck 3 \u2014 Truck 3",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-008",
+    "tenantId": "forge-demo",
+    "name": "Engine 3 \u2014 Engine 3",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-009",
+    "tenantId": "forge-demo",
+    "name": "Truck 3 \u2014 Truck 3",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-010",
+    "tenantId": "forge-demo",
+    "name": "Engine 3 \u2014 Engine 3",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-011",
+    "tenantId": "forge-demo",
+    "name": "NW1 \u2014 NW1",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-012",
+    "tenantId": "forge-demo",
+    "name": "Other \u2014 Other",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-013",
+    "tenantId": "forge-demo",
+    "name": "Rescue 1 \u2014 Rescue 1",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-014",
+    "tenantId": "forge-demo",
+    "name": "Other \u2014 Other",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-015",
+    "tenantId": "forge-demo",
+    "name": "Other \u2014 Other",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  },
+  {
+    "id": "DF-016",
+    "tenantId": "forge-demo",
+    "name": "Test damage",
+    "category": "",
+    "status": "active",
+    "fields": [],
+    "createdAt": null,
+    "updatedAt": null
+  }
+]

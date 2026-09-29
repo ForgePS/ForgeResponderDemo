@@ -1,0 +1,16 @@
+[
+  {
+    "id": "HOR-0001",
+    "tenantId": "forge-demo",
+    "reportId": "HDR-DEMO-0001",
+    "hydrantId": null,
+    "reason": "missing_coordinates",
+    "status": "open",
+    "candidates": [],
+    "resolutionNotes": "",
+    "createdBy": "demo-user-01",
+    "updatedBy": "demo-user-01",
+    "createdAt": "2026-07-21T16:05:39.708Z",
+    "updatedAt": "2026-07-21T16:05:39.708Z"
+  }
+]

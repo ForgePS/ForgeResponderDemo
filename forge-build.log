@@ -1,0 +1,76 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260928200915
+Username: LASER_COMPUTER\jerem
+RunAs User: LASER_COMPUTER\jerem
+Configuration Name: 
+Machine: LASER_COMPUTER (Microsoft Windows NT 10.0.22631.0)
+Host Application: powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -File C:\Users\jerem\OneDrive\Desktop\New folder (2)\BUILD_FORGE_RESPONDER.ps1
+Process ID: 34088
+PSVersion: 5.1.22621.6133
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.22621.6133
+BuildVersion: 10.0.22621.6133
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+
+==================================================
+ FORGE RESPONDER - PRODUCTION BUILD
+==================================================
+Working folder: C:\Users\jerem\OneDrive\Desktop\New folder (2)
+
+Node version: v24.21.0
+Corepack version: 0.36.0
+
+--------------------------------------------------
+[1/7] Cleaning legacy files from older Forge builds
+--------------------------------------------------
+Legacy booth cleanup complete
+
+--------------------------------------------------
+[2/7] Removing stale Next.js build artifacts
+--------------------------------------------------
+Removed generated build artifact: .next
+Generated build cleanup complete
+
+--------------------------------------------------
+[3/7] Checking pnpm through Corepack (no admin install)
+--------------------------------------------------
+
+
+--------------------------------------------------
+[4/7] Installing exact dependencies
+--------------------------------------------------
+
+
+--------------------------------------------------
+[5/7] Running Forge validation suites
+--------------------------------------------------
+
+
+--------------------------------------------------
+[6/7] Running TypeScript typecheck
+--------------------------------------------------
+
+
+--------------------------------------------------
+[7/7] Building Next.js production bundle
+--------------------------------------------------
+
+
+==================================================
+ BUILD PASSED
+==================================================
+
+Next: run START_FORGE_RESPONDER.bat
+
+Build log saved to:
+C:\Users\jerem\OneDrive\Desktop\New folder (2)\forge-build.log
+
+**********************
+Windows PowerShell transcript end
+End time: 20260928201622
+**********************

@@ -1,0 +1,311 @@
+{
+  "personnelToApparatus": [
+    {
+      "personnelId": "PER-0001",
+      "apparatusId": "APP-011",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0003",
+      "apparatusId": "APP-004",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0004",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0005",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0007",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0008",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0009",
+      "apparatusId": "APP-012",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0010",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0011",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0012",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0013",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0014",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0015",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0016",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0017",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0018",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0020",
+      "apparatusId": "APP-004",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0021",
+      "apparatusId": "APP-004",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0022",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0025",
+      "apparatusId": "APP-011",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0026",
+      "apparatusId": "APP-012",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0027",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0028",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0029",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0030",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0031",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0032",
+      "apparatusId": "APP-004",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0033",
+      "apparatusId": "APP-004",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0034",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0035",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0036",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0037",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0038",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0039",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0040",
+      "apparatusId": "APP-004",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0041",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0042",
+      "apparatusId": "APP-011",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0043",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0044",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0045",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0046",
+      "apparatusId": "APP-012",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0047",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0048",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0049",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0050",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0051",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0052",
+      "apparatusId": "APP-012",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0053",
+      "apparatusId": "APP-003",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0054",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0055",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0056",
+      "apparatusId": "APP-012",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0057",
+      "apparatusId": "APP-011",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0058",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0059",
+      "apparatusId": "APP-011",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0060",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0061",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0062",
+      "apparatusId": "APP-001",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0063",
+      "apparatusId": "APP-004",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0064",
+      "apparatusId": "APP-011",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0065",
+      "apparatusId": "APP-010",
+      "basis": "source assignment/unit text match"
+    },
+    {
+      "personnelId": "PER-0068",
+      "apparatusId": "APP-002",
+      "basis": "source assignment/unit text match"
+    }
+  ],
+  "occupancyToPreplan": [],
+  "occupancyToHydrants": []
+}

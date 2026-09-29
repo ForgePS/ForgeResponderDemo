@@ -1,0 +1,29 @@
+[
+  {
+    "id": "HDR-DEMO-0001",
+    "tenantId": "forge-demo",
+    "hydrantId": null,
+    "reportNumber": "DR-0001",
+    "sourceType": "manual",
+    "severity": "moderate",
+    "status": "ownership_review_required",
+    "operationalStatus": "out_of_service",
+    "repairStatus": "not_reviewed",
+    "verificationStatus": "not_started",
+    "leaking": false,
+    "publicSafetyHazard": false,
+    "roadwayHazard": false,
+    "alternativeWaterSupplyRequired": false,
+    "dispatchNotificationRequired": false,
+    "description": "",
+    "immediateActions": "",
+    "internalNotes": "",
+    "utilityFacingNotes": "",
+    "waterCompanyName": "Northbridge Water Utility",
+    "discoveredBy": "Demo Administrator",
+    "createdBy": "demo-user-01",
+    "updatedBy": "demo-user-01",
+    "createdAt": "2026-07-21T16:05:39.467Z",
+    "updatedAt": "2026-07-21T18:19:22.795Z"
+  }
+]
