@@ -87,3 +87,33 @@ export async function createHydrantRecord(id:string,type:HydrantRecordType,paylo
   hydrants[index]=updated;writeForgeData('hydrants',hydrants)
   return {data:record,source:'demo'}
 }
+
+
+export type HydrantMigrationBundle={
+  schemaVersion:1
+  sourceSystem:'FORGE_RESPONDER'
+  exportedAt:string
+  hydrants:Array<Record<string,unknown>>
+  counts:{hydrants:number;flowTests:number;inspections:number;damageReports:number}
+}
+
+export function buildStandaloneHydrantMigrationBundle():HydrantMigrationBundle{
+  const hydrants=readForgeData<Hydrant[]>('hydrants')
+  const flowTests=readForgeData<Record<string,unknown>[]>('hydrant-flow-tests')
+  const inspections=readForgeData<Record<string,unknown>[]>('hydrant-inspections')
+  const damageReports=readForgeData<Record<string,unknown>[]>('hydrant-damage-reports')
+  const rows=hydrants.map(hydrant=>({
+    ...hydrant,
+    sourceHydrantId:hydrant.id,
+    flowTests:flowTests.filter(row=>row.hydrantId===hydrant.id||row.hydrant_id===hydrant.id),
+    inspections:inspections.filter(row=>row.hydrantId===hydrant.id||row.hydrant_id===hydrant.id),
+    damageReports:damageReports.filter(row=>row.hydrantId===hydrant.id||row.hydrant_id===hydrant.id)
+  }))
+  return {
+    schemaVersion:1,
+    sourceSystem:'FORGE_RESPONDER',
+    exportedAt:new Date().toISOString(),
+    hydrants:rows,
+    counts:{hydrants:hydrants.length,flowTests:flowTests.length,inspections:inspections.length,damageReports:damageReports.length}
+  }
+}
