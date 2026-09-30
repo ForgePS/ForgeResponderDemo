@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "cad-person-map-demo-01",
+    "cadConnectionId": "cad-conn-demo-01",
+    "sourcePersonnelId": "CAD-P-204",
+    "sourceName": "Demo Officer",
+    "forgePersonId": null,
+    "forgePersonnelId": "PER-0005",
+    "mappingType": "PERSONNEL",
+    "externalAgency": false,
+    "notes": "Sanitized demo mapping",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-30T09:45:00.000Z",
+    "updatedAt": "2026-09-30T09:45:00.000Z"
+  }
+]
