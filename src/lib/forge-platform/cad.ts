@@ -541,6 +541,12 @@ export function markDemoCadMessageApplied(rawMessageId:string,incidentId:string)
   const rows=local<CadRawMessageMeta & {appliedIncidentId?:string|null}>('cad-messages')
   const index=rows.findIndex(row=>row.id===rawMessageId)
   if(index<0)return
-  rows[index]={...rows[index],processingStatus:'APPLIED',appliedIncidentId:incidentId}
+  const message=rows[index]
+  rows[index]={...message,processingStatus:'APPLIED',appliedIncidentId:incidentId}
   writeForgeData('cad-messages',rows)
+  const events=readForgeData<Array<Record<string,unknown>>>('activity-events')
+  writeForgeData('activity-events',[
+    {id:randomUUID(),type:'cad',title:'CAD event applied to incident',resourceType:'incident',resourceId:incidentId,occurredAt:new Date().toISOString(),detail:{rawMessageId,sourceIncidentId:message.sourceIncidentId,sourceMessageId:message.sourceMessageId,scenarioId:message.scenarioId||null,callType:message.simulatedCallType||null}},
+    ...events
+  ].slice(0,500))
 }
