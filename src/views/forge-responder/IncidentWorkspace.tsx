@@ -16,6 +16,7 @@ import Typography from '@mui/material/Typography'
 
 import NerisDynamicForm from '@views/forge-responder/NerisDynamicForm'
 import SpecialtyRecordsPanel from '@views/forge-responder/SpecialtyRecordsPanel'
+import AiNarrativeAssistant from '@views/forge-responder/AiNarrativeAssistant'
 
 type Incident={
   id:string
@@ -267,6 +268,7 @@ export default function IncidentWorkspace({
           <TextField multiline minRows={14} label='Incident Narrative' value={narrative} onChange={e=>setNarrative(e.target.value)}/>
           <TextField label='Version Note' value={versionNote} onChange={e=>setVersionNote(e.target.value)} placeholder='Optional revision note'/>
           <Box sx={{display:'flex',justifyContent:'flex-end'}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void saveNarrative()}>Save Narrative</Button></Box>
+          <AiNarrativeAssistant incidentId={incident.id} currentNarrative={narrative} recordVersion={incident.recordVersion} onAccepted={(nextNarrative,nextVersion)=>{setNarrative(nextNarrative);setIncident(current=>({...current,recordVersion:nextVersion}));setMessage('Assistant narrative accepted.')}}/>
         </Box>:null}
 
         {tab===5?<Box sx={{mt:4,display:'grid',gap:3}}>
