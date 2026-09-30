@@ -237,7 +237,7 @@ export async function batchFieldValues(
   const mode=getForgePlatformMode()
   if(mode!=='demo'){
     try{
-      return await forgePlatformSend(`${base(incidentId)}/field-values`,'PATCH',{values},{ifMatch:recordVersionToIfMatch(recordVersion)})
+      return await forgePlatformSend<{incident:Awaited<ReturnType<typeof getIncident>>['data'];upserted:number}>(`${base(incidentId)}/field-values`,'PATCH',{values},{ifMatch:recordVersionToIfMatch(recordVersion)})
     }catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
   }
 
@@ -273,7 +273,7 @@ export async function updateSpecialtySection(
 ):Promise<ForgePlatformResult<{incidentId:string;sectionKey:string;status:string}>>{
   const mode=getForgePlatformMode()
   if(mode!=='demo'){
-    try{return await forgePlatformSend(`${base(incidentId)}/specialty-sections`,'POST',{sectionKey,action})}
+    try{return await forgePlatformSend<{incidentId:string;sectionKey:string;status:string}>(`${base(incidentId)}/specialty-sections`,'POST',{sectionKey,action})}
     catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
   }
   const rows=readForgeData<SpecialtyState[]>('incident-specialty-sections')
