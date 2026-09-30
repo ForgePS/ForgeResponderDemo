@@ -15,7 +15,7 @@ import {
   listCadPersonnelMappings,
   listCadUnitMappings
 } from '@/lib/forge-platform/cad'
-import { getFormDescriptor, batchFieldValues, type NerisFieldValueState } from '@/lib/forge-platform/neris'
+import { getFormDescriptor, batchFieldValues, lookupValueSetOptions, type NerisFieldValueState } from '@/lib/forge-platform/neris'
 import { listRmsMasterData } from '@/lib/forge-platform/rms'
 import {
   ForgePlatformApiError,
@@ -399,11 +399,27 @@ export async function applyIncidentPrefill(
     for(const candidate of dynamic){
       const field=fieldMap.get(candidate.fieldKey)
       if(!field){skipped+=1;continue}
+
+      let fieldState:NerisFieldValueState
+      if(field.valueSetLocation){
+        const options=(await lookupValueSetOptions(field.valueSetLocation,String(candidate.value||''))).data
+        const wanted=String(candidate.value||'').trim().toLowerCase()
+        const match=options.find(option=>
+          option.id.toLowerCase()===wanted ||
+          option.label.trim().toLowerCase()===wanted ||
+          String(option.subtitle||'').trim().toLowerCase()===wanted
+        )
+        if(!match){skipped+=1;continue}
+        fieldState={valueOptionId:match.id}
+      }else{
+        fieldState=stateFor(candidate.value)
+      }
+
       values.push({
         fieldId:field.fieldId,
         fieldKey:field.fieldKey,
         sectionKey:candidate.sectionKey||descriptor.modules.find(module=>module.fields.some(f=>f.fieldId===field.fieldId))?.sectionKey||'OVERVIEW',
-        ...stateFor(candidate.value),
+        ...fieldState,
         prefillSource:candidate.prefillSource,
         userConfirmed:false
       })
