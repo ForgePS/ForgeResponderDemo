@@ -535,3 +535,12 @@ export async function rotateCadConnectionSecret(connectionId:string,reason:strin
   rows[index]=updated;writeForgeData('cad-connections',rows)
   return {data:{rotated:true,connection:updated},source:'demo'}
 }
+
+
+export function markDemoCadMessageApplied(rawMessageId:string,incidentId:string):void{
+  const rows=local<CadRawMessageMeta & {appliedIncidentId?:string|null}>('cad-messages')
+  const index=rows.findIndex(row=>row.id===rawMessageId)
+  if(index<0)return
+  rows[index]={...rows[index],processingStatus:'APPLIED',appliedIncidentId:incidentId}
+  writeForgeData('cad-messages',rows)
+}
