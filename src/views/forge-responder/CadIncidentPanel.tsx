@@ -44,7 +44,18 @@ export default function CadIncidentPanel({incidentId,lang}:{incidentId:string;la
       const connectionsBody=await connectionsResponse.json()
       if(!statusResponse.ok)throw new Error(statusBody.error||'Unable to load CAD status.')
       if(!connectionsResponse.ok)throw new Error(connectionsBody.error||'Unable to load CAD connections.')
-      setStatus(statusBody.data)
+      setStatus({
+        ...statusBody.data,
+        links:statusBody.data?.links||[],
+        openConflicts:statusBody.data?.openConflicts||[],
+        fieldProvenance:statusBody.data?.fieldProvenance||[],
+        operatingHints:{
+          linked:Boolean(statusBody.data?.operatingHints?.linked),
+          conflictCount:Number(statusBody.data?.operatingHints?.conflictCount||0),
+          cadOwnedFieldCount:Number(statusBody.data?.operatingHints?.cadOwnedFieldCount||0),
+          manualOverrideCount:Number(statusBody.data?.operatingHints?.manualOverrideCount||0)
+        }
+      })
       setSource(statusBody.source)
       setConnections(connectionsBody.data||[])
       if(!connectionId&&(connectionsBody.data||[])[0]?.id)setConnectionId((connectionsBody.data||[])[0].id)
