@@ -225,7 +225,7 @@ export default function IncidentWorkspace({
           <Divider/>
           <Box><Typography variant='h5' sx={{mb:2}}>Personnel Assignments</Typography>
             <Box sx={{display:'flex',gap:2,flexWrap:'wrap',mb:2}}><TextField select size='small' label='Personnel' value={selectedPerson} onChange={e=>setSelectedPerson(e.target.value)} sx={{minWidth:320}}><MenuItem value=''>Select personnel</MenuItem>{personnel.map(x=><MenuItem key={x.id} value={x.id}>{x.displayName||x.personId||x.id} {x.rank?`— ${x.rank}`:''}</MenuItem>)}</TextField><Button variant='contained' disabled={!selectedPerson||busy} onClick={()=>void addPerson()}>Assign Personnel</Button></Box>
-            <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>{personAssignments.map((a:any)=>{const p=personnelMap.get(String(a.personnelId));return <Chip key={String(a.id)} label={`${p?.displayName||p?.personId||a.personnelId}${a.role?` · ${a.role}`:''}`} variant='tonal'/>>})}</Box>
+            <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>{personAssignments.map((a:any)=>{const p=personnelMap.get(String(a.personnelId));return <Chip key={String(a.id)} label={`${p?.displayName||p?.personId||a.personnelId}${a.role?` · ${a.role}`:''}`} variant='tonal'/>})}</Box>
           </Box>
         </Box>:null}
 
