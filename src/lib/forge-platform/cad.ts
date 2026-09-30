@@ -25,6 +25,47 @@ export type CadConflict={
   createdAt:string
 }
 
+export type CadNormalizedEventDetail={
+  id:string
+  cadRawMessageId:string
+  cadConnectionId:string
+  sourceMessageId:string|null
+  sourceIncidentId:string|null
+  sourceIncidentNumber:string|null
+  sourceEventId:string|null
+  sourceSequence:number|null
+  normalizedEventType:string
+  normalizedEventTimestamp:string
+  originalEventTimestamp:string|null
+  originalTimezone:string|null
+  normalizedPayload:Record<string,unknown>
+  normalizationWarnings:unknown
+  normalizationErrors:unknown
+  mappingStatus:string|null
+  incidentApplicationStatus:string|null
+  createdAt:string
+}
+
+export type CadMessageDetail={
+  message:{
+    id:string
+    cadConnectionId:string
+    receivedAt:string
+    transportType:string
+    sourceMessageId:string|null
+    sourceIncidentId:string|null
+    sourceEventType:string|null
+    sourceVersion:string|null
+    sourceSequence:number|null
+    processingStatus:string
+    authenticationStatus:string
+    payloadSizeBytes:number|null
+    payloadHash:string
+    correlationId:string
+  }
+  normalizedEvents:CadNormalizedEventDetail[]
+}
+
 export type CadIncidentStatus={
   links:Array<{
     id:string
@@ -38,6 +79,36 @@ export type CadIncidentStatus={
   }>
   openConflicts:CadConflict[]
   operatingHints:{linked:boolean;conflictCount:number}
+}
+
+export async function getCadMessageDetail(rawMessageId:string):Promise<ForgePlatformResult<CadMessageDetail>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformGet<CadMessageDetail>(`${tenantBase()}/cad/messages/${rawMessageId}`)}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const message=local<CadRawMessageMeta>('cad-messages').find(row=>row.id===rawMessageId)
+  if(!message)throw new ForgePlatformApiError('CAD message not found.',404,'NOT_FOUND')
+  const detail:CadMessageDetail={
+    message:{
+      id:message.id,
+      cadConnectionId:message.cadConnectionId,
+      receivedAt:message.receivedAt,
+      transportType:message.transportType,
+      sourceMessageId:message.sourceMessageId,
+      sourceIncidentId:message.sourceIncidentId,
+      sourceEventType:null,
+      sourceVersion:'1.0',
+      sourceSequence:null,
+      processingStatus:message.processingStatus,
+      authenticationStatus:message.authenticationStatus,
+      payloadSizeBytes:message.payloadSizeBytes,
+      payloadHash:message.payloadHash||'',
+      correlationId:message.correlationId||''
+    },
+    normalizedEvents:[]
+  }
+  return {data:detail,source:'demo'}
 }
 
 export async function getCadIncidentStatus(incidentId:string):Promise<ForgePlatformResult<CadIncidentStatus>>{
