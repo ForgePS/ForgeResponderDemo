@@ -20,7 +20,7 @@ type CadStatus={
 type Connection={id:string;name:string;vendor:string;status:string}
 const actions=['USE_CAD','KEEP_FORGE','MERGE','LINK','UNLINK','CREATE_NEW','IGNORE','ESCALATE','CORRECT_MAPPING']
 
-export default function CadIncidentPanel({incidentId}:{incidentId:string}){
+export default function CadIncidentPanel({incidentId,lang}:{incidentId:string;lang:string}){
   const [status,setStatus]=useState<CadStatus|null>(null)
   const [source,setSource]=useState<'platform'|'demo'>('demo')
   const [connections,setConnections]=useState<Connection[]>([])
@@ -158,7 +158,7 @@ export default function CadIncidentPanel({incidentId}:{incidentId:string}){
     </CardContent></Card>
 
     <Box sx={{display:'flex',justifyContent:'flex-end'}}>
-      <Button href='../cad' variant='outlined'>Open CAD Operations</Button>
+      <Button href={`/${lang}/cad`} variant='outlined'>Open CAD Operations</Button>
     </Box>
   </Box>
 }
