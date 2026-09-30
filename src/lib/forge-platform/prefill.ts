@@ -280,6 +280,45 @@ async function baseCandidates(
   return out
 }
 
+function normalizePlatformCandidate(candidate:PrefillCandidate):PrefillCandidate[]{
+  const source=candidate.prefillSource
+  const value=candidate.value
+  if(candidate.fieldKey==='response_district'){
+    return [{...candidate,fieldKey:'response_district',target:'INCIDENT',label:candidate.label||'Response District'}]
+  }
+  if(candidate.fieldKey==='station_timezone'){
+    return [{...candidate,target:'CONTEXT',informational:true,label:candidate.label||'Station Timezone'}]
+  }
+  if(candidate.fieldKey==='personnel_rank'){
+    return [{...candidate,target:'CONTEXT',informational:true,label:candidate.label||'Personnel Rank'}]
+  }
+  if(candidate.fieldKey==='location_name'){
+    return [{...candidate,fieldKey:'nl_site',sectionKey:'LOCATION',target:'FIELD',label:candidate.label||'Site / Occupancy Name'}]
+  }
+  if(candidate.fieldKey==='address_line1'){
+    const parsed=splitAddress(String(value||''))
+    const out:PrefillCandidate[]=[]
+    const numeric=Number(parsed.number)
+    if(parsed.number){
+      out.push({
+        fieldKey:Number.isInteger(numeric)?'an_number':'an_complete',
+        sectionKey:'LOCATION',
+        value:Number.isInteger(numeric)?numeric:parsed.number,
+        prefillSource:source,
+        target:'FIELD',
+        label:'Address Number'
+      })
+    }
+    if(parsed.street)out.push({fieldKey:'sn_street_name',sectionKey:'LOCATION',value:parsed.street,prefillSource:source,target:'FIELD',label:'Street Name'})
+    if(parsed.streetType)out.push({fieldKey:'sn_post_type',sectionKey:'LOCATION',value:parsed.streetType,prefillSource:source,target:'FIELD',label:'Street Type'})
+    return out
+  }
+  if(candidate.fieldKey==='tactical_summary'){
+    return [{...candidate,fieldKey:'preplan_tactical_context',target:'CONTEXT',informational:true,label:candidate.label||'Preplan Tactical Summary'}]
+  }
+  return [{...candidate,target:candidate.target||'FIELD'}]
+}
+
 export async function getIncidentPrefill(
   incidentId:string,
   query:Query={}
@@ -291,7 +330,7 @@ export async function getIncidentPrefill(
   if(mode!=='demo'){
     try{
       const platform=await forgePlatformGet<PrefillCandidate[]>(base(incidentId),query as Record<string,string>)
-      result=platform.data.map(candidate=>({...candidate,target:candidate.target||'FIELD'}))
+      result=platform.data.flatMap(normalizePlatformCandidate)
       source='platform'
     }catch(error){
       if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error
