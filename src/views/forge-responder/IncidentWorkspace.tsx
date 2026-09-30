@@ -19,6 +19,7 @@ import SpecialtyRecordsPanel from '@views/forge-responder/SpecialtyRecordsPanel'
 import AiNarrativeAssistant from '@views/forge-responder/AiNarrativeAssistant'
 import CadIncidentPanel from '@views/forge-responder/CadIncidentPanel'
 import SpecialtyReviewSummary from '@views/forge-responder/SpecialtyReviewSummary'
+import IncidentPrefillAssistant from '@views/forge-responder/IncidentPrefillAssistant'
 
 type Incident={
   id:string
@@ -43,7 +44,9 @@ export default function IncidentWorkspace({
   stations,
   shifts,
   units,
-  personnel
+  personnel,
+  occupancies,
+  preplans
 }:{
   initialIncident:Incident
   lang:string
@@ -51,6 +54,8 @@ export default function IncidentWorkspace({
   shifts:Option[]
   units:Option[]
   personnel:Option[]
+  occupancies:Option[]
+  preplans:Option[]
 }) {
   const [incident,setIncident]=useState(initialIncident)
   const [tab,setTab]=useState(0)
@@ -233,6 +238,7 @@ export default function IncidentWorkspace({
         <Typography color='text.secondary'>{incident.primaryIncidentTypeCode||'Incident type not recorded'} · {incident.incidentDate||'No date'}</Typography>
         <Tabs value={tab} onChange={(_,value)=>setTab(value)} variant='scrollable' sx={{mt:3,borderBottom:1,borderColor:'divider'}}>
           <Tab label='Overview'/>
+          <Tab label='Prefill Assist'/>
           <Tab label='Units & Personnel'/>
           <Tab label='NERIS Forms'/>
           <Tab label='Specialty Records'/>
@@ -251,7 +257,9 @@ export default function IncidentWorkspace({
           <Box sx={{gridColumn:{md:'1 / -1'},display:'flex',justifyContent:'flex-end'}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void saveOverview()}>Save Overview</Button></Box>
         </Box>:null}
 
-        {tab===1?<Box sx={{mt:4,display:'grid',gap:4}}>
+        {tab===1?<Box sx={{mt:4}}><IncidentPrefillAssistant incidentId={incident.id} recordVersion={incident.recordVersion} occupancies={occupancies} preplans={preplans} onApplied={(version,applied,skipped)=>{setIncident(current=>({...current,recordVersion:version}));setMessage(`${applied} prefill suggestion${applied===1?'':'s'} applied; ${skipped} skipped.`)}}/></Box>:null}
+
+        {tab===2?<Box sx={{mt:4,display:'grid',gap:4}}>
           <Box><Typography variant='h5' sx={{mb:2}}>Unit Assignments</Typography>
             <Box sx={{display:'flex',gap:2,flexWrap:'wrap',mb:2}}><TextField select size='small' label='Unit' value={selectedUnit} onChange={e=>setSelectedUnit(e.target.value)} sx={{minWidth:280}}><MenuItem value=''>Select unit</MenuItem>{units.map(x=><MenuItem key={x.id} value={x.id}>{x.callSign||x.unitNumber||x.name||x.id}</MenuItem>)}</TextField><Button variant='contained' disabled={!selectedUnit||busy} onClick={()=>void addUnit()}>Assign Unit</Button></Box>
             <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>{unitAssignments.map((a:any)=>{const u=unitMap.get(String(a.unitId));return <Chip key={String(a.id)} label={`${u?.callSign||u?.unitNumber||a.unitId}${a.isPrimary?' · Primary':''}`} variant='tonal' color={a.isPrimary?'error':'default'}/>})}</Box>
@@ -263,20 +271,20 @@ export default function IncidentWorkspace({
           </Box>
         </Box>:null}
 
-        {tab===2?<Box sx={{mt:4}}><NerisDynamicForm incidentId={incident.id} recordVersion={incident.recordVersion} onRecordVersion={version=>setIncident(current=>({...current,recordVersion:version}))}/></Box>:null}
+        {tab===3?<Box sx={{mt:4}}><NerisDynamicForm incidentId={incident.id} recordVersion={incident.recordVersion} onRecordVersion={version=>setIncident(current=>({...current,recordVersion:version}))}/></Box>:null}
 
-        {tab===3?<Box sx={{mt:4}}><SpecialtyRecordsPanel incidentId={incident.id}/></Box>:null}
+        {tab===4?<Box sx={{mt:4}}><SpecialtyRecordsPanel incidentId={incident.id}/></Box>:null}
 
-        {tab===4?<Box sx={{mt:4}}><CadIncidentPanel incidentId={incident.id} lang={lang}/></Box>:null}
+        {tab===5?<Box sx={{mt:4}}><CadIncidentPanel incidentId={incident.id} lang={lang}/></Box>:null}
 
-        {tab===5?<Box sx={{display:'grid',gap:3,mt:4}}>
+        {tab===6?<Box sx={{display:'grid',gap:3,mt:4}}>
           <TextField multiline minRows={14} label='Incident Narrative' value={narrative} onChange={e=>setNarrative(e.target.value)}/>
           <TextField label='Version Note' value={versionNote} onChange={e=>setVersionNote(e.target.value)} placeholder='Optional revision note'/>
           <Box sx={{display:'flex',justifyContent:'flex-end'}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void saveNarrative()}>Save Narrative</Button></Box>
           <AiNarrativeAssistant incidentId={incident.id} currentNarrative={narrative} recordVersion={incident.recordVersion} onAccepted={(nextNarrative,nextVersion)=>{setNarrative(nextNarrative);setIncident(current=>({...current,recordVersion:nextVersion}));setMessage('Assistant narrative accepted.')}}/>
         </Box>:null}
 
-        {tab===6?<Box sx={{mt:4,display:'grid',gap:3}}>
+        {tab===7?<Box sx={{mt:4,display:'grid',gap:3}}>
           <SpecialtyReviewSummary incidentId={incident.id}/>
           <Box sx={{display:'flex',gap:2,flexWrap:'wrap'}}><Button variant='outlined' disabled={busy} onClick={()=>void validate()}>Run NERIS Validation</Button></Box>
           {findings.length?<Box sx={{display:'grid',gap:1}}>{findings.map((f,index)=><Alert key={`${f.code}-${index}`} severity={f.severity==='BLOCKING_ERROR'?'error':f.severity==='WARNING'?'warning':'info'}>{f.message}</Alert>)}</Box>:<Alert severity='info' variant='outlined'>Run validation to check the current incident for blocking errors, warnings, and guidance.</Alert>}
