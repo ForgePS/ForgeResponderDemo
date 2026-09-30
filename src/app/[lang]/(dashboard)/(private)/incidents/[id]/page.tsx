@@ -16,11 +16,13 @@ export default async function IncidentDetailPage({params}:{params:Promise<{lang:
     notFound()
   }
 
-  const [stations,shifts,units,personnel]=await Promise.all([
+  const [stations,shifts,units,personnel,occupancies,preplans]=await Promise.all([
     listRmsMasterData<Option>('stations'),
     listRmsMasterData<Option>('shifts'),
     listRmsMasterData<Option>('units'),
-    listRmsMasterData<Option>('personnel')
+    listRmsMasterData<Option>('personnel'),
+    listRmsMasterData<Option>('occupancies'),
+    listRmsMasterData<Option>('preplans')
   ])
 
   return (
@@ -36,6 +38,8 @@ export default async function IncidentDetailPage({params}:{params:Promise<{lang:
         shifts={shifts.data}
         units={units.data}
         personnel={personnel.data}
+        occupancies={occupancies.data}
+        preplans={preplans.data}
       />
     </div>
   )
