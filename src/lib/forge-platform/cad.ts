@@ -272,3 +272,60 @@ export async function listCadMessages():Promise<ForgePlatformResult<CadRawMessag
   if(mode!=='demo'){try{return await forgePlatformGet<CadRawMessageMeta[]>(`${tenantBase()}/cad/messages`)}catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}}
   return {data:local<CadRawMessageMeta>('cad-messages'),source:'demo'}
 }
+
+
+export async function reprocessCadMessage(id:string,reason:string):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<Record<string,unknown>>(`${tenantBase()}/cad/messages/${id}/reprocess`,'POST',{reason})}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const rows=local<CadRawMessageMeta>('cad-messages');const index=rows.findIndex(x=>x.id===id)
+  if(index<0)throw new ForgePlatformApiError('CAD message not found.',404,'NOT_FOUND')
+  const updated={...rows[index],processingStatus:'QUEUED'};rows[index]=updated;writeForgeData('cad-messages',rows)
+  return {data:{accepted:true,rawMessageId:id,reason},source:'demo'}
+}
+
+export async function replayCadMessages(rawMessageIds:string[],reason:string):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<Record<string,unknown>>(`${tenantBase()}/cad/messages/replay`,'POST',{rawMessageIds,reason})}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  let replayedCount=0
+  for(const id of rawMessageIds){try{await reprocessCadMessage(id,reason);replayedCount+=1}catch{}}
+  return {data:{accepted:true,replayedCount,skippedCount:rawMessageIds.length-replayedCount},source:'demo'}
+}
+
+export async function linkCadIncident(
+  incidentId:string,
+  payload:{cadConnectionId:string;sourceIncidentId:string;sourceIncidentNumber?:string|null;reason:string;recordVersion?:number}
+):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<Record<string,unknown>>(`${tenantBase()}/neris/incidents/${incidentId}/cad-link`,'POST',payload)}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const rows=local<Record<string,unknown>>('cad-incident-links')
+  const now=new Date().toISOString()
+  const row={id:randomUUID(),incidentId,...payload,linkStatus:'ACTIVE',linkMethod:'MANUAL',recordVersion:1,createdAt:now,updatedAt:now}
+  writeForgeData('cad-incident-links',[row,...rows])
+  return {data:row,source:'demo'}
+}
+
+export async function unlinkCadIncident(
+  incidentId:string,
+  payload:{cadIncidentLinkId:string;reason:string;recordVersion:number}
+):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<Record<string,unknown>>(`${tenantBase()}/neris/incidents/${incidentId}/cad-unlink`,'POST',payload)}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const rows=local<Record<string,unknown>>('cad-incident-links');const index=rows.findIndex(x=>x.id===payload.cadIncidentLinkId&&x.incidentId===incidentId)
+  if(index<0)throw new ForgePlatformApiError('CAD incident link not found.',404,'NOT_FOUND')
+  const current=rows[index]
+  if(Number(current.recordVersion||1)!==payload.recordVersion)throw new ForgePlatformApiError('CAD incident link was modified elsewhere.',412,'PRECONDITION_FAILED')
+  const updated={...current,linkStatus:'UNLINKED',manualOverrideReason:payload.reason,recordVersion:payload.recordVersion+1,updatedAt:new Date().toISOString()}
+  rows[index]=updated;writeForgeData('cad-incident-links',rows);return {data:updated,source:'demo'}
+}
