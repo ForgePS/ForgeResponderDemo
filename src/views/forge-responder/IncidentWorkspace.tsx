@@ -21,6 +21,7 @@ import CadIncidentPanel from '@views/forge-responder/CadIncidentPanel'
 import SpecialtyReviewSummary from '@views/forge-responder/SpecialtyReviewSummary'
 import IncidentPrefillAssistant from '@views/forge-responder/IncidentPrefillAssistant'
 import IncidentAuditTrail from '@views/forge-responder/IncidentAuditTrail'
+import IncidentTacticalIntelligence from '@views/forge-responder/IncidentTacticalIntelligence'
 
 type Incident={
   id:string
@@ -247,6 +248,7 @@ export default function IncidentWorkspace({
           <Tab label='Narrative'/>
           <Tab label='Officer Review'/>
           <Tab label='Audit Trail'/>
+          <Tab label='Tactical Intelligence'/>
         </Tabs>
 
         {tab===0?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3,mt:4}}>
@@ -313,6 +315,8 @@ export default function IncidentWorkspace({
         </Box>:null}
 
         {tab===8?<Box sx={{mt:4}}><IncidentAuditTrail incidentId={incident.id}/></Box>:null}
+
+        {tab===9?<Box sx={{mt:4}}><IncidentTacticalIntelligence incidentId={incident.id} recordVersion={incident.recordVersion} lang={lang} onApplied={version=>{setIncident(current=>({...current,recordVersion:version}));setMessage('Occupancy/preplan context applied to NERIS.')}}/></Box>:null}
       </CardContent>
     </Card>
   </div>
