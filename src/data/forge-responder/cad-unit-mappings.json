@@ -1,1 +1,16 @@
-[]
+[
+  {
+    "id": "cad-unit-map-demo-01",
+    "cadConnectionId": "cad-conn-demo-01",
+    "sourceUnitId": "CAD-E12",
+    "sourceUnitCallsign": "E12",
+    "forgeApparatusId": "APP-002",
+    "forgeUnitId": "UNIT-E2",
+    "mappingType": "UNIT",
+    "externalAgency": false,
+    "notes": "Sanitized demo mapping",
+    "status": "ACTIVE",
+    "createdAt": "2026-09-30T09:45:00.000Z",
+    "updatedAt": "2026-09-30T09:45:00.000Z"
+  }
+]
