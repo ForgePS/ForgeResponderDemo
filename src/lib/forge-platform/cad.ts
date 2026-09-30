@@ -154,9 +154,9 @@ export async function getCadOperationsSummary():Promise<ForgePlatformResult<CadO
       byStatus
     },
     openConflicts:local<CadConflict>('cad-conflicts').filter(x=>x.status==='OPEN').length,
-    unmappedValues:local<CadUnmappedValue>('cad-unmapped-values').filter(x=>x.status!=='RESOLVED').length,
-    unknownUnits:local<CadUnknownUnit>('cad-unknown-units').filter(x=>x.status!=='RESOLVED').length,
-    unknownPersonnel:local<CadUnknownPersonnel>('cad-unknown-personnel').filter(x=>x.status!=='RESOLVED').length,
+    unmappedValues:local<CadUnmappedValue>('cad-unmapped-values').filter(x=>!['MAPPED','IGNORED_WITH_REASON'].includes(x.status)).length,
+    unknownUnits:local<CadUnknownUnit>('cad-unknown-units').filter(x=>!['MAPPED','IGNORED_WITH_REASON'].includes(x.status)).length,
+    unknownPersonnel:local<CadUnknownPersonnel>('cad-unknown-personnel').filter(x=>!['MAPPED','IGNORED_WITH_REASON'].includes(x.status)).length,
     activeLinks:local<Record<string,unknown>>('cad-incident-links').filter(x=>String(x.linkStatus||'ACTIVE')==='ACTIVE').length
   },source:'demo'}
 }
