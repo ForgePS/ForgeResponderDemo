@@ -152,6 +152,11 @@ export default function NerisDynamicForm({
   const activeModules=useMemo(()=>descriptor?.modules.filter(module=>module.visible&&module.sectionKey===activeSection)||[],[descriptor,activeSection])
   const activeFields=useMemo(()=>activeModules.flatMap(module=>module.fields).filter(field=>field.visible&&!String(field.dataType||'').toLowerCase().includes('module')).sort((a,b)=>a.displayOrder-b.displayOrder),[activeModules])
   const specialty=descriptor?.specialtyWorkflows?.find(item=>item.sectionKey===activeSection)
+  const unconfirmedInSection=useMemo(()=>activeFields.filter(field=>{
+    const state=values[field.fieldId]
+    return Boolean(state?.prefillSource&&state.prefillSource!=='MANUAL'&&state.userConfirmed===false)
+  }).length,[activeFields,values])
+
 
   useEffect(()=>{
     const locations=[...new Set(activeFields.map(field=>field.valueSetLocation).filter(Boolean) as string[])]
@@ -265,6 +270,13 @@ export default function NerisDynamicForm({
         </Button>
       })}
     </Box>
+
+    {unconfirmedInSection>0?<Alert severity='warning' variant='outlined'>
+      <Box sx={{display:'flex',justifyContent:'space-between',gap:2,alignItems:'center',flexWrap:'wrap'}}>
+        <Box><Typography fontWeight={800}>Prefilled values require officer review</Typography><Typography variant='body2'>Review or edit each prefilled value in this section. Saving an edited field confirms it as a manual officer-entered value.</Typography></Box>
+        <Chip color='warning' variant='tonal' label={String(unconfirmedInSection)+' unconfirmed'}/>
+      </Box>
+    </Alert>:null}
 
     {specialty?<Alert severity={specialty.state==='NOT_APPLICABLE'?'info':specialty.hasBlockingGaps?'warning':'success'} variant='outlined'>
       <Box sx={{display:'flex',justifyContent:'space-between',gap:2,alignItems:'center',flexWrap:'wrap'}}>
