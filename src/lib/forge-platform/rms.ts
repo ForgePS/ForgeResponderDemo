@@ -19,6 +19,7 @@ export type RmsMasterDataKind =
   | 'apparatus'
   | 'units'
   | 'personnel'
+  | 'hydrants'
   | 'occupancies'
   | 'preplans'
   | 'rosters'
@@ -29,6 +30,7 @@ const demoEntityMap: Record<RmsMasterDataKind, string> = {
   apparatus: 'apparatus',
   units: 'units',
   personnel: 'personnel',
+  hydrants: 'hydrants',
   occupancies: 'occupancies',
   preplans: 'preplans',
   rosters: 'rosters'
