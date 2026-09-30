@@ -226,7 +226,39 @@ export async function getFormDescriptor(incidentId:string):Promise<ForgePlatform
 
 export async function listFieldValues(incidentId:string):Promise<ForgePlatformResult<Record<string,NerisFieldValueState>>>{
   const mode=getForgePlatformMode()
-  if(mode==='connected')return {data:{},source:'platform'}
+  if(mode!=='demo'){
+    try{
+      const result=await forgePlatformGet<Array<{
+        fieldId:string
+        valueText:string|null
+        valueNumber:string|null
+        valueBoolean:boolean|null
+        valueTimestamp:string|null
+        valueOptionId:string|null
+        valueJson:unknown
+        prefillSource:NerisFieldValueState['prefillSource']
+        userConfirmed:boolean
+      }>>(`${base(incidentId)}/field-values`)
+      return {
+        data:Object.fromEntries(result.data.map(row=>[
+          row.fieldId,
+          {
+            valueText:row.valueText,
+            valueNumber:row.valueNumber===null?null:Number(row.valueNumber),
+            valueBoolean:row.valueBoolean,
+            valueTimestamp:row.valueTimestamp,
+            valueOptionId:row.valueOptionId,
+            valueJson:row.valueJson,
+            prefillSource:row.prefillSource,
+            userConfirmed:row.userConfirmed
+          }
+        ])),
+        source:'platform'
+      }
+    }catch(error){
+      if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error
+    }
+  }
   const rows=readForgeData<StoredFieldValue[]>('incident-field-values').filter(x=>x.incidentId===incidentId)
   return {data:Object.fromEntries(rows.map(row=>[row.fieldId,row.value])),source:'demo'}
 }
