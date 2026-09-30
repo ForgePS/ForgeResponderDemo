@@ -218,9 +218,41 @@ function patchIncidentDemo(id: string, payload: Record<string, unknown>, recordV
   const index = current.findIndex(x => x.id === id)
   if (index < 0) throw new ForgePlatformApiError('Incident not found.',404,'NOT_FOUND')
   if (current[index].recordVersion !== recordVersion) throw new ForgePlatformApiError('Incident was modified elsewhere.',412,'PRECONDITION_FAILED')
-  const updated = { ...current[index], ...payload, id, recordVersion: recordVersion + 1, updatedAt: new Date().toISOString() } as IncidentRecord
+
+  const before=current[index]
+  const updated = { ...before, ...payload, id, recordVersion: recordVersion + 1, updatedAt: new Date().toISOString() } as IncidentRecord
   current[index] = updated
   writeRows(current)
+
+  const manualFields=[
+    {key:'primaryIncidentTypeCode',identifier:'incident.primaryIncidentTypeCode'},
+    {key:'responseDistrict',identifier:'incident.responseDistrict'},
+    {key:'dispatchDescription',identifier:'incident.dispatchDescription'},
+    {key:'alarmAt',identifier:'incident.alarmAt'}
+  ]
+  const provenance=readForgeData<Array<Record<string,unknown>>>('cad-field-provenance')
+  let provenanceChanged=false
+  const now=new Date().toISOString()
+  for(const field of manualFields){
+    if(!Object.prototype.hasOwnProperty.call(payload,field.key))continue
+    const beforeValue=(before as unknown as Record<string,unknown>)[field.key]
+    const afterValue=(updated as unknown as Record<string,unknown>)[field.key]
+    if(JSON.stringify(beforeValue??null)===JSON.stringify(afterValue??null))continue
+    const pIndex=provenance.findIndex(row=>row.incidentId===id&&row.fieldIdentifier===field.identifier)
+    if(pIndex<0)continue
+    provenance[pIndex]={
+      ...provenance[pIndex],
+      currentValueSource:'FORGE',
+      manualOverrideAt:now,
+      manualOverrideByUserId:'demo-user',
+      manualOverrideReason:'Officer edited CAD-owned incident field',
+      recordVersion:Number(provenance[pIndex].recordVersion||1)+1,
+      updatedAt:now
+    }
+    provenanceChanged=true
+  }
+  if(provenanceChanged)writeForgeData('cad-field-provenance',provenance)
+
   activity(`Incident ${updated.incidentNumber} updated`, id)
   return { data: updated, source: 'demo' }
 }
