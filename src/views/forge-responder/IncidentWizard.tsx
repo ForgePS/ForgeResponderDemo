@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
@@ -17,6 +17,7 @@ import Typography from '@mui/material/Typography'
 const steps=['Dispatch','Units & Personnel','Operations','Review']
 
 type Option={id:string;name?:string;code?:string;stationNumber?:string;callSign?:string;unitNumber?:string;unitType?:string;personId?:string;displayName?:string;rank?:string}
+type CadMessage={id:string;sourceIncidentId:string|null;sourceMessageId:string|null;cadConnectionId:string;processingStatus:string;receivedAt:string}
 
 export default function IncidentWizard({
   lang,stations,shifts,units,personnel
@@ -26,6 +27,9 @@ export default function IncidentWizard({
   const [saving,setSaving]=useState(false)
   const [error,setError]=useState('')
   const [incidentDate,setIncidentDate]=useState(new Date().toISOString().slice(0,10))
+  const [incidentSource,setIncidentSource]=useState('MANUAL')
+  const [cadMessages,setCadMessages]=useState<CadMessage[]>([])
+  const [cadMessageId,setCadMessageId]=useState('')
   const [alarmAt,setAlarmAt]=useState('')
   const [stationId,setStationId]=useState(stations[0]?.id||'')
   const [shiftId,setShiftId]=useState(shifts[0]?.id||'')
@@ -37,6 +41,14 @@ export default function IncidentWizard({
   const [unitRole,setUnitRole]=useState('PRIMARY_RESPONSE')
   const [narrative,setNarrative]=useState('')
 
+  useEffect(()=>{
+    void fetch('/api/cad/messages',{cache:'no-store'})
+      .then(async response=>{const body=await response.json();if(response.ok)setCadMessages((body.data||[]).filter((row:CadMessage)=>Boolean(row.sourceIncidentId)))})
+      .catch(()=>{})
+  },[])
+
+  const selectedCadMessage=cadMessages.find(row=>row.id===cadMessageId)
+
   async function create(){
     setSaving(true);setError('')
     try{
@@ -46,7 +58,7 @@ export default function IncidentWizard({
         stationId,
         shiftId,
         responseDistrict,
-        incidentSource:'MANUAL',
+        incidentSource,
         dispatchDescription,
         primaryIncidentTypeCode:incidentType
       }).filter(([,value])=>value!==''))
@@ -55,6 +67,20 @@ export default function IncidentWizard({
       const body=await response.json()
       if(!response.ok) throw new Error(body.error||'Unable to create incident.')
       const incident=body.data
+
+      if(incidentSource==='CAD'&&selectedCadMessage?.sourceIncidentId){
+        const linkResponse=await fetch(`/api/incidents/${incident.id}/cad-link`,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            cadConnectionId:selectedCadMessage.cadConnectionId,
+            sourceIncidentId:selectedCadMessage.sourceIncidentId,
+            reason:'Incident created from selected CAD message'
+          })
+        })
+        const linkBody=await linkResponse.json()
+        if(!linkResponse.ok)throw new Error(linkBody.error||'Incident created, but CAD linkage failed.')
+      }
 
       if(unitId){
         const unitResponse=await fetch(`/api/incidents/${incident.id}/units`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({unitId,isPrimary:true,unitRole})})
@@ -86,7 +112,9 @@ export default function IncidentWizard({
     {error?<Alert severity='error' sx={{mb:3}}>{error}</Alert>:null}
 
     {step===0?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
+      <TextField select label='Incident Source' value={incidentSource} onChange={e=>{setIncidentSource(e.target.value);if(e.target.value!=='CAD')setCadMessageId('')}}><MenuItem value='MANUAL'>Manual</MenuItem><MenuItem value='CAD'>CAD Assisted</MenuItem></TextField>
       <TextField label='Incident Date' type='date' value={incidentDate} onChange={e=>setIncidentDate(e.target.value)} InputLabelProps={{shrink:true}}/>
+      {incidentSource==='CAD'?<TextField select label='CAD Message' value={cadMessageId} onChange={e=>setCadMessageId(e.target.value)} sx={{gridColumn:{md:'1 / -1'}}><MenuItem value=''>Select CAD message</MenuItem>{cadMessages.map(row=><MenuItem key={row.id} value={row.id}>{row.sourceIncidentId||row.sourceMessageId||row.id} — {row.processingStatus}</MenuItem>)}</TextField>:null}
       <TextField label='Alarm Time' type='time' value={alarmAt} onChange={e=>setAlarmAt(e.target.value)} InputLabelProps={{shrink:true}}/>
       <TextField select label='Station' value={stationId} onChange={e=>setStationId(e.target.value)}><MenuItem value=''>Not assigned</MenuItem>{stations.map(x=><MenuItem key={x.id} value={x.id}>{x.name||x.stationNumber||x.id}</MenuItem>)}</TextField>
       <TextField select label='Shift' value={shiftId} onChange={e=>setShiftId(e.target.value)}><MenuItem value=''>Not assigned</MenuItem>{shifts.map(x=><MenuItem key={x.id} value={x.id}>{x.name||x.code||x.id}</MenuItem>)}</TextField>
@@ -104,13 +132,14 @@ export default function IncidentWizard({
     {step===2?<Box sx={{display:'grid',gap:3}}>
       <TextField multiline minRows={8} label='Initial Incident Narrative' value={narrative} onChange={e=>setNarrative(e.target.value)} placeholder='Dispatch, arrival conditions, command, assignments, tactical actions, water supply, search, ventilation, fire control, overhaul, disposition...'/>
       <Alert severity='info' variant='outlined'>Additional NERIS sections and specialty records are completed from the incident workspace after creation.</Alert>
+      {incidentSource==='CAD'?<Alert severity='warning' variant='outlined'>CAD-assisted creation links the selected source incident and records CAD as the incident source. It does not invent location, unit, personnel, or classification values that were not actually provided by the connected CAD workflow.</Alert>:null}
     </Box>:null}
 
     {step===3?<Box><Typography variant='h5'>Create Incident Record</Typography><Typography color='text.secondary' sx={{mt:1,mb:3}}>This creates the incident, primary unit assignment, reporting officer assignment, and initial narrative through the same Forge data layer used by connected Forge Platform mode.</Typography><Alert severity='warning' variant='outlined'>Creating the record does not submit it for officer review or final NERIS processing. Validation and review occur in the incident workspace.</Alert></Box>:null}
 
     <Box sx={{display:'flex',justifyContent:'space-between',gap:2,mt:5}}>
       <Button disabled={step===0||saving} onClick={()=>setStep(v=>Math.max(0,v-1))}>Back</Button>
-      {step<3?<Button variant='contained' color='error' disabled={saving} onClick={()=>setStep(v=>Math.min(3,v+1))}>Continue</Button>:<Button variant='contained' color='error' disabled={saving} onClick={()=>void create()}>{saving?'Creating...':'Create Incident'}</Button>}
+      {step<3?<Button variant='contained' color='error' disabled={saving||(step===0&&incidentSource==='CAD'&&!cadMessageId)} onClick={()=>setStep(v=>Math.min(3,v+1))}>Continue</Button>:<Button variant='contained' color='error' disabled={saving} onClick={()=>void create()}>{saving?'Creating...':'Create Incident'}</Button>}
     </Box>
   </CardContent></Card>
 }
