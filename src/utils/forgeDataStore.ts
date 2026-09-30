@@ -32,6 +32,7 @@ export const FORGE_DATA_ENTITIES = [
   'incident-alarm-systems',
   'incident-protection-systems',
   'incident-attachments',
+  'incident-occupancy-links',
   'cad-connections',
   'cad-conflicts',
   'cad-unmapped-values',
