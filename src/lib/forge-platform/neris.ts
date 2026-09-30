@@ -1,6 +1,6 @@
 import 'server-only'
 
-import { randomUUID } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 
 import { nerisModules, nerisValueSets, humanizeNerisName, type NerisField } from '@/utils/nerisSchema'
 import { readForgeData, writeForgeData } from '@/utils/forgeDataStore'
@@ -278,7 +278,9 @@ export async function batchFieldValues(
   const descriptor=localDescriptor(incidentId)
   const fieldById=new Map(descriptor.modules.flatMap(m=>m.fields).map(field=>[field.fieldId,field]))
   const rows=readForgeData<StoredFieldValue[]>('incident-field-values')
+  const provenanceRows=readForgeData<Array<Record<string,unknown>>>('cad-field-provenance')
   const now=new Date().toISOString()
+  let provenanceChanged=false
   let upserted=0
   for(const item of values){
     const known=fieldById.get(item.fieldId)
@@ -299,12 +301,67 @@ export async function batchFieldValues(
     const stored={id:existing?.id||randomUUID(),incidentId,fieldId:item.fieldId,fieldKey,sectionKey:item.sectionKey,value,updatedAt:now}
     if(index>=0)rows[index]=stored
     else rows.push(stored)
+
+    const provenanceIndex=provenanceRows.findIndex(row=>
+      row.incidentId===incidentId&&row.fieldIdentifier===`neris.${fieldKey}`
+    )
+    const provenance=provenanceIndex>=0?provenanceRows[provenanceIndex]:null
+
+    if(value.prefillSource==='CAD'){
+      const sourceValueHash=createHash('sha256').update(JSON.stringify({
+        valueText:value.valueText,
+        valueNumber:value.valueNumber,
+        valueBoolean:value.valueBoolean,
+        valueTimestamp:value.valueTimestamp,
+        valueOptionId:value.valueOptionId,
+        valueJson:value.valueJson
+      })).digest('hex')
+      const next={
+        id:provenance?.id||randomUUID(),
+        incidentId,
+        fieldIdentifier:`neris.${fieldKey}`,
+        currentValueSource:'CAD',
+        sourceSystem:'CAD',
+        cadConnectionId:provenance?.cadConnectionId||null,
+        cadRawMessageId:provenance?.cadRawMessageId||null,
+        cadNormalizedEventId:provenance?.cadNormalizedEventId||null,
+        sourcePath:provenance?.sourcePath||null,
+        sourceValueHash,
+        mappingProfileId:provenance?.mappingProfileId||null,
+        mappingVersion:provenance?.mappingVersion||null,
+        appliedAt:provenance?.appliedAt||now,
+        appliedByUserId:null,
+        manualOverrideAt:null,
+        manualOverrideByUserId:null,
+        manualOverrideReason:null,
+        ownershipPolicy:'CAD_UNTIL_MANUAL_EDIT',
+        recordVersion:Number(provenance?.recordVersion||0)+1,
+        createdAt:provenance?.createdAt||now,
+        updatedAt:now
+      }
+      if(provenanceIndex>=0)provenanceRows[provenanceIndex]=next
+      else provenanceRows.push(next)
+      provenanceChanged=true
+    }else if(existing?.value.prefillSource==='CAD'&&value.prefillSource==='MANUAL'&&provenance){
+      provenanceRows[provenanceIndex]={
+        ...provenance,
+        currentValueSource:'FORGE',
+        manualOverrideAt:now,
+        manualOverrideByUserId:'demo-user',
+        manualOverrideReason:'Officer edited CAD-prefilled NERIS value',
+        recordVersion:Number(provenance.recordVersion||1)+1,
+        updatedAt:now
+      }
+      provenanceChanged=true
+    }
+
     upserted+=1
   }
   if(upserted===0){
     return {data:{incident:(await getIncident(incidentId)).data,upserted:0},source:'demo'}
   }
   writeForgeData('incident-field-values',rows)
+  if(provenanceChanged)writeForgeData('cad-field-provenance',provenanceRows)
   const patched=await patchIncident(incidentId,{},recordVersion)
   return {data:{incident:patched.data,upserted},source:'demo'}
 }
