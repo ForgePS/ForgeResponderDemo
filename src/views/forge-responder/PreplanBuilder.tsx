@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -15,59 +16,56 @@ import Typography from '@mui/material/Typography'
 
 const steps=['Occupancy','Access & Utilities','Hazards & Protection','Review']
 
-export default function PreplanBuilder({occupancies}:{occupancies:any[]}) {
-  const [step,setStep]=useState(0)
-  const [saved,setSaved]=useState(false)
+type OccupancyOption={id:string;name?:string;addressLine1?:string|null;address?:string|null}
+type Props={occupancies:OccupancyOption[];initialOccupancyId?:string;lang:string}
 
-  const save=()=>{
-    const event={type:'preplan-save',title:'Demo preplan saved',occurredAt:new Date().toISOString()}
-    const key='forge-responder-theme-demo-events'
-    const current=JSON.parse(localStorage.getItem(key)||'[]')
-    localStorage.setItem(key,JSON.stringify([event,...current].slice(0,100)))
-    setSaved(true)
+export default function PreplanBuilder({occupancies,initialOccupancyId,lang}:Props){
+  const router=useRouter()
+  const firstId=initialOccupancyId&&occupancies.some(x=>x.id===initialOccupancyId)?initialOccupancyId:occupancies[0]?.id||''
+  const [step,setStep]=useState(0)
+  const [saving,setSaving]=useState(false)
+  const [error,setError]=useState('')
+  const [occupancyId,setOccupancyId]=useState(firstId)
+  const [versionLabel,setVersionLabel]=useState('1')
+  const [approvalStatus,setApprovalStatus]=useState('DRAFT')
+  const [accessNotes,setAccessNotes]=useState('')
+  const [utilityNotes,setUtilityNotes]=useState('')
+  const [hazards,setHazards]=useState('')
+  const [tacticalSummary,setTacticalSummary]=useState('')
+  const [primaryStationId,setPrimaryStationId]=useState('')
+  const selectedOccupancy=useMemo(()=>occupancies.find(x=>x.id===occupancyId),[occupancies,occupancyId])
+
+  async function save(){
+    setSaving(true);setError('')
+    try{
+      const payload=Object.fromEntries(Object.entries({
+        occupancyId,versionLabel,approvalStatus,accessNotes,utilityNotes,hazards,tacticalSummary,primaryStationId
+      }).filter(([,v])=>v!==''))
+      const response=await fetch('/api/rms/preplans',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      const body=await response.json()
+      if(!response.ok) throw new Error(body.error||'Unable to create preplan.')
+      router.push(`/${lang}/preplans/${body.data.id}`);router.refresh()
+    }catch(err){setError(err instanceof Error?err.message:'Unable to create preplan.');setSaving(false)}
   }
 
-  return (
-    <Card>
-      <CardContent>
-        <Stepper activeStep={step} alternativeLabel sx={{mb:5}}>
-          {steps.map(label=><Step key={label}><StepLabel>{label}</StepLabel></Step>)}
-        </Stepper>
-
-        {saved ? <Alert severity='success' sx={{mb:3}}>Demo preplan saved locally in this browser. Source records were not modified.</Alert> : null}
-
-        {step===0 ? <Box sx={{display:'grid',gap:3}}>
-          <TextField select fullWidth label='Occupancy' defaultValue={occupancies[0]?.id || ''}>{occupancies.map(x=><MenuItem key={x.id} value={x.id}>{x.name} — {x.address}</MenuItem>)}</TextField>
-          <TextField fullWidth label='Preplan Title' defaultValue='Responder Preplan' />
-          <TextField select fullWidth label='Plan Status' defaultValue='draft'><MenuItem value='draft'>Draft</MenuItem><MenuItem value='review'>Ready for Review</MenuItem></TextField>
-        </Box> : null}
-
-        {step===1 ? <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
-          <TextField label='Primary Access' placeholder='Front / Alpha side' />
-          <TextField label='Knox Box' placeholder='Location' />
-          <TextField label='Electric Shutoff' placeholder='Location' />
-          <TextField label='Gas Shutoff' placeholder='Location' />
-          <TextField multiline minRows={3} sx={{gridColumn:{md:'1 / -1'}}} label='Access Notes' placeholder='Gates, apparatus access, restricted areas...' />
-        </Box> : null}
-
-        {step===2 ? <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
-          <TextField label='Construction' placeholder='Type / features' />
-          <TextField label='Occupancy Use' placeholder='Primary use' />
-          <TextField label='Fire Protection' placeholder='Sprinkler, standpipe, alarm...' />
-          <TextField label='FDC Location' placeholder='Location' />
-          <TextField multiline minRows={4} sx={{gridColumn:{md:'1 / -1'}}} label='Special Hazards & Tactical Notes' />
-        </Box> : null}
-
-        {step===3 ? <Box>
-          <Typography variant='h5'>Ready for Demo Save</Typography>
-          <Typography color='text.secondary' sx={{mt:1}}>This workflow demonstrates plan authoring, review, and publish readiness. No source record or external system will be changed.</Typography>
-        </Box> : null}
-
-        <Box sx={{display:'flex',justifyContent:'space-between',gap:2,mt:5}}>
-          <Button disabled={step===0} onClick={()=>setStep(v=>Math.max(0,v-1))}>Back</Button>
-          {step<steps.length-1 ? <Button variant='contained' color='error' onClick={()=>setStep(v=>Math.min(steps.length-1,v+1))}>Continue</Button> : <Button variant='contained' color='error' onClick={save}>Save Demo Preplan</Button>}
-        </Box>
-      </CardContent>
-    </Card>
-  )
+  return <Card><CardContent>
+    <Stepper activeStep={step} alternativeLabel sx={{mb:5}}>{steps.map(label=><Step key={label}><StepLabel>{label}</StepLabel></Step>)}</Stepper>
+    {error?<Alert severity='error' sx={{mb:3}}>{error}</Alert>:null}
+    {step===0?<Box sx={{display:'grid',gap:3}}>
+      <TextField select fullWidth label='Occupancy' value={occupancyId} onChange={e=>setOccupancyId(e.target.value)}>{occupancies.map(x=><MenuItem key={x.id} value={x.id}>{x.name||x.id} — {x.addressLine1||x.address||'No address'}</MenuItem>)}</TextField>
+      <TextField fullWidth label='Version Label' value={versionLabel} onChange={e=>setVersionLabel(e.target.value)}/>
+      <TextField select fullWidth label='Approval Status' value={approvalStatus} onChange={e=>setApprovalStatus(e.target.value)}><MenuItem value='DRAFT'>Draft</MenuItem><MenuItem value='IN_REVIEW'>In Review</MenuItem><MenuItem value='APPROVED'>Approved</MenuItem><MenuItem value='RETIRED'>Retired</MenuItem></TextField>
+    </Box>:null}
+    {step===1?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
+      <TextField multiline minRows={4} label='Access Notes' value={accessNotes} onChange={e=>setAccessNotes(e.target.value)} placeholder='Primary/secondary access, gates, apparatus access, Knox Box, staging...'/>
+      <TextField multiline minRows={4} label='Utility Notes' value={utilityNotes} onChange={e=>setUtilityNotes(e.target.value)} placeholder='Electric, gas, water, sprinkler riser, FDC, shutoffs...'/>
+      <TextField label='Primary Station ID' value={primaryStationId} onChange={e=>setPrimaryStationId(e.target.value)} helperText='Optional Forge Platform station UUID' sx={{gridColumn:{md:'1 / -1'}}}/>
+    </Box>:null}
+    {step===2?<Box sx={{display:'grid',gap:3}}>
+      <TextField multiline minRows={4} label='Hazards' value={hazards} onChange={e=>setHazards(e.target.value)} placeholder='Special hazards, hazardous materials, collapse concerns, occupancy-specific risks...'/>
+      <TextField multiline minRows={5} label='Tactical Summary' value={tacticalSummary} onChange={e=>setTacticalSummary(e.target.value)} placeholder='Initial strategy, access priorities, water supply, protection systems, command considerations...'/>
+    </Box>:null}
+    {step===3?<Box sx={{display:'grid',gap:2}}><Typography variant='h5'>Ready to Create Preplan</Typography><Typography color='text.secondary'>{selectedOccupancy?.name||occupancyId} · Version {versionLabel} · {approvalStatus.replaceAll('_',' ')}</Typography><Alert severity='info' variant='outlined'>Save writes through the Forge Responder data adapter: Forge Platform when connected, persistent demo storage when standalone.</Alert></Box>:null}
+    <Box sx={{display:'flex',justifyContent:'space-between',gap:2,mt:5}}><Button disabled={step===0||saving} onClick={()=>setStep(v=>Math.max(0,v-1))}>Back</Button>{step<3?<Button variant='contained' color='error' disabled={!occupancyId||saving} onClick={()=>setStep(v=>Math.min(3,v+1))}>Continue</Button>:<Button variant='contained' color='error' disabled={!occupancyId||saving} onClick={()=>void save()}>{saving?'Saving...':'Create Preplan'}</Button>}</Box>
+  </CardContent></Card>
 }
