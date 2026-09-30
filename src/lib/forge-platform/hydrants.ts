@@ -48,6 +48,7 @@ function platformRecordPath(id:string,type:HydrantRecordType){
 }
 function normalizeRecordPayload(type:HydrantRecordType,payload:Record<string,unknown>){
   const out={...payload}
+  if(type==='flow-tests'&&out.outletDiameter!==undefined){out.dischargeSize=out.outletDiameter;delete out.outletDiameter}
   if(type==='inspections'&&out.operationalStatus)out.operationalStatus=platformStatus(out.operationalStatus)
   if(type==='damage'&&out.operationalStatus)out.operationalStatus=platformStatus(out.operationalStatus)
   return out
