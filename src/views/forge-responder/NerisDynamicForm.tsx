@@ -122,6 +122,7 @@ export default function NerisDynamicForm({
   const [saving,setSaving]=useState(false)
   const [error,setError]=useState('')
   const [message,setMessage]=useState('')
+  const [rehydrationWarning,setRehydrationWarning]=useState('')
 
   async function loadDescriptor(){
     setLoading(true);setError('')
@@ -133,9 +134,16 @@ export default function NerisDynamicForm({
       const descriptorBody=await descriptorResponse.json()
       const valuesBody=await valuesResponse.json()
       if(!descriptorResponse.ok)throw new Error(descriptorBody.error||'Unable to load NERIS form.')
-      if(!valuesResponse.ok)throw new Error(valuesBody.error||'Unable to load saved NERIS field values.')
       setDescriptor(descriptorBody.data)
-      setValues(valuesBody.data||{})
+      if(valuesResponse.ok){
+        setValues(valuesBody.data||{})
+        setRehydrationWarning('')
+      }else if(valuesResponse.status===404||valuesResponse.status===405){
+        setValues({})
+        setRehydrationWarning('Saved field-value rehydration is not available on this Forge Platform deployment yet. The form remains usable, but previously stored connected-mode values cannot be displayed until the field-value read contract is deployed.')
+      }else{
+        throw new Error(valuesBody.error||'Unable to load saved NERIS field values.')
+      }
       const nav=(descriptorBody.data.navigationSections||descriptorBody.data.sections||[]).filter((x:string)=>CORE_DYNAMIC.includes(x)||!['OVERVIEW','NARRATIVE','ATTACHMENTS','REVIEW'].includes(x))
       if(!nav.includes(activeSection)&&nav.length)setActiveSection(nav[0])
     }catch(err){setError(err instanceof Error?err.message:'Unable to load NERIS form.')}
@@ -236,6 +244,7 @@ export default function NerisDynamicForm({
   return <Box sx={{display:'grid',gap:3}}>
     {error?<Alert severity='error'>{error}</Alert>:null}
     {message?<Alert severity='success'>{message}</Alert>:null}
+    {rehydrationWarning?<Alert severity='warning' variant='outlined'>{rehydrationWarning}</Alert>:null}
 
     <Card variant='outlined'>
       <CardContent>
