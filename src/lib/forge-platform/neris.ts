@@ -13,7 +13,7 @@ import {
   recordVersionToIfMatch,
   type ForgePlatformResult
 } from '@/lib/forge-platform/server'
-import { getIncident, patchIncident } from '@/lib/forge-platform/incidents'
+import { getIncident, patchIncident, validateIncident as validateBaseIncident } from '@/lib/forge-platform/incidents'
 
 export type NerisFieldValueState = {
   valueText?: string | null
@@ -308,4 +308,36 @@ export async function lookupValueSetOptions(valueSetLocation:string,search=''):P
     return {id,label,subtitle}
   }).filter(row=>!q||row.label.toLowerCase().includes(q)||(row.subtitle||'').toLowerCase().includes(q)).slice(0,50)
   return {data:options,source:'demo'}
+}
+
+
+export async function validateNerisIncident(incidentId:string){
+  const baseResult=await validateBaseIncident(incidentId)
+  if(getForgePlatformMode()==='connected'||baseResult.source==='platform')return baseResult
+
+  const descriptor=localDescriptor(incidentId)
+  const values=localValueMap(incidentId)
+  const extra=descriptor.modules
+    .flatMap(module=>module.fields.map(field=>({module,field})))
+    .filter(({field})=>field.required)
+    .filter(({field})=>!isFilled(values.get(field.fieldKey)?.value))
+    .map(({module,field})=>({
+      severity:'BLOCKING_ERROR' as const,
+      code:'NERIS_REQUIRED_FIELD_MISSING',
+      message:`${field.displayLabel} is required.`,
+      sectionKey:module.sectionKey
+    }))
+
+  const findings=[...baseResult.data.findings,...extra]
+  return {
+    data:{
+      ...baseResult.data,
+      ok:!findings.some(item=>item.severity==='BLOCKING_ERROR'),
+      findings,
+      blockingErrorCount:findings.filter(item=>item.severity==='BLOCKING_ERROR').length,
+      warningCount:findings.filter(item=>item.severity==='WARNING').length,
+      guidanceCount:findings.filter(item=>item.severity==='GUIDANCE').length
+    },
+    source:'demo' as const
+  }
 }
