@@ -3,19 +3,25 @@
     "id": "PP-0001",
     "tenantId": "forge-demo",
     "title": "Demo Preplan 1",
-    "occupancyId": null,
+    "occupancyId": "OCC-0003",
     "publicationStatus": "unpublished",
     "reviewStatus": "",
     "version": 1,
     "reviewerName": "",
     "buildingConstruction": "",
     "occupancyUse": "",
-    "hazards": [],
+    "hazards": "High rack storage; large interior travel distances; commercial vehicle traffic; roof collapse potential under advanced fire conditions.",
     "accessPoints": [],
     "fireProtectionSystems": [],
     "utilities": [],
     "notes": "",
     "createdAt": "2026-07-23T14:55:25.699Z",
-    "updatedAt": "2026-07-23T14:55:25.797Z"
+    "updatedAt": "2026-07-23T14:55:25.797Z",
+    "versionLabel": "1",
+    "approvalStatus": "APPROVED",
+    "tacticalSummary": "Large warehouse footprint. Establish command on the Alpha side, confirm sprinkler status, and maintain clear apparatus access to loading areas.",
+    "accessNotes": "Primary apparatus access from Spahn Rd. Keep loading-dock lanes clear for secondary access and aerial positioning.",
+    "utilityNotes": "Utility controls should be confirmed with site management on arrival. Verify fire pump and sprinkler control locations before shutdown.",
+    "primaryStationId": null
   }
 ]
