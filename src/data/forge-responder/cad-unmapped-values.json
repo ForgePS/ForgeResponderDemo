@@ -1,0 +1,12 @@
+[
+  {
+    "id": "cad-unmapped-demo-01",
+    "category": "INCIDENT_TYPE",
+    "sourceField": "callType",
+    "sourceValue": "FIRE-COMM",
+    "occurrenceCount": 7,
+    "status": "OPEN",
+    "recordVersion": 1,
+    "lastSeenAt": "2026-09-30T09:49:00.000Z"
+  }
+]
