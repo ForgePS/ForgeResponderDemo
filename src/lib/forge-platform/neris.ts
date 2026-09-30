@@ -328,7 +328,26 @@ export async function validateNerisIncident(incidentId:string){
       sectionKey:module.sectionKey
     }))
 
-  const findings=[...baseResult.data.findings,...extra]
+  const specialtyState=localSpecialtyMap(incidentId)
+  const repeatableRequirements=[
+    {sectionKey:'HAZMAT',entity:'incident-hazmat-substances',label:'Hazardous materials substance'},
+    {sectionKey:'CIVILIAN_CASUALTY',entity:'incident-civilian-casualties',label:'Civilian casualty'},
+    {sectionKey:'FIRE_SERVICE_CASUALTY',entity:'incident-fire-service-casualties',label:'Fire-service casualty'}
+  ]
+  const specialtyFindings=repeatableRequirements.flatMap(requirement=>{
+    if(specialtyState.get(requirement.sectionKey)?.state!=='ACTIVE')return []
+    const count=readForgeData<Array<Record<string,unknown>>>(requirement.entity)
+      .filter(row=>row.incidentId===incidentId&&String(row.status||'ACTIVE')!=='ARCHIVED').length
+    if(count>0)return []
+    return [{
+      severity:'BLOCKING_ERROR' as const,
+      code:'NERIS_SPECIALTY_RECORD_REQUIRED',
+      message:`${requirement.label} record is required because this specialty workflow is active.`,
+      sectionKey:requirement.sectionKey
+    }]
+  })
+
+  const findings=[...baseResult.data.findings,...extra,...specialtyFindings]
   return {
     data:{
       ...baseResult.data,
