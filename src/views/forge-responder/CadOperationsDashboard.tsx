@@ -53,13 +53,17 @@ export default function CadOperationsDashboard(){
   const [message,setMessage]=useState('')
   const [selectedMessageIds,setSelectedMessageIds]=useState<string[]>([])
   const [reason,setReason]=useState('Reviewed by CAD administrator')
+  const [scenarios,setScenarios]=useState<Record<string,unknown>[]>([])
+  const [scenarioId,setScenarioId]=useState('STRUCTURE_FIRE')
+  const [simConnectionId,setSimConnectionId]=useState('')
+  const [simSourceIncidentId,setSimSourceIncidentId]=useState('SIM-INC-1001')
   const [editingConnection,setEditingConnection]=useState<Connection|null>(null)
   const [connectionForm,setConnectionForm]=useState({name:'Demo CAD',vendor:'GENERIC',adapterKey:'generic',adapterVersion:'1.0',environment:'SIMULATOR',transportType:'SYNTHETIC_SIMULATOR',intakeMode:'HYBRID'})
 
   async function load(){
     setError('')
     try{
-      const [s,c,cf,u,uu,up,m,unitMap,personMap,units,personnel]=await Promise.all([
+      const [s,c,cf,u,uu,up,m,unitMap,personMap,units,personnel,scenarioData]=await Promise.all([
         json('/api/cad/summary'),
         json('/api/cad/connections'),
         json('/api/cad/conflicts?status=OPEN'),
@@ -70,12 +74,14 @@ export default function CadOperationsDashboard(){
         json('/api/cad/unit-mappings'),
         json('/api/cad/personnel-mappings'),
         json('/api/rms/units'),
-        json('/api/rms/personnel')
+        json('/api/rms/personnel'),
+        json('/api/cad/simulator/scenarios')
       ])
       setSummary(s.data);setConnections(c.data||[]);setConflicts(cf.data||[]);setUnmapped(u.data||[])
       setUnknownUnits(uu.data||[]);setUnknownPersonnel(up.data||[]);setMessages(m.data||[])
       setUnitMappings(unitMap.data||[]);setPersonnelMappings(personMap.data||[])
-      setRmsUnits(units.data||[]);setRmsPersonnel(personnel.data||[])
+      setRmsUnits(units.data||[]);setRmsPersonnel(personnel.data||[]);setScenarios(scenarioData.data||[])
+      if(!simConnectionId&&(c.data||[])[0]?.id)setSimConnectionId((c.data||[])[0].id)
     }catch(err){setError(err instanceof Error?err.message:'Unable to load CAD operations.')}
   }
 
@@ -163,6 +169,20 @@ export default function CadOperationsDashboard(){
   const unresolvedUnits=useMemo(()=>unknownUnits.filter(x=>!['MAPPED','IGNORED_WITH_REASON'].includes(x.status)),[unknownUnits])
   const unresolvedPersonnel=useMemo(()=>unknownPersonnel.filter(x=>!['MAPPED','IGNORED_WITH_REASON'].includes(x.status)),[unknownPersonnel])
 
+  async function sendScenario(){
+    if(!simConnectionId||!scenarioId)return
+    setBusy(true);setError('');setMessage('')
+    try{await json('/api/cad/simulator/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({connectionId:simConnectionId,scenarioId,sourceIncidentId:simSourceIncidentId,delivery:'DIRECT_QUEUE'})});await load();setMessage('CAD simulator scenario injected.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to inject CAD simulator scenario.')}finally{setBusy(false)}
+  }
+
+  async function simulatorOutage(recover:boolean){
+    if(!simConnectionId)return
+    setBusy(true);setError('');setMessage('')
+    try{await json('/api/cad/simulator/outage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({connectionId:simConnectionId,reason:reason||'CAD simulator outage',recover})});await load();setMessage(recover?'CAD simulator connection recovered.':'CAD simulator outage started.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to update CAD simulator state.')}finally{setBusy(false)}
+  }
+
   return <Box sx={{display:'grid',gap:3}}>
     {error?<Alert severity='error'>{error}</Alert>:null}
     {message?<Alert severity='success'>{message}</Alert>:null}
@@ -171,7 +191,7 @@ export default function CadOperationsDashboard(){
       <Typography variant='h4'>CAD Operations</Typography>
       <Typography color='text.secondary'>Connections, intake health, message processing, conflicts, mapping exceptions, and incident linkage.</Typography>
       <Tabs value={tab} onChange={(_,value)=>setTab(value)} variant='scrollable' sx={{mt:3,borderBottom:1,borderColor:'divider'}}>
-        <Tab label='Overview'/><Tab label='Connections'/><Tab label='Conflicts'/><Tab label='Mapping Exceptions'/><Tab label='Messages'/>
+        <Tab label='Overview'/><Tab label='Connections'/><Tab label='Conflicts'/><Tab label='Mapping Exceptions'/><Tab label='Messages'/><Tab label='Simulator'/>
       </Tabs>
     </CardContent></Card>
 
@@ -270,5 +290,28 @@ export default function CadOperationsDashboard(){
         {!messages.length?<Typography color='text.secondary'>No CAD messages recorded.</Typography>:null}
       </Box></CardContent></Card>
     </Box>:null}
+    {tab===5?<Box sx={{display:'grid',gap:3}}>
+      <Card><CardContent>
+        <Typography variant='h5'>CAD Simulator</Typography>
+        <Typography color='text.secondary' sx={{mb:3}}>Inject synthetic CAD traffic and test degraded/recovery behavior without targeting a production connection.</Typography>
+        <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'repeat(2,1fr)'},gap:3}}>
+          <TextField select label='Connection' value={simConnectionId} onChange={e=>setSimConnectionId(e.target.value)}>
+            {connections.filter(row=>row.environment!=='PRODUCTION').map(row=><MenuItem key={row.id} value={row.id}>{row.name} — {row.environment}</MenuItem>)}
+          </TextField>
+          <TextField select label='Scenario' value={scenarioId} onChange={e=>setScenarioId(e.target.value)}>
+            {scenarios.map((row:any)=>{const id=String(row.id||row.scenarioId||'');return <MenuItem key={id} value={id}>{String(row.label||row.name||id)}</MenuItem>})}
+          </TextField>
+          <TextField label='Source Incident ID' value={simSourceIncidentId} onChange={e=>setSimSourceIncidentId(e.target.value)}/>
+          <TextField label='Outage / Recovery Reason' value={reason} onChange={e=>setReason(e.target.value)}/>
+        </Box>
+        <Box sx={{display:'flex',gap:2,flexWrap:'wrap',mt:3}}>
+          <Button variant='contained' color='error' disabled={busy||!simConnectionId||!scenarioId} onClick={()=>void sendScenario()}>Inject Scenario</Button>
+          <Button variant='outlined' color='warning' disabled={busy||!simConnectionId} onClick={()=>void simulatorOutage(false)}>Start Outage</Button>
+          <Button variant='outlined' color='success' disabled={busy||!simConnectionId} onClick={()=>void simulatorOutage(true)}>Recover Connection</Button>
+        </Box>
+      </CardContent></Card>
+      <Card><CardContent><Typography variant='h5'>Available Scenarios</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{scenarios.map((row:any)=>{const id=String(row.id||row.scenarioId||'');return <Box key={id} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Typography fontWeight={700}>{String(row.label||row.name||id)}</Typography><Typography color='text.secondary'>{String(row.description||row.summary||'Synthetic CAD scenario')}</Typography></Box>})}</Box></CardContent></Card>
+    </Box>:null}
+
   </Box>
 }
