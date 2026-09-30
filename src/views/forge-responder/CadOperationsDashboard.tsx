@@ -8,8 +8,6 @@ import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Checkbox from '@mui/material/Checkbox'
 import Chip from '@mui/material/Chip'
-import Divider from '@mui/material/Divider'
-import FormControlLabel from '@mui/material/FormControlLabel'
 import MenuItem from '@mui/material/MenuItem'
 import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
@@ -53,6 +51,7 @@ export default function CadOperationsDashboard(){
   const [message,setMessage]=useState('')
   const [selectedMessageIds,setSelectedMessageIds]=useState<string[]>([])
   const [reason,setReason]=useState('Reviewed by CAD administrator')
+  const [editingConnection,setEditingConnection]=useState<Connection|null>(null)
   const [connectionForm,setConnectionForm]=useState({name:'Demo CAD',vendor:'GENERIC',adapterKey:'generic',adapterVersion:'1.0',environment:'SIMULATOR',transportType:'SYNTHETIC_SIMULATOR',intakeMode:'HYBRID'})
 
   async function load(){
@@ -83,10 +82,39 @@ export default function CadOperationsDashboard(){
     catch(err){setError(err instanceof Error?err.message:'CAD connection action failed.')}finally{setBusy(false)}
   }
 
+  function startEditConnection(row:Connection){
+    setEditingConnection(row)
+    setConnectionForm({
+      name:row.name,
+      vendor:row.vendor,
+      adapterKey:row.adapterKey,
+      adapterVersion:row.adapterVersion,
+      environment:row.environment,
+      transportType:row.transportType,
+      intakeMode:row.intakeMode
+    })
+  }
+
+  function resetConnectionForm(){
+    setEditingConnection(null)
+    setConnectionForm({name:'Demo CAD',vendor:'GENERIC',adapterKey:'generic',adapterVersion:'1.0',environment:'SIMULATOR',transportType:'SYNTHETIC_SIMULATOR',intakeMode:'HYBRID'})
+  }
+
   async function createConnection(){
     setBusy(true);setError('');setMessage('')
-    try{await json('/api/cad/connections',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...connectionForm,configurationJson:{}})});await load();setMessage('CAD connection created.')}
-    catch(err){setError(err instanceof Error?err.message:'Unable to create CAD connection.')}finally{setBusy(false)}
+    try{
+      await json('/api/cad/connections',{
+        method:editingConnection?'PATCH':'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(editingConnection
+          ? {id:editingConnection.id,recordVersion:editingConnection.recordVersion,...connectionForm,configurationJson:{}}
+          : {...connectionForm,configurationJson:{}})
+      })
+      resetConnectionForm()
+      await load()
+      setMessage(editingConnection?'CAD connection updated.':'CAD connection created.')
+    }catch(err){setError(err instanceof Error?err.message:'Unable to save CAD connection.')}
+    finally{setBusy(false)}
   }
 
   async function resolveConflict(row:Conflict,action:string){
@@ -157,7 +185,7 @@ export default function CadOperationsDashboard(){
     </Box>:null}
 
     {tab===1?<Box sx={{display:'grid',gap:3}}>
-      <Card><CardContent><Typography variant='h5' sx={{mb:3}}>Add CAD Connection</Typography>
+      <Card><CardContent><Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:2,mb:3}}><Typography variant='h5'>{editingConnection?'Edit CAD Connection':'Add CAD Connection'}</Typography>{editingConnection?<Button size='small' onClick={resetConnectionForm}>Cancel Edit</Button>:null}</Box>
         <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'repeat(2,1fr)'},gap:3}}>
           <TextField label='Name' value={connectionForm.name} onChange={e=>setConnectionForm(v=>({...v,name:e.target.value}))}/>
           <TextField label='Vendor' value={connectionForm.vendor} onChange={e=>setConnectionForm(v=>({...v,vendor:e.target.value}))}/>
@@ -167,7 +195,7 @@ export default function CadOperationsDashboard(){
           <TextField select label='Transport' value={connectionForm.transportType} onChange={e=>setConnectionForm(v=>({...v,transportType:e.target.value}))}>{transports.map(x=><MenuItem key={x} value={x}>{x.replaceAll('_',' ')}</MenuItem>)}</TextField>
           <TextField select label='Intake Mode' value={connectionForm.intakeMode} onChange={e=>setConnectionForm(v=>({...v,intakeMode:e.target.value}))}>{intakeModes.map(x=><MenuItem key={x} value={x}>{x.replaceAll('_',' ')}</MenuItem>)}</TextField>
         </Box>
-        <Box sx={{display:'flex',justifyContent:'flex-end',mt:3}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void createConnection()}>Create Connection</Button></Box>
+        <Box sx={{display:'flex',justifyContent:'flex-end',mt:3}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void createConnection()}>{editingConnection?'Save Connection':'Create Connection'}</Button></Box>
       </CardContent></Card>
 
       {connections.map(row=><Card key={row.id}><CardContent>
@@ -178,6 +206,7 @@ export default function CadOperationsDashboard(){
         <Typography variant='body2' sx={{mt:2}}>Transport: {row.transportType} · Intake: {row.intakeMode}</Typography>
         {row.lastErrorSummary?<Alert severity='warning' sx={{mt:2}}>{row.lastErrorSummary}</Alert>:null}
         <Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:3}}>
+          <Button variant='outlined' disabled={busy} onClick={()=>startEditConnection(row)}>Edit</Button>
           <Button variant='outlined' disabled={busy} onClick={()=>void actConnection(row.id,'TEST')}>Test</Button>
           {row.status==='ACTIVE'||row.status==='ENABLED'?<Button color='warning' variant='outlined' disabled={busy} onClick={()=>void actConnection(row.id,'DISABLE')}>Disable</Button>:<Button variant='contained' disabled={busy} onClick={()=>void actConnection(row.id,'ENABLE')}>Enable</Button>}
         </Box>
