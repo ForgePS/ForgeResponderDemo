@@ -267,7 +267,7 @@ export default function IncidentWorkspace({
 
         {tab===3?<Box sx={{mt:4}}><SpecialtyRecordsPanel incidentId={incident.id}/></Box>:null}
 
-        {tab===4?<Box sx={{mt:4}}><CadIncidentPanel incidentId={incident.id}/></Box>:null}
+        {tab===4?<Box sx={{mt:4}}><CadIncidentPanel incidentId={incident.id} lang={lang}/></Box>:null}
 
         {tab===5?<Box sx={{display:'grid',gap:3,mt:4}}>
           <TextField multiline minRows={14} label='Incident Narrative' value={narrative} onChange={e=>setNarrative(e.target.value)}/>
