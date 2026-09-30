@@ -1,0 +1,90 @@
+[
+  {
+    "id": "cad-norm-demo-02",
+    "cadRawMessageId": "cad-msg-demo-02",
+    "cadConnectionId": "cad-conn-demo-01",
+    "sourceMessageId": "CAD-MSG-1002",
+    "sourceIncidentId": "CAD-INC-2402",
+    "sourceIncidentNumber": "CAD-INC-2402",
+    "sourceEventId": "CAD-EVT-2402-1",
+    "sourceSequence": 1,
+    "normalizedEventType": "INCIDENT_CREATED",
+    "normalizedEventTimestamp": "2026-09-30T09:50:00.000Z",
+    "originalEventTimestamp": "2026-09-30T09:50:00.000Z",
+    "originalTimezone": "America/Chicago",
+    "normalizedPayload": {
+      "source": {
+        "vendor": "Generic CAD",
+        "adapterKey": "generic-simulator",
+        "adapterVersion": "1.0",
+        "messageId": "CAD-MSG-1002",
+        "eventId": "CAD-EVT-2402-1",
+        "incidentId": "CAD-INC-2402",
+        "incidentNumber": "CAD-INC-2402",
+        "timestamp": "2026-09-30T09:50:00.000Z"
+      },
+      "eventType": "INCIDENT_CREATED",
+      "incident": {
+        "callType": "STRUCTURE_FIRE",
+        "nature": "Reported residential structure fire",
+        "priority": "1",
+        "alarmLevel": "1"
+      },
+      "location": {
+        "fullAddress": "123 Main St",
+        "addressNumber": "123",
+        "street": "Main",
+        "city": "Springfield",
+        "state": "IL",
+        "postalCode": "62701",
+        "district": "District 1",
+        "latitude": 39.8017,
+        "longitude": -89.6436
+      },
+      "timestamps": {
+        "callReceived": "2026-09-30T09:49:42.000Z",
+        "callEntered": "2026-09-30T09:49:51.000Z",
+        "dispatch": "2026-09-30T09:50:00.000Z"
+      },
+      "units": [
+        {
+          "sourceUnitId": "CAD-E12",
+          "sourceUnitCallsign": "E12",
+          "status": "DISPATCHED",
+          "dispatchedAt": "2026-09-30T09:50:00.000Z"
+        }
+      ],
+      "personnel": [
+        {
+          "sourcePersonnelId": "CAD-P-204",
+          "sourceName": "Demo Officer",
+          "role": "OFFICER"
+        }
+      ],
+      "comments": [
+        {
+          "sourceCommentId": "CAD-C-1",
+          "sourceTimestamp": "2026-09-30T09:50:04.000Z",
+          "normalizedTimestamp": "2026-09-30T09:50:04.000Z",
+          "text": "Caller reports smoke showing from the second floor.",
+          "restricted": false
+        }
+      ],
+      "provenance": [
+        {
+          "fieldIdentifier": "incident.callType",
+          "sourcePath": "callType"
+        },
+        {
+          "fieldIdentifier": "location.fullAddress",
+          "sourcePath": "address"
+        }
+      ]
+    },
+    "normalizationWarnings": [],
+    "normalizationErrors": [],
+    "mappingStatus": "REQUIRES_REVIEW",
+    "incidentApplicationStatus": "REQUIRES_REVIEW",
+    "createdAt": "2026-09-30T09:50:01.000Z"
+  }
+]

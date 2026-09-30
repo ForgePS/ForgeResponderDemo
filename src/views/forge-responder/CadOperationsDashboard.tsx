@@ -1,0 +1,412 @@
+'use client'
+
+import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import Checkbox from '@mui/material/Checkbox'
+import Chip from '@mui/material/Chip'
+import MenuItem from '@mui/material/MenuItem'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+
+type Connection={id:string;name:string;vendor:string;adapterKey:string;adapterVersion:string;environment:string;transportType:string;status:string;intakeMode:string;healthStatus:string;recordVersion:number;lastMessageAt?:string|null;lastSuccessAt?:string|null;lastErrorSummary?:string|null}
+type Summary={connections:Connection[];messages:{received:number;applied:number;duplicates:number;failed:number;deadLetter:number;requiresReview:number;byStatus:Record<string,number>};openConflicts:number;unmappedValues:number;unknownUnits:number;unknownPersonnel:number;activeLinks:number}
+type Conflict={id:string;incidentId:string|null;conflictType:string;status:string;severity:string;fieldIdentifier:string|null;resolutionReason:string|null;recordVersion:number;createdAt:string}
+type Unmapped={id:string;category:string;sourceField:string;sourceValue:string;occurrenceCount:number;status:string;recordVersion:number;lastSeenAt:string}
+type UnknownUnit={id:string;sourceUnitId:string;sourceUnitCallsign:string|null;occurrenceCount:number;status:string;recordVersion:number;lastSeenAt:string}
+type UnknownPerson={id:string;sourcePersonnelId:string;sourceName:string|null;occurrenceCount:number;status:string;recordVersion:number;lastSeenAt:string}
+type Message={id:string;receivedAt:string;transportType:string;sourceMessageId:string|null;sourceIncidentId:string|null;processingStatus:string;authenticationStatus:string;payloadSizeBytes:number|null;payloadHash:string|null;correlationId:string|null;cadConnectionId:string}
+type MessageDetail={message:Record<string,unknown>;normalizedEvents:Array<{id:string;normalizedEventType:string;normalizedEventTimestamp:string;sourceIncidentId?:string|null;sourceIncidentNumber?:string|null;mappingStatus?:string|null;incidentApplicationStatus?:string|null;normalizedPayload:Record<string,unknown>}>}
+type Option={id:string;callSign?:string;unitNumber?:string;name?:string;personId?:string;displayName?:string}
+
+const resolutionActions=['USE_CAD','KEEP_FORGE','MERGE','LINK','UNLINK','CREATE_NEW','IGNORE','ESCALATE','CORRECT_MAPPING']
+const environments=['SIMULATOR','DEVELOPMENT','TEST','STAGING','PRODUCTION']
+const transports=['HTTPS_WEBHOOK','POLLING','SYNTHETIC_SIMULATOR']
+const intakeModes=['MANUAL_ONLY','CAD_ENABLED','HYBRID']
+
+async function json(url:string,init?:RequestInit){
+  const response=await fetch(url,init)
+  const body=await response.json()
+  if(!response.ok)throw new Error(body.error||'CAD operation failed.')
+  return body
+}
+
+export default function CadOperationsDashboard({lang}:{lang:string}){
+  const router=useRouter()
+  const [tab,setTab]=useState(0)
+  const [summary,setSummary]=useState<Summary|null>(null)
+  const [connections,setConnections]=useState<Connection[]>([])
+  const [conflicts,setConflicts]=useState<Conflict[]>([])
+  const [unmapped,setUnmapped]=useState<Unmapped[]>([])
+  const [unknownUnits,setUnknownUnits]=useState<UnknownUnit[]>([])
+  const [unknownPersonnel,setUnknownPersonnel]=useState<UnknownPerson[]>([])
+  const [messages,setMessages]=useState<Message[]>([])
+  const [selectedMessageDetail,setSelectedMessageDetail]=useState<MessageDetail|null>(null)
+  const [unitMappings,setUnitMappings]=useState<Record<string,unknown>[]>([])
+  const [personnelMappings,setPersonnelMappings]=useState<Record<string,unknown>[]>([])
+  const [rmsUnits,setRmsUnits]=useState<Option[]>([])
+  const [rmsPersonnel,setRmsPersonnel]=useState<Option[]>([])
+  const [busy,setBusy]=useState(false)
+  const [error,setError]=useState('')
+  const [message,setMessage]=useState('')
+  const [selectedMessageIds,setSelectedMessageIds]=useState<string[]>([])
+  const [reason,setReason]=useState('Reviewed by CAD administrator')
+  const [scenarios,setScenarios]=useState<Record<string,unknown>[]>([])
+  const [scenarioId,setScenarioId]=useState('STRUCTURE_FIRE')
+  const [simConnectionId,setSimConnectionId]=useState('')
+  const [simSourceIncidentId,setSimSourceIncidentId]=useState('SIM-INC-1001')
+  const [simAutoDispatch,setSimAutoDispatch]=useState(true)
+  const [outages,setOutages]=useState<Record<string,unknown>[]>([])
+  const [editingConnection,setEditingConnection]=useState<Connection|null>(null)
+  const [connectionForm,setConnectionForm]=useState({name:'Demo CAD',vendor:'GENERIC',adapterKey:'generic',adapterVersion:'1.0',environment:'SIMULATOR',transportType:'SYNTHETIC_SIMULATOR',intakeMode:'HYBRID'})
+
+  async function load(){
+    setError('')
+    try{
+      const [s,c,cf,u,uu,up,m,unitMap,personMap,units,personnel,scenarioData,outageData]=await Promise.all([
+        json('/api/cad/summary'),
+        json('/api/cad/connections'),
+        json('/api/cad/conflicts?status=OPEN'),
+        json('/api/cad/unmapped-values'),
+        json('/api/cad/unknown-units'),
+        json('/api/cad/unknown-personnel'),
+        json('/api/cad/messages'),
+        json('/api/cad/unit-mappings'),
+        json('/api/cad/personnel-mappings'),
+        json('/api/rms/units'),
+        json('/api/rms/personnel'),
+        json('/api/cad/simulator/scenarios'),
+        json('/api/cad/simulator/outages')
+      ])
+      setSummary(s.data);setConnections(c.data||[]);setConflicts(cf.data||[]);setUnmapped(u.data||[])
+      setUnknownUnits(uu.data||[]);setUnknownPersonnel(up.data||[]);setMessages(m.data||[])
+      setUnitMappings(unitMap.data||[]);setPersonnelMappings(personMap.data||[])
+      setRmsUnits(units.data||[]);setRmsPersonnel(personnel.data||[]);setScenarios(scenarioData.data||[]);setOutages(outageData.data||[])
+      if(!simConnectionId&&(c.data||[])[0]?.id)setSimConnectionId((c.data||[])[0].id)
+    }catch(err){setError(err instanceof Error?err.message:'Unable to load CAD operations.')}
+  }
+
+  useEffect(()=>{void load()},[])
+
+  async function actConnection(id:string,action:'ENABLE'|'DISABLE'|'TEST'){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/connections/${id}/action`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action})});await load();setMessage(`CAD connection ${action.toLowerCase()} action completed.`)}
+    catch(err){setError(err instanceof Error?err.message:'CAD connection action failed.')}finally{setBusy(false)}
+  }
+
+  function startEditConnection(row:Connection){
+    setEditingConnection(row)
+    setConnectionForm({
+      name:row.name,
+      vendor:row.vendor,
+      adapterKey:row.adapterKey,
+      adapterVersion:row.adapterVersion,
+      environment:row.environment,
+      transportType:row.transportType,
+      intakeMode:row.intakeMode
+    })
+  }
+
+  function resetConnectionForm(){
+    setEditingConnection(null)
+    setConnectionForm({name:'Demo CAD',vendor:'GENERIC',adapterKey:'generic',adapterVersion:'1.0',environment:'SIMULATOR',transportType:'SYNTHETIC_SIMULATOR',intakeMode:'HYBRID'})
+  }
+
+  async function createConnection(){
+    setBusy(true);setError('');setMessage('')
+    try{
+      await json('/api/cad/connections',{
+        method:editingConnection?'PATCH':'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(editingConnection
+          ? {id:editingConnection.id,recordVersion:editingConnection.recordVersion,...connectionForm,configurationJson:{}}
+          : {...connectionForm,configurationJson:{}})
+      })
+      resetConnectionForm()
+      await load()
+      setMessage(editingConnection?'CAD connection updated.':'CAD connection created.')
+    }catch(err){setError(err instanceof Error?err.message:'Unable to save CAD connection.')}
+    finally{setBusy(false)}
+  }
+
+  async function resolveConflict(row:Conflict,action:string){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/conflicts/${row.id}/resolve`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resolutionAction:action,resolutionReason:reason,recordVersion:row.recordVersion})});await load();setMessage('CAD conflict updated.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to resolve conflict.')}finally{setBusy(false)}
+  }
+
+  async function resolveUnmapped(row:Unmapped,status:string){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/unmapped-values/${row.id}/resolve`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resolutionReason:reason,recordVersion:row.recordVersion,status})});await load();setMessage('CAD value exception resolved.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to resolve CAD value.')}finally{setBusy(false)}
+  }
+
+  async function resolveUnknownUnit(row:UnknownUnit,forgeUnitId:string,status='MAPPED'){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/unknown-units/${row.id}/resolve`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resolutionReason:reason,recordVersion:row.recordVersion,status,forgeUnitId:forgeUnitId||null,mappingType:'UNIT',externalAgency:false})});await load();setMessage('CAD unit mapping updated.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to resolve CAD unit.')}finally{setBusy(false)}
+  }
+
+  async function resolveUnknownPerson(row:UnknownPerson,forgePersonnelId:string,status='MAPPED'){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/unknown-personnel/${row.id}/resolve`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resolutionReason:reason,recordVersion:row.recordVersion,status,forgePersonnelId:forgePersonnelId||null,mappingType:'PERSONNEL',externalAgency:false})});await load();setMessage('CAD personnel mapping updated.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to resolve CAD personnel.')}finally{setBusy(false)}
+  }
+
+  async function inspectMessage(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{
+      const body=await json(`/api/cad/messages/${id}`)
+      setSelectedMessageDetail(body.data)
+    }catch(err){setError(err instanceof Error?err.message:'Unable to inspect CAD message.')}
+    finally{setBusy(false)}
+  }
+
+  async function createIncidentFromMessage(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{
+      const body=await json(`/api/cad/messages/${id}/create-incident`,{method:'POST'})
+      router.push(`/${lang}/incidents/${body.data.incidentId}`)
+      router.refresh()
+    }catch(err){setError(err instanceof Error?err.message:'Unable to create incident from CAD message.');setBusy(false)}
+  }
+
+  async function reprocess(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/messages/${id}/reprocess`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason})});await load();setMessage('CAD message queued for reprocessing.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to reprocess CAD message.')}finally{setBusy(false)}
+  }
+
+  async function rotateSecret(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/connections/${id}/rotate-secret`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason})});await load();setMessage('CAD webhook secret rotated.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to rotate CAD secret.')}finally{setBusy(false)}
+  }
+
+  async function quarantine(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/messages/${id}/quarantine`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason})});await load();setMessage('CAD message quarantined.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to quarantine CAD message.')}finally{setBusy(false)}
+  }
+
+  async function replay(){
+    if(!selectedMessageIds.length)return
+    setBusy(true);setError('');setMessage('')
+    try{await json('/api/cad/messages/replay',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({rawMessageIds:selectedMessageIds,reason})});setSelectedMessageIds([]);await load();setMessage('Selected CAD messages queued for replay.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to replay CAD messages.')}finally{setBusy(false)}
+  }
+
+  const unresolvedUnmapped=useMemo(()=>unmapped.filter(x=>!['MAPPED','IGNORED_WITH_REASON'].includes(x.status)),[unmapped])
+  const unresolvedUnits=useMemo(()=>unknownUnits.filter(x=>!['MAPPED','IGNORED_WITH_REASON'].includes(x.status)),[unknownUnits])
+  const unresolvedPersonnel=useMemo(()=>unknownPersonnel.filter(x=>!['MAPPED','IGNORED_WITH_REASON'].includes(x.status)),[unknownPersonnel])
+
+  async function sendScenario(){
+    if(!simConnectionId||!scenarioId)return
+    setBusy(true);setError('');setMessage('')
+    try{
+      const body=await json('/api/cad/simulator/send',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({connectionId:simConnectionId,scenarioId,sourceIncidentId:simSourceIncidentId,delivery:'DIRECT_QUEUE',autoDispatch:simAutoDispatch})
+      })
+      await load()
+      if(body.data?.incident?.incidentId){
+        const applied=Number(body.data?.autoPrefill?.applied||0)
+        const skipped=Number(body.data?.autoPrefill?.skipped||0)
+        setMessage(`CAD scenario applied to incident ${body.data.incident.incidentNumber}. ${applied} Auto-Dispatch item${applied===1?'':'s'} applied; ${skipped} skipped for review.`)
+        router.push(`/${lang}/incidents/${body.data.incident.incidentId}`)
+        router.refresh()
+        return
+      }
+      setMessage('CAD simulator scenario injected.')
+    }catch(err){setError(err instanceof Error?err.message:'Unable to inject CAD simulator scenario.')}
+    finally{setBusy(false)}
+  }
+
+  async function simulatorOutage(recover:boolean){
+    if(!simConnectionId)return
+    setBusy(true);setError('');setMessage('')
+    try{await json('/api/cad/simulator/outage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({connectionId:simConnectionId,reason:reason||'CAD simulator outage',recover})});await load();setMessage(recover?'CAD simulator connection recovered.':'CAD simulator outage started.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to update CAD simulator state.')}finally{setBusy(false)}
+  }
+
+  return <Box sx={{display:'grid',gap:3}}>
+    {error?<Alert severity='error'>{error}</Alert>:null}
+    {message?<Alert severity='success'>{message}</Alert>:null}
+
+    <Card><CardContent>
+      <Typography variant='h4'>CAD Operations</Typography>
+      <Typography color='text.secondary'>Connections, intake health, message processing, conflicts, mapping exceptions, and incident linkage.</Typography>
+      <Tabs value={tab} onChange={(_,value)=>setTab(value)} variant='scrollable' sx={{mt:3,borderBottom:1,borderColor:'divider'}}>
+        <Tab label='Overview'/><Tab label='Connections'/><Tab label='Conflicts'/><Tab label='Mapping Exceptions'/><Tab label='Messages'/><Tab label='Simulator'/>
+      </Tabs>
+    </CardContent></Card>
+
+    {tab===0?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',sm:'repeat(2,1fr)',xl:'repeat(4,1fr)'},gap:3}}>
+      {[
+        ['Connections',summary?.connections.length??'—'],
+        ['Messages Received',summary?.messages.received??'—'],
+        ['Open Conflicts',summary?.openConflicts??'—'],
+        ['Active CAD Links',summary?.activeLinks??'—'],
+        ['Unmapped Values',summary?.unmappedValues??'—'],
+        ['Unknown Units',summary?.unknownUnits??'—'],
+        ['Unknown Personnel',summary?.unknownPersonnel??'—'],
+        ['Requires Review',summary?.messages.requiresReview??'—']
+      ].map(([label,value])=><Card key={String(label)}><CardContent><Typography variant='caption' color='text.secondary'>{label}</Typography><Typography variant='h4'>{value}</Typography></CardContent></Card>)}
+      <Card sx={{gridColumn:{xl:'1 / -1'}}}><CardContent><Typography variant='h5'>Message Processing</Typography><Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:2}}>{Object.entries(summary?.messages.byStatus||{}).map(([status,count])=><Chip key={status} variant='tonal' label={status.replaceAll('_',' ')+' · '+count}/>)}</Box></CardContent></Card>
+    </Box>:null}
+
+    {tab===1?<Box sx={{display:'grid',gap:3}}>
+      <Card><CardContent><Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:2,mb:3}}><Typography variant='h5'>{editingConnection?'Edit CAD Connection':'Add CAD Connection'}</Typography>{editingConnection?<Button size='small' onClick={resetConnectionForm}>Cancel Edit</Button>:null}</Box>
+        <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'repeat(2,1fr)'},gap:3}}>
+          <TextField label='Name' value={connectionForm.name} onChange={e=>setConnectionForm(v=>({...v,name:e.target.value}))}/>
+          <TextField label='Vendor' value={connectionForm.vendor} onChange={e=>setConnectionForm(v=>({...v,vendor:e.target.value}))}/>
+          <TextField label='Adapter Key' value={connectionForm.adapterKey} onChange={e=>setConnectionForm(v=>({...v,adapterKey:e.target.value}))}/>
+          <TextField label='Adapter Version' value={connectionForm.adapterVersion} onChange={e=>setConnectionForm(v=>({...v,adapterVersion:e.target.value}))}/>
+          <TextField select label='Environment' value={connectionForm.environment} onChange={e=>setConnectionForm(v=>({...v,environment:e.target.value}))}>{environments.map(x=><MenuItem key={x} value={x}>{x}</MenuItem>)}</TextField>
+          <TextField select label='Transport' value={connectionForm.transportType} onChange={e=>setConnectionForm(v=>({...v,transportType:e.target.value}))}>{transports.map(x=><MenuItem key={x} value={x}>{x.replaceAll('_',' ')}</MenuItem>)}</TextField>
+          <TextField select label='Intake Mode' value={connectionForm.intakeMode} onChange={e=>setConnectionForm(v=>({...v,intakeMode:e.target.value}))}>{intakeModes.map(x=><MenuItem key={x} value={x}>{x.replaceAll('_',' ')}</MenuItem>)}</TextField>
+        </Box>
+        <Box sx={{display:'flex',justifyContent:'flex-end',mt:3}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void createConnection()}>{editingConnection?'Save Connection':'Create Connection'}</Button></Box>
+      </CardContent></Card>
+
+      {connections.map(row=><Card key={row.id}><CardContent>
+        <Box sx={{display:'flex',justifyContent:'space-between',gap:2,alignItems:'flex-start',flexWrap:'wrap'}}>
+          <Box><Typography variant='h5'>{row.name}</Typography><Typography color='text.secondary'>{row.vendor} · {row.adapterKey} {row.adapterVersion} · {row.environment}</Typography></Box>
+          <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}><Chip variant='tonal' label={row.status}/><Chip variant='tonal' color={row.healthStatus==='HEALTHY'?'success':'warning'} label={row.healthStatus}/></Box>
+        </Box>
+        <Typography variant='body2' sx={{mt:2}}>Transport: {row.transportType} · Intake: {row.intakeMode}</Typography>
+        {row.lastErrorSummary?<Alert severity='warning' sx={{mt:2}}>{row.lastErrorSummary}</Alert>:null}
+        <Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:3}}>
+          <Button variant='outlined' disabled={busy} onClick={()=>startEditConnection(row)}>Edit</Button>
+          <Button variant='outlined' disabled={busy} onClick={()=>void actConnection(row.id,'TEST')}>Test</Button>
+          <Button variant='outlined' disabled={busy} onClick={()=>void rotateSecret(row.id)}>Rotate Secret</Button>
+          {row.status==='ACTIVE'||row.status==='ENABLED'?<Button color='warning' variant='outlined' disabled={busy} onClick={()=>void actConnection(row.id,'DISABLE')}>Disable</Button>:<Button variant='contained' disabled={busy} onClick={()=>void actConnection(row.id,'ENABLE')}>Enable</Button>}
+        </Box>
+      </CardContent></Card>)}
+    </Box>:null}
+
+    {tab===2?<Box sx={{display:'grid',gap:3}}>
+      <TextField label='Resolution Reason' value={reason} onChange={e=>setReason(e.target.value)}/>
+      {conflicts.map(row=><Card key={row.id}><CardContent>
+        <Box sx={{display:'flex',justifyContent:'space-between',gap:2,alignItems:'center',flexWrap:'wrap'}}>
+          <Box><Typography variant='h5'>{row.conflictType.replaceAll('_',' ')}</Typography><Typography color='text.secondary'>{row.fieldIdentifier||'No field identifier'} · {row.incidentId||'No incident linked'}</Typography></Box>
+          <Chip variant='tonal' color={row.severity==='HIGH'||row.severity==='CRITICAL'?'error':'warning'} label={row.severity}/>
+        </Box>
+        <Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:3}}>{resolutionActions.map(action=><Button key={action} size='small' variant={action==='ESCALATE'?'outlined':'tonal'} color={action==='ESCALATE'?'warning':'primary'} disabled={busy} onClick={()=>void resolveConflict(row,action)}>{action.replaceAll('_',' ')}</Button>)}</Box>
+      </CardContent></Card>)}
+      {!conflicts.length?<Alert severity='success'>No open CAD conflicts.</Alert>:null}
+    </Box>:null}
+
+    {tab===3?<Box sx={{display:'grid',gap:3}}>
+      <TextField label='Resolution Reason' value={reason} onChange={e=>setReason(e.target.value)}/>
+      <Card><CardContent><Typography variant='h5'>Unmapped Values</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{unresolvedUnmapped.map(row=><Box key={row.id} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Typography fontWeight={700}>{row.sourceField}: {row.sourceValue}</Typography><Typography variant='caption' color='text.secondary'>{row.category} · Seen {row.occurrenceCount} times</Typography><Box sx={{display:'flex',gap:1,mt:2}}><Button size='small' onClick={()=>void resolveUnmapped(row,'MAPPED')}>Mark Mapped</Button><Button size='small' color='warning' onClick={()=>void resolveUnmapped(row,'IGNORED_WITH_REASON')}>Ignore</Button><Button size='small' color='error' onClick={()=>void resolveUnmapped(row,'ESCALATED')}>Escalate</Button></Box></Box>)}</Box></CardContent></Card>
+      <Card><CardContent><Typography variant='h5'>Unknown Units</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{unresolvedUnits.map(row=><Box key={row.id} sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr auto'},gap:2,alignItems:'center',p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Box><Typography fontWeight={700}>{row.sourceUnitCallsign||row.sourceUnitId}</Typography><Typography variant='caption'>Source ID: {row.sourceUnitId}</Typography></Box><TextField select size='small' label='Forge Unit' defaultValue='' onChange={e=>{if(e.target.value)void resolveUnknownUnit(row,e.target.value)}}><MenuItem value=''>Select mapping</MenuItem>{rmsUnits.map(unit=><MenuItem key={unit.id} value={unit.id}>{unit.callSign||unit.unitNumber||unit.name||unit.id}</MenuItem>)}</TextField><Button size='small' color='warning' onClick={()=>void resolveUnknownUnit(row,'','IGNORED_WITH_REASON')}>Ignore</Button></Box>)}</Box></CardContent></Card>
+      <Card><CardContent><Typography variant='h5'>Unknown Personnel</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{unresolvedPersonnel.map(row=><Box key={row.id} sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr auto'},gap:2,alignItems:'center',p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Box><Typography fontWeight={700}>{row.sourceName||row.sourcePersonnelId}</Typography><Typography variant='caption'>Source ID: {row.sourcePersonnelId}</Typography></Box><TextField select size='small' label='Forge Personnel' defaultValue='' onChange={e=>{if(e.target.value)void resolveUnknownPerson(row,e.target.value)}}><MenuItem value=''>Select mapping</MenuItem>{rmsPersonnel.map(person=><MenuItem key={person.id} value={person.id}>{person.displayName||person.personId||person.name||person.id}</MenuItem>)}</TextField><Button size='small' color='warning' onClick={()=>void resolveUnknownPerson(row,'','IGNORED_WITH_REASON')}>Ignore</Button></Box>)}</Box></CardContent></Card>
+      <Card><CardContent>
+        <Typography variant='h5'>Active Unit Mappings</Typography>
+        <Box sx={{display:'grid',gap:1,mt:2}}>
+          {unitMappings.map((row:any)=><Box key={String(row.id)} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}>
+            <Typography fontWeight={700}>{String(row.sourceUnitCallsign||row.sourceUnitId||'CAD Unit')}</Typography>
+            <Typography variant='caption' color='text.secondary'>{'Forge Unit: '+String(row.forgeUnitId||row.forgeApparatusId||'External / not linked')+' · '+String(row.mappingType||'MAPPING')}</Typography>
+          </Box>)}
+          {!unitMappings.length?<Typography color='text.secondary'>No active unit mappings.</Typography>:null}
+        </Box>
+      </CardContent></Card>
+      <Card><CardContent>
+        <Typography variant='h5'>Active Personnel Mappings</Typography>
+        <Box sx={{display:'grid',gap:1,mt:2}}>
+          {personnelMappings.map((row:any)=><Box key={String(row.id)} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}>
+            <Typography fontWeight={700}>{String(row.sourceName||row.sourcePersonnelId||'CAD Personnel')}</Typography>
+            <Typography variant='caption' color='text.secondary'>{'Forge Personnel: '+String(row.forgePersonnelId||row.forgePersonId||'External / not linked')+' · '+String(row.mappingType||'MAPPING')}</Typography>
+          </Box>)}
+          {!personnelMappings.length?<Typography color='text.secondary'>No active personnel mappings.</Typography>:null}
+        </Box>
+      </CardContent></Card>
+    </Box>:null}
+
+    {tab===4?<Box sx={{display:'grid',gap:3}}>
+      <Box sx={{display:'flex',gap:2,flexWrap:'wrap',alignItems:'center'}}><TextField label='Replay / Reprocess Reason' value={reason} onChange={e=>setReason(e.target.value)} sx={{minWidth:320}}/><Button variant='contained' disabled={busy||!selectedMessageIds.length} onClick={()=>void replay()}>Replay Selected ({selectedMessageIds.length})</Button></Box>
+      <Card><CardContent><Box sx={{display:'grid',gap:2}}>
+        {messages.map(row=><Box key={row.id} sx={{display:'grid',gridTemplateColumns:{xs:'auto 1fr',lg:'auto 1.1fr .8fr .8fr auto'},gap:2,alignItems:'center',p:2,borderBottom:'1px solid',borderColor:'divider'}}>
+          <Checkbox checked={selectedMessageIds.includes(row.id)} onChange={e=>setSelectedMessageIds(current=>e.target.checked?[...current,row.id]:current.filter(id=>id!==row.id))}/>
+          <Box><Typography fontWeight={700}>{row.sourceMessageId||row.id}</Typography><Typography variant='caption' color='text.secondary'>{new Date(row.receivedAt).toLocaleString()}</Typography></Box>
+          <Typography>{row.sourceIncidentId||'No source incident'}</Typography>
+          <Chip size='small' variant='tonal' color={row.processingStatus==='FAILED'||row.processingStatus==='DEAD_LETTER'?'error':row.processingStatus==='APPLIED'?'success':'warning'} label={row.processingStatus}/>
+          <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}><Button size='small' variant='outlined' disabled={busy} onClick={()=>void inspectMessage(row.id)}>Inspect</Button>{row.sourceIncidentId?<Button size='small' variant='contained' disabled={busy} onClick={()=>void createIncidentFromMessage(row.id)}>Create Incident</Button>:null}<Button size='small' disabled={busy} onClick={()=>void reprocess(row.id)}>Reprocess</Button><Button size='small' color='warning' disabled={busy} onClick={()=>void quarantine(row.id)}>Quarantine</Button></Box>
+        </Box>)}
+        {!messages.length?<Typography color='text.secondary'>No CAD messages recorded.</Typography>:null}
+      </Box></CardContent></Card>
+      {selectedMessageDetail?<Card><CardContent>
+        <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:2,flexWrap:'wrap'}}>
+          <Box><Typography variant='h5'>Normalized Message Detail</Typography><Typography color='text.secondary'>Vendor-neutral CAD content available to Auto-Dispatch and reviewed prefill.</Typography></Box>
+          <Button size='small' onClick={()=>setSelectedMessageDetail(null)}>Close</Button>
+        </Box>
+        <Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:2}}>
+          <Chip variant='tonal' label={'Source: '+String(selectedMessageDetail.message.sourceIncidentId||'—')}/>
+          <Chip variant='tonal' label={'Status: '+String(selectedMessageDetail.message.processingStatus||'—')}/>
+          <Chip variant='tonal' label={String(selectedMessageDetail.normalizedEvents.length)+' normalized event'+(selectedMessageDetail.normalizedEvents.length===1?'':'s')}/>
+        </Box>
+        <Box sx={{display:'grid',gap:2,mt:3}}>
+          {selectedMessageDetail.normalizedEvents.map(event=>{
+            const payload=event.normalizedPayload||{}
+            const incident=(payload.incident||{}) as Record<string,unknown>
+            const location=(payload.location||{}) as Record<string,unknown>
+            const timestamps=(payload.timestamps||{}) as Record<string,unknown>
+            const units=Array.isArray(payload.units)?payload.units:[]
+            const personnel=Array.isArray(payload.personnel)?payload.personnel:[]
+            const comments=Array.isArray(payload.comments)?payload.comments:[]
+            return <Box key={event.id} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}>
+              <Box sx={{display:'flex',justifyContent:'space-between',gap:2,flexWrap:'wrap'}}>
+                <Box><Typography fontWeight={800}>{event.normalizedEventType.replaceAll('_',' ')}</Typography><Typography variant='caption' color='text.secondary'>{new Date(event.normalizedEventTimestamp).toLocaleString()}</Typography></Box>
+                <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>{event.mappingStatus?<Chip size='small' variant='tonal' label={event.mappingStatus}/>:null}{event.incidentApplicationStatus?<Chip size='small' variant='tonal' label={event.incidentApplicationStatus}/>:null}</Box>
+              </Box>
+              <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'repeat(2,1fr)'},gap:2,mt:2}}>
+                <Box><Typography variant='caption' color='text.secondary'>Incident</Typography><Typography>{String(incident.callType||incident.nature||'—')}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Priority</Typography><Typography>{String(incident.priority||'—')}</Typography></Box>
+                <Box sx={{gridColumn:{md:'1 / -1'}}}><Typography variant='caption' color='text.secondary'>Location</Typography><Typography>{String(location.fullAddress||'—')}{location.city?', '+String(location.city):''}{location.state?', '+String(location.state):''}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Call Received</Typography><Typography>{timestamps.callReceived?new Date(String(timestamps.callReceived)).toLocaleString():'—'}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Dispatch</Typography><Typography>{timestamps.dispatch?new Date(String(timestamps.dispatch)).toLocaleString():'—'}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Units</Typography><Typography>{String(units.length)}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Personnel</Typography><Typography>{String(personnel.length)}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Comments</Typography><Typography>{String(comments.length)}</Typography></Box>
+              </Box>
+            </Box>
+          })}
+          {!selectedMessageDetail.normalizedEvents.length?<Alert severity='info' variant='outlined'>This CAD message has not produced a normalized event yet.</Alert>:null}
+        </Box>
+      </CardContent></Card>:null}
+    </Box>:null}
+    {tab===5?<Box sx={{display:'grid',gap:3}}>
+      <Card><CardContent>
+        <Typography variant='h5'>CAD Simulator</Typography>
+        <Typography color='text.secondary' sx={{mb:3}}>Inject synthetic CAD traffic and test degraded/recovery behavior without targeting a production connection.</Typography>
+        <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'repeat(2,1fr)'},gap:3}}>
+          <TextField select label='Connection' value={simConnectionId} onChange={e=>setSimConnectionId(e.target.value)}>
+            {connections.filter(row=>row.environment!=='PRODUCTION').map(row=><MenuItem key={row.id} value={row.id}>{row.name} — {row.environment}</MenuItem>)}
+          </TextField>
+          <TextField select label='Scenario' value={scenarioId} onChange={e=>setScenarioId(e.target.value)}>
+            {scenarios.map((row:any)=>{const id=String(row.id||row.scenarioId||'');return <MenuItem key={id} value={id}>{String(row.label||row.name||id)}</MenuItem>})}
+          </TextField>
+          <TextField label='Source Incident ID' value={simSourceIncidentId} onChange={e=>setSimSourceIncidentId(e.target.value)}/>
+          <TextField label='Outage / Recovery Reason' value={reason} onChange={e=>setReason(e.target.value)}/>
+          <FormControlLabel sx={{gridColumn:{md:'1 / -1'}}} control={<Checkbox checked={simAutoDispatch} onChange={e=>setSimAutoDispatch(e.target.checked)}/>} label='Auto-create/link Forge incident in standalone demo mode'/>
+        </Box>
+        <Box sx={{display:'flex',gap:2,flexWrap:'wrap',mt:3}}>
+          <Button variant='contained' color='error' disabled={busy||!simConnectionId||!scenarioId} onClick={()=>void sendScenario()}>Inject Scenario</Button>
+          <Button variant='outlined' color='warning' disabled={busy||!simConnectionId} onClick={()=>void simulatorOutage(false)}>Start Outage</Button>
+          <Button variant='outlined' color='success' disabled={busy||!simConnectionId} onClick={()=>void simulatorOutage(true)}>Recover Connection</Button>
+        </Box>
+      </CardContent></Card>
+      <Card><CardContent><Typography variant='h5'>Available Scenarios</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{scenarios.map((row:any)=>{const id=String(row.id||row.scenarioId||'');return <Box key={id} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Typography fontWeight={700}>{String(row.label||row.name||id)}</Typography><Typography color='text.secondary'>{String(row.description||row.summary||'Synthetic CAD scenario')}</Typography></Box>})}</Box></CardContent></Card>
+      <Card><CardContent><Typography variant='h5'>Outage History</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{outages.map((row:any)=><Box key={String(row.id)} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Typography fontWeight={700}>{String(row.status||'UNKNOWN')}</Typography><Typography>{String(row.reason||'No reason recorded')}</Typography><Typography variant='caption' color='text.secondary'>{row.startedAt?'Started '+new Date(String(row.startedAt)).toLocaleString():''}{row.endedAt?' · Ended '+new Date(String(row.endedAt)).toLocaleString():''}</Typography></Box>)}{!outages.length?<Typography color='text.secondary'>No simulator outages recorded.</Typography>:null}</Box></CardContent></Card>
+    </Box>:null}
+
+  </Box>
+}

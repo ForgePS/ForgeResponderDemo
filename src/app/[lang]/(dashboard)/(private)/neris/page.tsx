@@ -6,16 +6,18 @@ import StatCard from '@views/forge-responder/StatCard'
 import NerisValidationCenter from '@views/forge-responder/NerisValidationCenter'
 import NerisSchemaDashboard from '@views/forge-responder/NerisSchemaDashboard'
 import { nerisCatalog, nerisModules } from '@/utils/nerisSchema'
+import { listIncidents } from '@/lib/forge-platform/incidents'
 
 export default async function NerisPage({params}:{params:Promise<{lang:string}>}) {
   const {lang}=await params
   const s=nerisCatalog.summary
+  const incidents=(await listIncidents()).data
 
   return (
     <div>
       <Box sx={{display:'flex',justifyContent:'flex-end',gap:2,mb:2}}>
         <Button href={`/${lang}/neris/value-sets`} variant='tonal' startIcon={<i className='tabler-list-check'/>}>Value Sets</Button>
-        <Button href={`/${lang}/incidents/new`} variant='contained' color='error' startIcon={<i className='tabler-plus'/>}>Create Demo Incident</Button>
+        <Button href={`/${lang}/incidents/new`} variant='contained' color='error' startIcon={<i className='tabler-plus'/>}>Create Incident</Button>
       </Box>
       <PageHeader title='NERIS' description='Schema-driven NERIS module catalog, field rules, coded value sets, and validation readiness.' />
 
@@ -30,7 +32,7 @@ export default async function NerisPage({params}:{params:Promise<{lang:string}>}
         This catalog is generated directly from the uploaded NERIS V1 Core and Secondary schema workbooks and is the source of truth for this demo.
       </Alert>
 
-      <Box sx={{mb:4}}><NerisValidationCenter /></Box>
+      <Box sx={{mb:4}}><NerisValidationCenter incidents={incidents} /></Box>
       <NerisSchemaDashboard modules={nerisModules} lang={lang}/>
     </div>
   )

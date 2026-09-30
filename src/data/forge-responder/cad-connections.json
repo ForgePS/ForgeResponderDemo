@@ -1,0 +1,22 @@
+[
+  {
+    "id": "cad-conn-demo-01",
+    "publicId": "CAD-DEMO-01",
+    "name": "Metro CAD Simulator",
+    "vendor": "Generic CAD",
+    "adapterKey": "generic-simulator",
+    "adapterVersion": "1.0",
+    "environment": "SIMULATOR",
+    "transportType": "SYNTHETIC_SIMULATOR",
+    "status": "ACTIVE",
+    "intakeMode": "HYBRID",
+    "healthStatus": "HEALTHY",
+    "recordVersion": 3,
+    "hasCredentialsSecret": false,
+    "hasWebhookSecret": false,
+    "lastMessageAt": "2026-09-30T09:52:00.000Z",
+    "lastSuccessAt": "2026-09-30T09:52:01.000Z",
+    "lastErrorSummary": null,
+    "updatedAt": "2026-09-30T09:52:01.000Z"
+  }
+]

@@ -7,33 +7,55 @@ import Divider from '@mui/material/Divider'
 import Typography from '@mui/material/Typography'
 import Alert from '@mui/material/Alert'
 import { notFound } from 'next/navigation'
+
 import PageHeader from '@views/forge-responder/PageHeader'
 import StatCard from '@views/forge-responder/StatCard'
-import { loadForgeSeed } from '@/utils/forgeSeed'
+import { getRmsMasterData } from '@/lib/forge-platform/rms'
+
+type Occupancy = {
+  id: string
+  name?: string
+  addressLine1?: string | null
+  address?: string | null
+  city?: string | null
+  state?: string | null
+  postalCode?: string | null
+  occupancyType?: string | null
+  primaryContact?: string | null
+  status?: string
+  preplanId?: string | null
+  sprinklered?: boolean
+  fireAlarm?: boolean
+  constructionType?: string | null
+  knoxBox?: boolean
+  notes?: string | null
+}
 
 export default async function OccupancyDetailPage({params}:{params:Promise<{lang:string,id:string}>}) {
   const {lang,id}=await params
-  const rows=loadForgeSeed<any[]>('occupancies')
-  const occupancy=rows.find(row=>row.id===id)
-  if(!occupancy) notFound()
-
-  const links=loadForgeSeed<any>('demo-navigation-links')
-  const suggestedPreplan=links.occupancySuggestedPreplan?.find((x:any)=>x.occupancyId===id)
-  const suggestedInspectionIds=links.occupancySuggestedInspectionType?.filter((x:any)=>x.occupancyId===id).map((x:any)=>x.inspectionTypeId) || []
-  const inspectionTypes=loadForgeSeed<any[]>('inspection-types').filter(x=>suggestedInspectionIds.includes(x.id))
-  const preplans=loadForgeSeed<any[]>('preplans')
-  const preplan=suggestedPreplan ? preplans.find(x=>x.id===suggestedPreplan.preplanId) : null
+  let result
+  try {
+    result=await getRmsMasterData<Occupancy>('occupancies',id)
+  } catch {
+    notFound()
+  }
+  const occupancy=result.data
+  const address=occupancy.addressLine1 || occupancy.address || 'No address'
 
   return (
     <div>
       <Box sx={{mb:2}}><Button href={`/${lang}/occupancies`} startIcon={<i className='tabler-arrow-left'/>}>Occupancies</Button></Box>
-      <PageHeader title={occupancy.name} description={`${occupancy.address || 'No address'} · ${occupancy.occupancyType || 'Occupancy type not recorded'}`} />
+      <PageHeader title={occupancy.name || occupancy.id} description={`${address} · ${occupancy.occupancyType || 'Occupancy type not recorded'}`} />
+
+      <Alert severity={result.source==='platform'?'success':'info'} variant='outlined' sx={{mb:3}}>
+        {result.source==='platform'?'Live Forge Platform occupancy record.':'Persistent standalone demo occupancy record.'}
+      </Alert>
 
       <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',sm:'repeat(2,1fr)',xl:'repeat(4,1fr)'},gap:3,mb:3}}>
-        <StatCard label='Status' value={occupancy.status || 'Active'} detail='Source occupancy state' icon='tabler-building-check' color='success'/>
-        <StatCard label='Sprinkler' value={occupancy.sprinklered?'Yes':'No'} detail='Source protection field' icon='tabler-sprinkler' color={occupancy.sprinklered?'success':'warning'}/>
-        <StatCard label='Fire Alarm' value={occupancy.fireAlarm?'Yes':'No'} detail='Source protection field' icon='tabler-bell' color={occupancy.fireAlarm?'info':'warning'}/>
-        <StatCard label='Inspection Programs' value={inspectionTypes.length} detail='Demo navigation suggestions' icon='tabler-clipboard-check' color='error'/>
+        <StatCard label='Status' value={occupancy.status || 'ACTIVE'} detail='Occupancy state' icon='tabler-building-check' color='success'/>
+        <StatCard label='Preplan' value={occupancy.preplanId?'Linked':'Not Linked'} detail='Responder planning linkage' icon='tabler-map-2' color={occupancy.preplanId?'success':'warning'}/>
+        <StatCard label='Sprinkler' value={occupancy.sprinklered===undefined?'—':occupancy.sprinklered?'Yes':'No'} detail='Legacy/demo protection field' icon='tabler-sprinkler' color='info'/>
+        <StatCard label='Fire Alarm' value={occupancy.fireAlarm===undefined?'—':occupancy.fireAlarm?'Yes':'No'} detail='Legacy/demo protection field' icon='tabler-bell' color='warning'/>
       </Box>
 
       <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',lg:'1.25fr .75fr'},gap:3}}>
@@ -44,11 +66,10 @@ export default async function OccupancyDetailPage({params}:{params:Promise<{lang
               {[
                 ['Occupancy Type',occupancy.occupancyType],
                 ['Construction',occupancy.constructionType],
-                ['Address',occupancy.address],
-                ['City / State',[occupancy.city,occupancy.state].filter(Boolean).join(', ')],
-                ['Knox Box',occupancy.knoxBox?'Recorded':'Not recorded'],
-                ['Primary Contact',occupancy.primaryContactName],
-                ['Phone',occupancy.primaryContactPhone],
+                ['Address',address],
+                ['City / State / ZIP',[occupancy.city,occupancy.state,occupancy.postalCode].filter(Boolean).join(', ')],
+                ['Knox Box',occupancy.knoxBox===undefined?null:occupancy.knoxBox?'Recorded':'Not recorded'],
+                ['Primary Contact',occupancy.primaryContact],
                 ['Notes',occupancy.notes]
               ].map(([label,value])=>(
                 <Box key={String(label)}>
@@ -62,25 +83,20 @@ export default async function OccupancyDetailPage({params}:{params:Promise<{lang
 
         <Card>
           <CardContent>
-            <Typography variant='h5'>Prevention Actions</Typography>
-            <Typography color='text.secondary' sx={{mt:1,mb:3}}>Fast paths for a booth demonstration.</Typography>
+            <Typography variant='h5'>Responder / Prevention Actions</Typography>
+            <Typography color='text.secondary' sx={{mt:1,mb:3}}>Operational paths linked to this occupancy.</Typography>
             <Box sx={{display:'grid',gap:2}}>
-              <Button href={`/${lang}/inspections/new?occupancy=${occupancy.id}`} variant='contained' color='error' startIcon={<i className='tabler-clipboard-check'/>}>Start Demo Inspection</Button>
-              {preplan ? <Button href={`/${lang}/preplans/${preplan.id}`} variant='tonal' startIcon={<i className='tabler-map-2'/>}>Open Suggested Preplan</Button> : <Button href={`/${lang}/preplans/new`} variant='tonal'>Create Demo Preplan</Button>}
+              <Button href={`/${lang}/inspections/new?occupancy=${occupancy.id}`} variant='contained' color='error' startIcon={<i className='tabler-clipboard-check'/>}>Start Inspection</Button>
+              {occupancy.preplanId
+                ? <Button href={`/${lang}/preplans/${occupancy.preplanId}`} variant='tonal' startIcon={<i className='tabler-map-2'/>}>Open Preplan</Button>
+                : <Button href={`/${lang}/preplans/new?occupancy=${occupancy.id}`} variant='tonal' startIcon={<i className='tabler-map-plus'/>}>Create Preplan</Button>}
               <Button href={`/${lang}/hydrants`} variant='outlined' startIcon={<i className='tabler-droplet'/>}>View Water Supply</Button>
             </Box>
             <Divider sx={{my:3}}/>
-            <Typography variant='subtitle1' sx={{mb:1}}>Suggested inspection programs</Typography>
-            <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>
-              {inspectionTypes.length ? inspectionTypes.map(x=><Chip key={x.id} size='small' variant='tonal' label={x.name}/>) : <Typography color='text.secondary'>No demo suggestions.</Typography>}
-            </Box>
+            <Chip size='small' variant='tonal' color={result.source==='platform'?'success':'info'} label={result.source==='platform'?'Forge Platform':'Demo Persistence'}/>
           </CardContent>
         </Card>
       </Box>
-
-      <Alert severity='info' variant='outlined' sx={{mt:3}}>
-        Suggested preplan, inspection, and water-supply links are demo-navigation aids only unless explicitly identified as source-linked.
-      </Alert>
     </div>
   )
 }

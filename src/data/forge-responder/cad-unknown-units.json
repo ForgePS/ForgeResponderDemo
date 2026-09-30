@@ -1,0 +1,11 @@
+[
+  {
+    "id": "cad-unit-demo-01",
+    "sourceUnitId": "CAD-E12",
+    "sourceUnitCallsign": "E12",
+    "occurrenceCount": 4,
+    "status": "OPEN",
+    "recordVersion": 1,
+    "lastSeenAt": "2026-09-30T09:50:00.000Z"
+  }
+]

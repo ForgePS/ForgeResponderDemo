@@ -1,0 +1,41 @@
+[
+  {
+    "id": "cad-msg-demo-01",
+    "receivedAt": "2026-09-30T09:52:00.000Z",
+    "transportType": "SYNTHETIC_SIMULATOR",
+    "sourceMessageId": "CAD-MSG-1001",
+    "sourceIncidentId": "CAD-INC-2401",
+    "processingStatus": "APPLIED",
+    "authenticationStatus": "VERIFIED",
+    "payloadSizeBytes": 1842,
+    "payloadHash": "demo-hash-1001",
+    "correlationId": "demo-corr-1001",
+    "cadConnectionId": "cad-conn-demo-01"
+  },
+  {
+    "id": "cad-msg-demo-02",
+    "receivedAt": "2026-09-30T09:50:00.000Z",
+    "transportType": "SYNTHETIC_SIMULATOR",
+    "sourceMessageId": "CAD-MSG-1002",
+    "sourceIncidentId": "CAD-INC-2402",
+    "processingStatus": "REQUIRES_REVIEW",
+    "authenticationStatus": "VERIFIED",
+    "payloadSizeBytes": 2094,
+    "payloadHash": "demo-hash-1002",
+    "correlationId": "demo-corr-1002",
+    "cadConnectionId": "cad-conn-demo-01"
+  },
+  {
+    "id": "cad-msg-demo-03",
+    "receivedAt": "2026-09-30T09:47:00.000Z",
+    "transportType": "SYNTHETIC_SIMULATOR",
+    "sourceMessageId": "CAD-MSG-1003",
+    "sourceIncidentId": "CAD-INC-2403",
+    "processingStatus": "FAILED",
+    "authenticationStatus": "VERIFIED",
+    "payloadSizeBytes": 1557,
+    "payloadHash": "demo-hash-1003",
+    "correlationId": "demo-corr-1003",
+    "cadConnectionId": "cad-conn-demo-01"
+  }
+]

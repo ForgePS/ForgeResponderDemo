@@ -7,75 +7,58 @@ import Button from '@mui/material/Button'
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
-import LinearProgress from '@mui/material/LinearProgress'
+import MenuItem from '@mui/material/MenuItem'
+import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import { nerisModules } from '@/utils/nerisSchema'
 
-const domains=[
-  ['Dispatch','PASS','Incident number, alarm date, response mode'],
-  ['Civic Location','PASS','Address and jurisdiction fields'],
-  ['Location Use','PASS','Property use classification'],
-  ['Unit Response','REVIEW','Staffing snapshot and response mode review'],
-  ['Tactic Timestamps','PASS','Operational timestamp structure'],
-  ['Incident','PASS','Core incident fields'],
-  ['Fire','PASS','Fire secondary-module structure']
-]
+type IncidentOption={id:string;incidentNumber:string;status:string;incidentDate?:string|null;primaryIncidentTypeCode?:string|null}
+type Finding={severity:'GUIDANCE'|'WARNING'|'BLOCKING_ERROR';code:string;message:string;sectionKey?:string|null}
 
-export default function NerisValidationCenter() {
-  const [ran,setRan]=useState(false)
-  const [progress,setProgress]=useState(0)
+export default function NerisValidationCenter({incidents}:{incidents:IncidentOption[]}) {
+  const [incidentId,setIncidentId]=useState(incidents[0]?.id||'')
+  const [findings,setFindings]=useState<Finding[]>([])
+  const [result,setResult]=useState<{ok:boolean;blockingErrorCount:number;warningCount:number;guidanceCount:number}|null>(null)
+  const [busy,setBusy]=useState(false)
+  const [error,setError]=useState('')
+  const selected=incidents.find(x=>x.id===incidentId)
 
-  const run=()=>{
-    setRan(false)
-    setProgress(20)
-    setTimeout(()=>setProgress(60),150)
-    setTimeout(()=>{
-      setProgress(100)
-      setRan(true)
-      const event={type:'neris-validation',title:'NERIS demo validation completed',occurredAt:new Date().toISOString()}
-      const key='forge-responder-theme-demo-events'
-      const current=JSON.parse(localStorage.getItem(key)||'[]')
-      localStorage.setItem(key,JSON.stringify([event,...current].slice(0,100)))
-    },300)
+  async function run(){
+    if(!incidentId)return
+    setBusy(true);setError('')
+    try{
+      const response=await fetch('/api/incidents/'+incidentId+'/validate',{method:'POST'})
+      const body=await response.json()
+      if(!response.ok)throw new Error(body.error||'Unable to validate incident.')
+      setFindings(body.data?.findings||[])
+      setResult({ok:Boolean(body.data?.ok),blockingErrorCount:Number(body.data?.blockingErrorCount||0),warningCount:Number(body.data?.warningCount||0),guidanceCount:Number(body.data?.guidanceCount||0)})
+    }catch(err){setError(err instanceof Error?err.message:'Unable to validate incident.')}
+    finally{setBusy(false)}
   }
 
-  const pass=domains.filter(x=>x[1]==='PASS').length
-  const schemaModuleCount=nerisModules.length
-
-  return (
-    <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',lg:'1.25fr .75fr'},gap:3}}>
-      <Card>
-        <CardContent>
-          <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:2,flexWrap:'wrap'}}>
-            <div><Typography variant='h5'>Validation Center</Typography><Typography color='text.secondary'>Demo mapping and completeness checks.</Typography></div>
-            <Chip color={ran?'success':'default'} variant='tonal' label={ran?'Validation Complete':'Ready for Review'}/>
-          </Box>
-          {progress>0 ? <LinearProgress variant='determinate' value={progress} color='error' sx={{my:3}}/> : null}
-          <Box sx={{display:'grid',gap:1.5,mt:3}}>
-            {domains.map(([name,status,detail])=>(
-              <Box key={name} sx={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:2,p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}>
-                <div><Typography fontWeight={700}>{name}</Typography><Typography variant='caption' color='text.secondary'>{detail}</Typography></div>
-                <Chip size='small' variant='tonal' color={status==='PASS'?'success':'warning'} label={status}/>
-              </Box>
-            ))}
-          </Box>
-          <Button onClick={run} variant='contained' color='error' sx={{mt:3}} startIcon={<i className='tabler-scan'/>}>Run Demo Validation</Button>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent>
-          <Typography variant='h5'>Submission Boundary</Typography>
-          <Typography color='text.secondary' sx={{mt:1,mb:3}}>Standalone trade-show behavior.</Typography>
-          <Box sx={{display:'grid',gap:2}}>
-            <Box><Typography variant='caption' color='text.secondary'>Mapped domains</Typography><Typography variant='h4'>{schemaModuleCount}</Typography></Box>
-            <Box><Typography variant='caption' color='text.secondary'>Passing checks</Typography><Typography variant='h4'>{pass}</Typography></Box>
-            <Box><Typography variant='caption' color='text.secondary'>Live NERIS endpoint</Typography><Typography fontWeight={700}>Not configured</Typography></Box>
-            <Box><Typography variant='caption' color='text.secondary'>External submission</Typography><Typography fontWeight={700}>Disabled</Typography></Box>
-          </Box>
-          <Alert severity='info' variant='outlined' sx={{mt:3}}>Validation is local to the demo UI. No record is transmitted externally.</Alert>
-        </CardContent>
-      </Card>
-    </Box>
-  )
+  return <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',lg:'1.25fr .75fr'},gap:3}}>
+    <Card><CardContent>
+      <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:2,flexWrap:'wrap'}}>
+        <div><Typography variant='h5'>Incident Validation Center</Typography><Typography color='text.secondary'>Run the same validation route used by officer review.</Typography></div>
+        <Chip color={result?.ok?'success':result?'warning':'default'} variant='tonal' label={result?.ok?'Validation Passed':result?'Findings Present':'Ready'}/>
+      </Box>
+      <TextField select fullWidth label='Incident' value={incidentId} onChange={e=>{setIncidentId(e.target.value);setResult(null);setFindings([])}} sx={{mt:3}}>
+        {incidents.map(incident=><MenuItem key={incident.id} value={incident.id}>{incident.incidentNumber+' — '+(incident.primaryIncidentTypeCode||'Unclassified')+' — '+incident.status.replaceAll('_',' ')}</MenuItem>)}
+      </TextField>
+      {error?<Alert severity='error' sx={{mt:3}}>{error}</Alert>:null}
+      {!incidents.length?<Alert severity='info' sx={{mt:3}}>Create an incident before running NERIS validation.</Alert>:null}
+      {findings.length?<Box sx={{display:'grid',gap:1.5,mt:3}}>{findings.map((finding,index)=><Alert key={finding.code+'-'+index} severity={finding.severity==='BLOCKING_ERROR'?'error':finding.severity==='WARNING'?'warning':'info'} variant='outlined'><Typography fontWeight={700}>{finding.message}</Typography><Typography variant='caption'>{(finding.sectionKey?finding.sectionKey.replaceAll('_',' ')+' · ':'')+finding.code}</Typography></Alert>)}</Box>:result?<Alert severity='success' sx={{mt:3}}>No validation findings were returned.</Alert>:null}
+      <Button disabled={!incidentId||busy} onClick={()=>void run()} variant='contained' color='error' sx={{mt:3}} startIcon={<i className='tabler-scan'/>}>{busy?'Validating…':'Run NERIS Validation'}</Button>
+    </CardContent></Card>
+    <Card><CardContent>
+      <Typography variant='h5'>Validation Summary</Typography>
+      <Typography color='text.secondary' sx={{mt:1,mb:3}}>{selected?selected.incidentNumber:'Select an incident'}</Typography>
+      <Box sx={{display:'grid',gap:2}}>
+        <Box><Typography variant='caption' color='text.secondary'>Blocking Errors</Typography><Typography variant='h4'>{result?.blockingErrorCount??'—'}</Typography></Box>
+        <Box><Typography variant='caption' color='text.secondary'>Warnings</Typography><Typography variant='h4'>{result?.warningCount??'—'}</Typography></Box>
+        <Box><Typography variant='caption' color='text.secondary'>Guidance</Typography><Typography variant='h4'>{result?.guidanceCount??'—'}</Typography></Box>
+        <Box><Typography variant='caption' color='text.secondary'>Workflow Status</Typography><Typography fontWeight={700}>{selected?.status.replaceAll('_',' ')||'—'}</Typography></Box>
+      </Box>
+      <Alert severity='info' variant='outlined' sx={{mt:3}}>Validation checks the incident record; it does not submit or finalize the incident.</Alert>
+    </CardContent></Card>
+  </Box>
 }

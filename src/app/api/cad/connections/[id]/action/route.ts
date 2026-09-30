@@ -1,0 +1,3 @@
+import { NextResponse } from 'next/server'
+import { setCadConnectionEnabled, testCadConnection } from '@/lib/forge-platform/cad'
+export async function POST(request:Request,context:{params:Promise<{id:string}>}){try{const {id}=await context.params;const body=await request.json();if(body.action==='TEST')return NextResponse.json(await testCadConnection(id));if(body.action==='ENABLE')return NextResponse.json(await setCadConnectionEnabled(id,true));if(body.action==='DISABLE')return NextResponse.json(await setCadConnectionEnabled(id,false));throw new Error('Unsupported CAD connection action.')}catch(error){return NextResponse.json({error:error instanceof Error?error.message:'Unable to update CAD connection.'},{status:400})}}

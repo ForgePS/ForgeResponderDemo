@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -15,59 +16,130 @@ import Typography from '@mui/material/Typography'
 
 const steps=['Dispatch','Units & Personnel','Operations','Review']
 
-export default function IncidentWizard({apparatus,personnel}:{apparatus:any[];personnel:any[]}) {
-  const [step,setStep]=useState(0)
-  const [saved,setSaved]=useState(false)
+type Option={id:string;name?:string;code?:string;stationNumber?:string;callSign?:string;unitNumber?:string;unitType?:string;personId?:string;displayName?:string;rank?:string}
+type CadMessage={id:string;sourceIncidentId:string|null;sourceMessageId:string|null;cadConnectionId:string;processingStatus:string;receivedAt:string}
 
-  const save=()=>{
-    const event={type:'incident-create',title:'Demo incident created',occurredAt:new Date().toISOString()}
-    const key='forge-responder-theme-demo-events'
-    const current=JSON.parse(localStorage.getItem(key)||'[]')
-    localStorage.setItem(key,JSON.stringify([event,...current].slice(0,100)))
-    setSaved(true)
+export default function IncidentWizard({
+  lang,stations,shifts,units,personnel
+}:{lang:string;stations:Option[];shifts:Option[];units:Option[];personnel:Option[]}) {
+  const router=useRouter()
+  const [step,setStep]=useState(0)
+  const [saving,setSaving]=useState(false)
+  const [error,setError]=useState('')
+  const [incidentDate,setIncidentDate]=useState(new Date().toISOString().slice(0,10))
+  const [incidentSource,setIncidentSource]=useState('MANUAL')
+  const [cadMessages,setCadMessages]=useState<CadMessage[]>([])
+  const [cadMessageId,setCadMessageId]=useState('')
+  const [alarmAt,setAlarmAt]=useState('')
+  const [stationId,setStationId]=useState(stations[0]?.id||'')
+  const [shiftId,setShiftId]=useState(shifts[0]?.id||'')
+  const [incidentType,setIncidentType]=useState('STRUCTURE_FIRE')
+  const [dispatchDescription,setDispatchDescription]=useState('')
+  const [responseDistrict,setResponseDistrict]=useState('')
+  const [unitId,setUnitId]=useState(units[0]?.id||'')
+  const [officerId,setOfficerId]=useState(personnel[0]?.id||'')
+  const [unitRole,setUnitRole]=useState('PRIMARY_RESPONSE')
+  const [narrative,setNarrative]=useState('')
+
+  useEffect(()=>{
+    void fetch('/api/cad/messages',{cache:'no-store'})
+      .then(async response=>{const body=await response.json();if(response.ok)setCadMessages((body.data||[]).filter((row:CadMessage)=>Boolean(row.sourceIncidentId)))})
+      .catch(()=>{})
+  },[])
+
+  const selectedCadMessage=cadMessages.find(row=>row.id===cadMessageId)
+
+  async function create(){
+    setSaving(true);setError('')
+    try{
+      const payload=Object.fromEntries(Object.entries({
+        incidentDate,
+        alarmAt:alarmAt?new Date(`${incidentDate}T${alarmAt}:00`).toISOString():'',
+        stationId,
+        shiftId,
+        responseDistrict,
+        incidentSource,
+        dispatchDescription,
+        primaryIncidentTypeCode:incidentType
+      }).filter(([,value])=>value!==''))
+
+      const response=await fetch('/api/incidents',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+      const body=await response.json()
+      if(!response.ok) throw new Error(body.error||'Unable to create incident.')
+      const incident=body.data
+
+      if(incidentSource==='CAD'&&selectedCadMessage?.sourceIncidentId){
+        const linkResponse=await fetch(`/api/incidents/${incident.id}/cad-link`,{
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({
+            cadConnectionId:selectedCadMessage.cadConnectionId,
+            sourceIncidentId:selectedCadMessage.sourceIncidentId,
+            reason:'Incident created from selected CAD message'
+          })
+        })
+        const linkBody=await linkResponse.json()
+        if(!linkResponse.ok)throw new Error(linkBody.error||'Incident created, but CAD linkage failed.')
+      }
+
+      if(unitId){
+        const unitResponse=await fetch(`/api/incidents/${incident.id}/units`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({unitId,isPrimary:true,unitRole})})
+        const unitBody=await unitResponse.json()
+        if(!unitResponse.ok) throw new Error(unitBody.error||'Incident created, but primary unit assignment failed.')
+      }
+
+      if(officerId){
+        const person=personnel.find(x=>x.id===officerId)
+        const personResponse=await fetch(`/api/incidents/${incident.id}/personnel`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({personnelId:officerId,role:'OFFICER',rank:person?.rank||undefined,isIncidentCommander:true,isReportingOfficer:true})})
+        const personBody=await personResponse.json()
+        if(!personResponse.ok) throw new Error(personBody.error||'Incident created, but officer assignment failed.')
+      }
+
+      if(narrative.trim()){
+        const latest=await fetch(`/api/incidents/${incident.id}`,{cache:'no-store'}).then(r=>r.json())
+        const narrativeResponse=await fetch(`/api/incidents/${incident.id}/narrative`,{method:'PATCH',headers:{'Content-Type':'application/json','x-record-version':String(latest.data.recordVersion)},body:JSON.stringify({body:narrative,versionNote:'Initial incident narrative'})})
+        const narrativeBody=await narrativeResponse.json()
+        if(!narrativeResponse.ok) throw new Error(narrativeBody.error||'Incident created, but narrative save failed.')
+      }
+
+      router.push(`/${lang}/incidents/${incident.id}`)
+      router.refresh()
+    }catch(err){setError(err instanceof Error?err.message:'Unable to create incident.');setSaving(false)}
   }
 
-  return (
-    <Card>
-      <CardContent>
-        <Stepper activeStep={step} alternativeLabel sx={{mb:5}}>
-          {steps.map(label=><Step key={label}><StepLabel>{label}</StepLabel></Step>)}
-        </Stepper>
+  return <Card><CardContent>
+    <Stepper activeStep={step} alternativeLabel sx={{mb:5}}>{steps.map(label=><Step key={label}><StepLabel>{label}</StepLabel></Step>)}</Stepper>
+    {error?<Alert severity='error' sx={{mb:3}}>{error}</Alert>:null}
 
-        {saved ? <Alert severity='success' sx={{mb:3}}>Demo incident saved locally. No official incident or external submission was created.</Alert> : null}
+    {step===0?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
+      <TextField select label='Incident Source' value={incidentSource} onChange={e=>{setIncidentSource(e.target.value);if(e.target.value!=='CAD')setCadMessageId('')}}><MenuItem value='MANUAL'>Manual</MenuItem><MenuItem value='CAD'>CAD Assisted</MenuItem></TextField>
+      <TextField label='Incident Date' type='date' value={incidentDate} onChange={e=>setIncidentDate(e.target.value)} InputLabelProps={{shrink:true}}/>
+      {incidentSource==='CAD'?<TextField select label='CAD Message' value={cadMessageId} onChange={e=>setCadMessageId(e.target.value)} sx={{gridColumn:{md:'1 / -1'}}><MenuItem value=''>Select CAD message</MenuItem>{cadMessages.map(row=><MenuItem key={row.id} value={row.id}>{row.sourceIncidentId||row.sourceMessageId||row.id} — {row.processingStatus}</MenuItem>)}</TextField>:null}
+      <TextField label='Alarm Time' type='time' value={alarmAt} onChange={e=>setAlarmAt(e.target.value)} InputLabelProps={{shrink:true}}/>
+      <TextField select label='Station' value={stationId} onChange={e=>setStationId(e.target.value)}><MenuItem value=''>Not assigned</MenuItem>{stations.map(x=><MenuItem key={x.id} value={x.id}>{x.name||x.stationNumber||x.id}</MenuItem>)}</TextField>
+      <TextField select label='Shift' value={shiftId} onChange={e=>setShiftId(e.target.value)}><MenuItem value=''>Not assigned</MenuItem>{shifts.map(x=><MenuItem key={x.id} value={x.id}>{x.name||x.code||x.id}</MenuItem>)}</TextField>
+      <TextField label='Primary Incident Type Code' value={incidentType} onChange={e=>setIncidentType(e.target.value)}/>
+      <TextField label='Response District' value={responseDistrict} onChange={e=>setResponseDistrict(e.target.value)}/>
+      <TextField multiline minRows={3} sx={{gridColumn:{md:'1 / -1'}}} label='Dispatch Description' value={dispatchDescription} onChange={e=>setDispatchDescription(e.target.value)}/>
+    </Box>:null}
 
-        {step===0 ? <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
-          <TextField label='Incident Number' defaultValue='2026-000001' />
-          <TextField select label='Incident Type' defaultValue='structure'><MenuItem value='structure'>Structure Fire</MenuItem><MenuItem value='alarm'>Alarm</MenuItem><MenuItem value='vehicle'>Vehicle Fire</MenuItem><MenuItem value='hazard'>Hazardous Condition</MenuItem><MenuItem value='service'>Service Call</MenuItem></TextField>
-          <TextField label='Dispatch Time' type='time' InputLabelProps={{shrink:true}} />
-          <TextField label='Address' placeholder='100 Demo Avenue, Northbridge' />
-          <TextField label='Cross Street / Location Notes' sx={{gridColumn:{md:'1 / -1'}}} />
-        </Box> : null}
+    {step===1?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
+      <TextField select label='Primary Unit' value={unitId} onChange={e=>setUnitId(e.target.value)}><MenuItem value=''>No unit</MenuItem>{units.map(x=><MenuItem key={x.id} value={x.id}>{x.callSign||x.unitNumber||x.name||x.id} {x.unitType?`— ${x.unitType}`:''}</MenuItem>)}</TextField>
+      <TextField label='Unit Role' value={unitRole} onChange={e=>setUnitRole(e.target.value)}/>
+      <TextField select label='Incident Officer / Reporting Officer' value={officerId} onChange={e=>setOfficerId(e.target.value)} sx={{gridColumn:{md:'1 / -1'}}><MenuItem value=''>Not assigned</MenuItem>{personnel.map(x=><MenuItem key={x.id} value={x.id}>{x.displayName||x.personId||x.id} {x.rank?`— ${x.rank}`:''}</MenuItem>)}</TextField>
+    </Box>:null}
 
-        {step===1 ? <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
-          <TextField select label='Primary Unit' defaultValue={apparatus[0]?.id || ''}>{apparatus.slice(0,12).map(x=><MenuItem key={x.id} value={x.id}>{x.unitNumber || x.name || x.id}</MenuItem>)}</TextField>
-          <TextField select label='Officer' defaultValue={personnel[0]?.id || ''}>{personnel.slice(0,25).map(x=><MenuItem key={x.id} value={x.id}>{x.displayName || x.name || x.id}</MenuItem>)}</TextField>
-          <TextField select label='Alarm Assignment' defaultValue='first'><MenuItem value='first'>First Alarm</MenuItem><MenuItem value='working'>Working Fire</MenuItem><MenuItem value='mutual'>Mutual Aid</MenuItem></TextField>
-          <TextField label='Staffing Snapshot' defaultValue='4 personnel' />
-        </Box> : null}
+    {step===2?<Box sx={{display:'grid',gap:3}}>
+      <TextField multiline minRows={8} label='Initial Incident Narrative' value={narrative} onChange={e=>setNarrative(e.target.value)} placeholder='Dispatch, arrival conditions, command, assignments, tactical actions, water supply, search, ventilation, fire control, overhaul, disposition...'/>
+      <Alert severity='info' variant='outlined'>Additional NERIS sections and specialty records are completed from the incident workspace after creation.</Alert>
+      {incidentSource==='CAD'?<Alert severity='warning' variant='outlined'>CAD-assisted creation links the selected source incident and records CAD as the incident source. It does not invent location, unit, personnel, or classification values that were not actually provided by the connected CAD workflow.</Alert>:null}
+    </Box>:null}
 
-        {step===2 ? <Box sx={{display:'grid',gap:3}}>
-          <TextField select label='Operational Mode' defaultValue='investigating'><MenuItem value='investigating'>Investigating</MenuItem><MenuItem value='offensive'>Offensive</MenuItem><MenuItem value='defensive'>Defensive</MenuItem><MenuItem value='standby'>Standby</MenuItem></TextField>
-          <TextField multiline minRows={4} label='Command / Tactical Notes' placeholder='Initial actions, assignments, water supply, search, ventilation, fire control...' />
-          <TextField multiline minRows={3} label='Narrative Notes' placeholder='Key observations and operational milestones...' />
-        </Box> : null}
+    {step===3?<Box><Typography variant='h5'>Create Incident Record</Typography><Typography color='text.secondary' sx={{mt:1,mb:3}}>This creates the incident, primary unit assignment, reporting officer assignment, and initial narrative through the same Forge data layer used by connected Forge Platform mode.</Typography><Alert severity='warning' variant='outlined'>Creating the record does not submit it for officer review or final NERIS processing. Validation and review occur in the incident workspace.</Alert></Box>:null}
 
-        {step===3 ? <Box>
-          <Typography variant='h5'>Officer Review</Typography>
-          <Typography color='text.secondary' sx={{mt:1,mb:3}}>Review dispatch, unit assignment, staffing, operations, and narrative before saving the browser-local demo incident.</Typography>
-          <Alert severity='info' variant='outlined'>This standalone trade-show workflow does not write to a production RMS, CAD, NERIS endpoint, or external agency.</Alert>
-        </Box> : null}
-
-        <Box sx={{display:'flex',justifyContent:'space-between',gap:2,mt:5}}>
-          <Button disabled={step===0} onClick={()=>setStep(v=>Math.max(0,v-1))}>Back</Button>
-          {step<steps.length-1 ? <Button variant='contained' color='error' onClick={()=>setStep(v=>Math.min(steps.length-1,v+1))}>Continue</Button> : <Button variant='contained' color='error' onClick={save}>Save Demo Incident</Button>}
-        </Box>
-      </CardContent>
-    </Card>
-  )
+    <Box sx={{display:'flex',justifyContent:'space-between',gap:2,mt:5}}>
+      <Button disabled={step===0||saving} onClick={()=>setStep(v=>Math.max(0,v-1))}>Back</Button>
+      {step<3?<Button variant='contained' color='error' disabled={saving||(step===0&&incidentSource==='CAD'&&!cadMessageId)} onClick={()=>setStep(v=>Math.min(3,v+1))}>Continue</Button>:<Button variant='contained' color='error' disabled={saving} onClick={()=>void create()}>{saving?'Creating...':'Create Incident'}</Button>}
+    </Box>
+  </CardContent></Card>
 }
