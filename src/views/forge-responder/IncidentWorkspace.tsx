@@ -20,6 +20,7 @@ import AiNarrativeAssistant from '@views/forge-responder/AiNarrativeAssistant'
 import CadIncidentPanel from '@views/forge-responder/CadIncidentPanel'
 import SpecialtyReviewSummary from '@views/forge-responder/SpecialtyReviewSummary'
 import IncidentPrefillAssistant from '@views/forge-responder/IncidentPrefillAssistant'
+import IncidentAuditTrail from '@views/forge-responder/IncidentAuditTrail'
 
 type Incident={
   id:string
@@ -245,6 +246,7 @@ export default function IncidentWorkspace({
           <Tab label='CAD'/>
           <Tab label='Narrative'/>
           <Tab label='Officer Review'/>
+          <Tab label='Audit Trail'/>
         </Tabs>
 
         {tab===0?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3,mt:4}}>
@@ -309,6 +311,8 @@ export default function IncidentWorkspace({
             {statusHistory.length?statusHistory.map((item:any)=><Box key={String(item.id)} sx={{display:'flex',justifyContent:'space-between',gap:2,p:1.5,borderBottom:'1px solid',borderColor:'divider'}}><Typography>{String(item.fromStatus||'CREATED').replaceAll('_',' ')} → {String(item.toStatus||'').replaceAll('_',' ')}</Typography><Typography variant='caption' color='text.secondary'>{item.createdAt?new Date(String(item.createdAt)).toLocaleString():'—'}</Typography></Box>):<Typography color='text.secondary'>No status history recorded.</Typography>}
           </Box>
         </Box>:null}
+
+        {tab===8?<Box sx={{mt:4}}><IncidentAuditTrail incidentId={incident.id}/></Box>:null}
       </CardContent>
     </Card>
   </div>
