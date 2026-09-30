@@ -60,20 +60,27 @@ export default function IncidentWorkspace({
   const [findings,setFindings]=useState<ValidationFinding[]>([])
   const [returnReason,setReturnReason]=useState('')
   const [submitNote,setSubmitNote]=useState('')
+  const [reviewComment,setReviewComment]=useState('')
+  const [reviewComments,setReviewComments]=useState<Record<string,unknown>[]>([])
+  const [statusHistory,setStatusHistory]=useState<Record<string,unknown>[]>([])
 
   const unitMap=useMemo(()=>new Map(units.map(x=>[x.id,x])),[units])
   const personnelMap=useMemo(()=>new Map(personnel.map(x=>[x.id,x])),[personnel])
 
   async function loadRelated(){
     try{
-      const [n,u,p]=await Promise.all([
+      const [n,u,p,comments,history]=await Promise.all([
         fetch(`/api/incidents/${incident.id}/narrative`,{cache:'no-store'}).then(r=>r.json()),
         fetch(`/api/incidents/${incident.id}/units`,{cache:'no-store'}).then(r=>r.json()),
-        fetch(`/api/incidents/${incident.id}/personnel`,{cache:'no-store'}).then(r=>r.json())
+        fetch(`/api/incidents/${incident.id}/personnel`,{cache:'no-store'}).then(r=>r.json()),
+        fetch(`/api/incidents/${incident.id}/review-comments`,{cache:'no-store'}).then(r=>r.json()),
+        fetch(`/api/incidents/${incident.id}/status-history`,{cache:'no-store'}).then(r=>r.json())
       ])
       setNarrative(n.data?.body||'')
       setUnitAssignments(u.data||[])
       setPersonAssignments(p.data||[])
+      setReviewComments(comments.data||[])
+      setStatusHistory(history.data||[])
     }catch{}
   }
 
@@ -158,6 +165,24 @@ export default function IncidentWorkspace({
     finally{setBusy(false)}
   }
 
+  async function addReviewComment(){
+    if(!reviewComment.trim())return
+    setBusy(true);setError('');setMessage('')
+    try{
+      const response=await fetch(`/api/incidents/${incident.id}/review-comments`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({body:reviewComment})
+      })
+      const body=await response.json()
+      if(!response.ok)throw new Error(body.error||'Unable to add review comment.')
+      setReviewComment('')
+      await loadRelated()
+      setMessage('Review comment added.')
+    }catch(err){setError(err instanceof Error?err.message:'Unable to add review comment.')}
+    finally{setBusy(false)}
+  }
+
   async function validate(){
     setBusy(true);setError('');setMessage('')
     try{
@@ -239,12 +264,24 @@ export default function IncidentWorkspace({
           <Box sx={{display:'flex',gap:2,flexWrap:'wrap'}}><Button variant='outlined' disabled={busy} onClick={()=>void validate()}>Run NERIS Validation</Button></Box>
           {findings.length?<Box sx={{display:'grid',gap:1}}>{findings.map((f,index)=><Alert key={`${f.code}-${index}`} severity={f.severity==='BLOCKING_ERROR'?'error':f.severity==='WARNING'?'warning':'info'}>{f.message}</Alert>)}</Box>:<Alert severity='info' variant='outlined'>Run validation to check the current incident for blocking errors, warnings, and guidance.</Alert>}
           <Divider/>
+          <Box sx={{display:'grid',gap:2}}>
+            <Typography variant='h5'>Review Comments</Typography>
+            <TextField multiline minRows={2} label='Add Review Comment' value={reviewComment} onChange={e=>setReviewComment(e.target.value)}/>
+            <Box sx={{display:'flex',justifyContent:'flex-end'}}><Button variant='outlined' disabled={busy||!reviewComment.trim()} onClick={()=>void addReviewComment()}>Add Comment</Button></Box>
+            {reviewComments.length?reviewComments.map((comment:any)=><Box key={String(comment.id)} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Typography>{String(comment.body||'')}</Typography><Typography variant='caption' color='text.secondary'>{comment.authorUserId?String(comment.authorUserId):'Reviewer'} · {comment.createdAt?new Date(String(comment.createdAt)).toLocaleString():'Time not recorded'}</Typography></Box>):<Typography color='text.secondary'>No review comments yet.</Typography>}
+          </Box>
+          <Divider/>
           <TextField multiline minRows={2} label='Submit Note' value={submitNote} onChange={e=>setSubmitNote(e.target.value)}/>
           <Button variant='contained' color='error' disabled={busy||incident.status==='APPROVED'||incident.status==='FINALIZED'} onClick={()=>void action('submit',{note:submitNote||undefined},'Incident submitted for officer review.')}>Submit for Review</Button>
           <TextField multiline minRows={2} label='Return Reason' value={returnReason} onChange={e=>setReturnReason(e.target.value)}/>
           <Box sx={{display:'flex',gap:2,flexWrap:'wrap'}}>
             <Button variant='outlined' color='warning' disabled={busy||!returnReason.trim()} onClick={()=>void action('return',{reason:returnReason},'Incident returned for correction.')}>Return for Correction</Button>
             <Button variant='contained' color='success' disabled={busy||incident.status==='APPROVED'||incident.status==='FINALIZED'} onClick={()=>void action('approve',undefined,'Incident approved.')}>Approve Incident</Button>
+          </Box>
+          <Divider/>
+          <Box sx={{display:'grid',gap:1}}>
+            <Typography variant='h5'>Status History</Typography>
+            {statusHistory.length?statusHistory.map((item:any)=><Box key={String(item.id)} sx={{display:'flex',justifyContent:'space-between',gap:2,p:1.5,borderBottom:'1px solid',borderColor:'divider'}}><Typography>{String(item.fromStatus||'CREATED').replaceAll('_',' ')} → {String(item.toStatus||'').replaceAll('_',' ')}</Typography><Typography variant='caption' color='text.secondary'>{item.createdAt?new Date(String(item.createdAt)).toLocaleString():'—'}</Typography></Box>):<Typography color='text.secondary'>No status history recorded.</Typography>}
           </Box>
         </Box>:null}
       </CardContent>
