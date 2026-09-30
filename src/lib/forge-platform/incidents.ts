@@ -277,7 +277,7 @@ export async function validateIncident(id: string): Promise<ForgePlatformResult<
   const mode = getForgePlatformMode()
   if (mode !== 'demo') {
     try {
-      return await forgePlatformSend(`${base(id)}/validate`, 'POST')
+      return await forgePlatformSend<{ok:boolean;findings:ValidationFinding[];blockingErrorCount:number;warningCount:number;guidanceCount:number}>(`${base(id)}/validate`, 'POST')
     } catch (error) {
       if (!(mode === 'auto' && error instanceof ForgePlatformApiError)) throw error
     }
@@ -329,21 +329,21 @@ export async function approveIncident(id:string){ return transition(id,'APPROVED
 export async function listIncidentUnits(id:string): Promise<ForgePlatformResult<Record<string, unknown>[]>> {
   const mode=getForgePlatformMode()
   if(mode==='demo') return {data:readForgeData<Record<string,unknown>[]>('incident-unit-assignments').filter(x=>x.incidentId===id),source:'demo'}
-  try{return await forgePlatformGet(`${base(id)}/units`)}catch(error){if(mode==='auto'&&error instanceof ForgePlatformApiError)return {data:readForgeData<Record<string,unknown>[]>('incident-unit-assignments').filter(x=>x.incidentId===id),source:'demo'};throw error}
+  try{return await forgePlatformGet<Record<string,unknown>[]>(`${base(id)}/units`)}catch(error){if(mode==='auto'&&error instanceof ForgePlatformApiError)return {data:readForgeData<Record<string,unknown>[]>('incident-unit-assignments').filter(x=>x.incidentId===id),source:'demo'};throw error}
 }
 export async function addIncidentUnit(id:string,payload:Record<string,unknown>):Promise<ForgePlatformResult<Record<string,unknown>>>{
   const mode=getForgePlatformMode()
-  if(mode!=='demo'){try{return await forgePlatformSend(`${base(id)}/units`,'POST',payload)}catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}}
+  if(mode!=='demo'){try{return await forgePlatformSend<Record<string,unknown>>(`${base(id)}/units`,'POST',payload)}catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}}
   const rows=readForgeData<Record<string,unknown>[]>('incident-unit-assignments');const row={id:randomUUID(),incidentId:id,...payload,recordVersion:1};writeForgeData('incident-unit-assignments',[row,...rows]);return {data:row,source:'demo'}
 }
 export async function listIncidentPersonnel(id:string): Promise<ForgePlatformResult<Record<string, unknown>[]>> {
   const mode=getForgePlatformMode()
   if(mode==='demo') return {data:readForgeData<Record<string,unknown>[]>('incident-personnel-assignments').filter(x=>x.incidentId===id),source:'demo'}
-  try{return await forgePlatformGet(`${base(id)}/personnel`)}catch(error){if(mode==='auto'&&error instanceof ForgePlatformApiError)return {data:readForgeData<Record<string,unknown>[]>('incident-personnel-assignments').filter(x=>x.incidentId===id),source:'demo'};throw error}
+  try{return await forgePlatformGet<Record<string,unknown>[]>(`${base(id)}/personnel`)}catch(error){if(mode==='auto'&&error instanceof ForgePlatformApiError)return {data:readForgeData<Record<string,unknown>[]>('incident-personnel-assignments').filter(x=>x.incidentId===id),source:'demo'};throw error}
 }
 export async function addIncidentPersonnel(id:string,payload:Record<string,unknown>):Promise<ForgePlatformResult<Record<string,unknown>>>{
   const mode=getForgePlatformMode()
-  if(mode!=='demo'){try{return await forgePlatformSend(`${base(id)}/personnel`,'POST',payload)}catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}}
+  if(mode!=='demo'){try{return await forgePlatformSend<Record<string,unknown>>(`${base(id)}/personnel`,'POST',payload)}catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}}
   const rows=readForgeData<Record<string,unknown>[]>('incident-personnel-assignments');const row={id:randomUUID(),incidentId:id,...payload,recordVersion:1};writeForgeData('incident-personnel-assignments',[row,...rows]);return {data:row,source:'demo'}
 }
 
@@ -353,7 +353,7 @@ export async function listReviewComments(id:string):Promise<ForgePlatformResult<
   if(mode==='demo'){
     return {data:readForgeData<Record<string,unknown>[]>('incident-review-comments').filter(x=>x.incidentId===id),source:'demo'}
   }
-  try{return await forgePlatformGet(`${base(id)}/review-comments`)}
+  try{return await forgePlatformGet<Record<string,unknown>[]>(`${base(id)}/review-comments`)}
   catch(error){
     if(mode==='auto'&&error instanceof ForgePlatformApiError){
       return {data:readForgeData<Record<string,unknown>[]>('incident-review-comments').filter(x=>x.incidentId===id),source:'demo'}
@@ -365,7 +365,7 @@ export async function listReviewComments(id:string):Promise<ForgePlatformResult<
 export async function addReviewComment(id:string,body:string):Promise<ForgePlatformResult<Record<string,unknown>>>{
   const mode=getForgePlatformMode()
   if(mode!=='demo'){
-    try{return await forgePlatformSend(`${base(id)}/review-comments`,'POST',{body})}
+    try{return await forgePlatformSend<Record<string,unknown>>(`${base(id)}/review-comments`,'POST',{body})}
     catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
   }
   if(!body.trim()) throw new ForgePlatformApiError('Review comment is required.',400,'VALIDATION_ERROR')
@@ -381,7 +381,7 @@ export async function listStatusHistory(id:string):Promise<ForgePlatformResult<R
   if(mode==='demo'){
     return {data:readForgeData<Record<string,unknown>[]>('incident-status-history').filter(x=>x.incidentId===id),source:'demo'}
   }
-  try{return await forgePlatformGet(`${base(id)}/status-history`)}
+  try{return await forgePlatformGet<Record<string,unknown>[]>(`${base(id)}/status-history`)}
   catch(error){
     if(mode==='auto'&&error instanceof ForgePlatformApiError){
       return {data:readForgeData<Record<string,unknown>[]>('incident-status-history').filter(x=>x.incidentId===id),source:'demo'}
