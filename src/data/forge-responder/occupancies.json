@@ -57,7 +57,11 @@
     "notes": "",
     "status": "Active",
     "createdAt": "2026-07-21T15:47:59.705Z",
-    "updatedAt": "2026-07-21T15:47:59.705Z"
+    "updatedAt": "2026-07-21T15:47:59.705Z",
+    "addressLine1": "2600 Spahn Rd",
+    "latitude": 38.2825,
+    "longitude": -97.24,
+    "preplanId": "PP-0001"
   },
   {
     "id": "OCC-0004",
