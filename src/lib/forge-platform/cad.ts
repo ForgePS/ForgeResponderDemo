@@ -412,3 +412,65 @@ export async function listCadPersonnelMappings():Promise<ForgePlatformResult<Rec
   }
   return {data:local<Record<string,unknown>>('cad-personnel-mappings'),source:'demo'}
 }
+
+
+export async function listCadSimulatorScenarios():Promise<ForgePlatformResult<Array<Record<string,unknown>>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformGet<Array<Record<string,unknown>>>(`${tenantBase()}/cad/simulator/scenarios`)}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  return {data:[
+    {id:'STRUCTURE_FIRE',label:'Structure Fire',description:'Dispatch, unit assignment, timestamps, location, and fire response fields.'},
+    {id:'MEDICAL_AID',label:'Medical Aid',description:'EMS-style CAD incident with unit response and patient-location context.'},
+    {id:'MVA',label:'Motor Vehicle Collision',description:'Transportation incident with multiple responding units.'},
+    {id:'HAZMAT',label:'Hazardous Materials',description:'Hazmat response with specialty review cues.'}
+  ],source:'demo'}
+}
+
+export async function sendCadSimulatorScenario(payload:Record<string,unknown>):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<Record<string,unknown>>(`${tenantBase()}/cad/simulator/send`,'POST',payload)}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const connectionId=String(payload.connectionId||'')
+  const connection=local<CadConnection>('cad-connections').find(x=>x.id===connectionId)
+  if(!connection)throw new ForgePlatformApiError('CAD connection not found.',404,'NOT_FOUND')
+  const now=new Date().toISOString()
+  const rawMessageId=randomUUID()
+  const sourceIncidentId=String(payload.sourceIncidentId||`SIM-${Date.now()}`)
+  const row:CadRawMessageMeta={
+    id:rawMessageId,
+    receivedAt:now,
+    transportType:'SYNTHETIC_SIMULATOR',
+    sourceMessageId:`SIM-MSG-${Date.now()}`,
+    sourceIncidentId,
+    processingStatus:'REQUIRES_REVIEW',
+    authenticationStatus:'VERIFIED',
+    payloadSizeBytes:1024,
+    payloadHash:`demo-${rawMessageId}`,
+    correlationId:randomUUID(),
+    cadConnectionId:connectionId
+  }
+  writeForgeData('cad-messages',[row,...local<CadRawMessageMeta>('cad-messages')])
+  const connections=local<CadConnection>('cad-connections')
+  writeForgeData('cad-connections',connections.map(x=>x.id===connectionId?{...x,lastMessageAt:now,updatedAt:now}:x))
+  return {data:{delivery:String(payload.delivery||'DIRECT_QUEUE'),scenarioId:String(payload.scenarioId||'STRUCTURE_FIRE'),rawMessageId,payloadPreview:{sourceIncidentId}},source:'demo'}
+}
+
+export async function setCadSimulatorOutage(connectionId:string,reason:string,recover=false):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<Record<string,unknown>>(`${tenantBase()}/cad/simulator/${recover?'recover':'outage'}`,'POST',{connectionId,reason})}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const rows=local<CadConnection>('cad-connections')
+  const index=rows.findIndex(x=>x.id===connectionId)
+  if(index<0)throw new ForgePlatformApiError('CAD connection not found.',404,'NOT_FOUND')
+  const now=new Date().toISOString()
+  const updated={...rows[index],status:recover?'ACTIVE':'DEGRADED',healthStatus:recover?'HEALTHY':'DEGRADED',lastErrorSummary:recover?null:reason,lastSuccessAt:recover?now:rows[index].lastSuccessAt,recordVersion:rows[index].recordVersion+1,updatedAt:now}
+  rows[index]=updated
+  writeForgeData('cad-connections',rows)
+  return {data:recover?{recovered:true,connection:updated}:{outageId:randomUUID(),connection:updated},source:'demo'}
+}
