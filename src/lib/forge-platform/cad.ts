@@ -127,7 +127,7 @@ export type CadOperationsSummary={
 export type CadUnmappedValue={id:string;category:string;sourceField:string;sourceValue:string;occurrenceCount:number;status:string;recordVersion:number;lastSeenAt:string}
 export type CadUnknownUnit={id:string;sourceUnitId:string;sourceUnitCallsign:string|null;occurrenceCount:number;status:string;recordVersion:number;lastSeenAt:string}
 export type CadUnknownPersonnel={id:string;sourcePersonnelId:string;sourceName:string|null;occurrenceCount:number;status:string;recordVersion:number;lastSeenAt:string}
-export type CadRawMessageMeta={id:string;receivedAt:string;transportType:string;sourceMessageId:string|null;sourceIncidentId:string|null;processingStatus:string;authenticationStatus:string;payloadSizeBytes:number|null;payloadHash:string|null;correlationId:string|null;cadConnectionId:string}
+export type CadRawMessageMeta={id:string;receivedAt:string;transportType:string;sourceMessageId:string|null;sourceIncidentId:string|null;processingStatus:string;authenticationStatus:string;payloadSizeBytes:number|null;payloadHash:string|null;correlationId:string|null;cadConnectionId:string;scenarioId?:string|null;simulatedCallType?:string|null;simulatedDescription?:string|null;simulatedLocation?:{addressLine1?:string;city?:string;state?:string;postalCode?:string}|null;simulatedUnitCallsigns?:string[];simulatedPersonnelIds?:string[];simulatedComments?:string[];simulatedDispatchAt?:string|null}
 
 function tenantBase(){return `/api/v1/tenants/${getForgeTenantId()}`}
 function local<T>(entity:string){return readForgeData<T[]>(entity)}
@@ -428,6 +428,13 @@ export async function listCadSimulatorScenarios():Promise<ForgePlatformResult<Ar
   ],source:'demo'}
 }
 
+const demoScenarioPresets:Record<string,{callType:string;description:string;location:{addressLine1:string;city:string;state:string;postalCode:string};units:string[];personnel:string[];comments:string[]}> = {
+  STRUCTURE_FIRE:{callType:'STRUCTURE_FIRE',description:'Reported commercial structure fire with smoke showing',location:{addressLine1:'1200 Foundry Avenue',city:'Northbridge',state:'KS',postalCode:'66002'},units:['Engine 2','Truck 3','Unit 2'],personnel:['PER-0005','PER-0014'],comments:['Caller reports smoke from the rear of the building.']},
+  MEDICAL_AID:{callType:'MEDICAL_AID',description:'Medical aid response',location:{addressLine1:'415 Responder Lane',city:'Northbridge',state:'KS',postalCode:'66002'},units:['Unit 1','Engine 2'],personnel:['PER-0003'],comments:['Medical response requested by dispatch.']},
+  MVA:{callType:'MOTOR_VEHICLE_COLLISION',description:'Motor vehicle collision with reported injuries',location:{addressLine1:'900 Public Safety Parkway',city:'Northbridge',state:'KS',postalCode:'66002'},units:['Rescue 1','Unit 2'],personnel:['PER-0011'],comments:['Two vehicles reported with roadway blockage.']},
+  HAZMAT:{callType:'HAZARDOUS_MATERIALS',description:'Hazardous materials investigation',location:{addressLine1:'77 Industry Drive',city:'Northbridge',state:'KS',postalCode:'66002'},units:['Engine 3','Truck 3','Unit 3'],personnel:['PER-0008'],comments:['Unknown product odor reported near loading area.']}
+}
+
 export async function sendCadSimulatorScenario(payload:Record<string,unknown>):Promise<ForgePlatformResult<Record<string,unknown>>>{
   const mode=getForgePlatformMode()
   if(mode!=='demo'){
@@ -440,6 +447,8 @@ export async function sendCadSimulatorScenario(payload:Record<string,unknown>):P
   const now=new Date().toISOString()
   const rawMessageId=randomUUID()
   const sourceIncidentId=String(payload.sourceIncidentId||`SIM-${Date.now()}`)
+  const scenarioId=String(payload.scenarioId||'STRUCTURE_FIRE')
+  const scenario=demoScenarioPresets[scenarioId]||demoScenarioPresets.STRUCTURE_FIRE
   const row:CadRawMessageMeta={
     id:rawMessageId,
     receivedAt:now,
@@ -451,12 +460,20 @@ export async function sendCadSimulatorScenario(payload:Record<string,unknown>):P
     payloadSizeBytes:1024,
     payloadHash:`demo-${rawMessageId}`,
     correlationId:randomUUID(),
-    cadConnectionId:connectionId
+    cadConnectionId:connectionId,
+    scenarioId,
+    simulatedCallType:scenario.callType,
+    simulatedDescription:scenario.description,
+    simulatedLocation:scenario.location,
+    simulatedUnitCallsigns:scenario.units,
+    simulatedPersonnelIds:scenario.personnel,
+    simulatedComments:scenario.comments,
+    simulatedDispatchAt:now
   }
   writeForgeData('cad-messages',[row,...local<CadRawMessageMeta>('cad-messages')])
   const connections=local<CadConnection>('cad-connections')
   writeForgeData('cad-connections',connections.map(x=>x.id===connectionId?{...x,lastMessageAt:now,updatedAt:now}:x))
-  return {data:{delivery:String(payload.delivery||'DIRECT_QUEUE'),scenarioId:String(payload.scenarioId||'STRUCTURE_FIRE'),rawMessageId,payloadPreview:{sourceIncidentId}},source:'demo'}
+  return {data:{delivery:String(payload.delivery||'DIRECT_QUEUE'),scenarioId,rawMessageId,payloadPreview:{sourceIncidentId,callType:scenario.callType,location:scenario.location,units:scenario.units}},source:'demo'}
 }
 
 export async function setCadSimulatorOutage(connectionId:string,reason:string,recover=false):Promise<ForgePlatformResult<Record<string,unknown>>>{
