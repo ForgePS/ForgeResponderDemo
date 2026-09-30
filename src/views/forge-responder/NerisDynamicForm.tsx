@@ -181,6 +181,43 @@ export default function NerisDynamicForm({
     return drafts[field.fieldId] ?? fieldValue(field,values[field.fieldId])
   }
 
+  async function confirmPrefilledValues(){
+    const reviewable=activeFields.filter(field=>{
+      const state=values[field.fieldId]
+      return Boolean(state?.prefillSource&&state.prefillSource!=='MANUAL'&&state.userConfirmed===false)
+    })
+    if(!reviewable.length)return
+
+    setSaving(true);setError('');setMessage('')
+    try{
+      const payload=reviewable.map(field=>({
+        fieldId:field.fieldId,
+        fieldKey:field.fieldKey,
+        sectionKey:activeSection,
+        ...values[field.fieldId],
+        userConfirmed:true
+      }))
+      const response=await fetch(`/api/incidents/${incidentId}/field-values`,{
+        method:'PATCH',
+        headers:{'Content-Type':'application/json','x-record-version':String(recordVersion)},
+        body:JSON.stringify({values:payload})
+      })
+      const body=await response.json()
+      if(!response.ok)throw new Error(body.error||'Unable to confirm prefilled values.')
+      setValues(current=>{
+        const next={...current}
+        for(const field of reviewable){
+          next[field.fieldId]={...current[field.fieldId],userConfirmed:true}
+        }
+        return next
+      })
+      if(body.data?.incident?.recordVersion)onRecordVersion(Number(body.data.incident.recordVersion))
+      setMessage(`${reviewable.length} prefilled value${reviewable.length===1?'':'s'} confirmed.`)
+      await loadDescriptor()
+    }catch(err){setError(err instanceof Error?err.message:'Unable to confirm prefilled values.')}
+    finally{setSaving(false)}
+  }
+
   async function saveSection(){
     const dirty=activeFields.filter(field=>Object.prototype.hasOwnProperty.call(drafts,field.fieldId))
     if(!dirty.length){setMessage('No field changes to save.');return}
@@ -282,8 +319,11 @@ export default function NerisDynamicForm({
 
     {unconfirmedInSection>0?<Alert severity='warning' variant='outlined'>
       <Box sx={{display:'flex',justifyContent:'space-between',gap:2,alignItems:'center',flexWrap:'wrap'}}>
-        <Box><Typography fontWeight={800}>Prefilled values require officer review</Typography><Typography variant='body2'>Review or edit each prefilled value in this section. Saving an edited field confirms it as a manual officer-entered value.</Typography></Box>
-        <Chip color='warning' variant='tonal' label={String(unconfirmedInSection)+' unconfirmed'}/>
+        <Box><Typography fontWeight={800}>Prefilled values require officer review</Typography><Typography variant='body2'>Review each value. Edit and save to replace it with an officer-entered value, or confirm the current prefilled values unchanged while preserving their source.</Typography></Box>
+        <Box sx={{display:'flex',gap:1,alignItems:'center',flexWrap:'wrap'}}>
+          <Chip color='warning' variant='tonal' label={String(unconfirmedInSection)+' unconfirmed'}/>
+          <Button size='small' variant='contained' color='warning' disabled={saving} onClick={()=>void confirmPrefilledValues()}>Confirm Prefilled Values</Button>
+        </Box>
       </Box>
     </Alert>:null}
 
