@@ -3,7 +3,6 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 
 import { readForgeData, writeForgeData } from '@/utils/forgeDataStore'
-import { createIncident, getIncident } from '@/lib/forge-platform/incidents'
 
 import {
   ForgePlatformApiError,
@@ -604,58 +603,13 @@ export async function sendCadSimulatorScenario(payload:Record<string,unknown>):P
   const connections=local<CadConnection>('cad-connections')
   writeForgeData('cad-connections',connections.map(x=>x.id===connectionId?{...x,lastMessageAt:now,updatedAt:now}:x))
 
-  let incidentResult:Record<string,unknown>|undefined
-  if(Boolean(payload.autoDispatch)){
-    const links=local<Record<string,unknown>>('cad-incident-links')
-    const existingLink=links.find(link=>
-      link.cadConnectionId===connectionId &&
-      link.sourceIncidentId===sourceIncidentId &&
-      String(link.linkStatus||'ACTIVE')==='ACTIVE'
-    )
-
-    if(existingLink?.incidentId){
-      try{
-        const existing=await getIncident(String(existingLink.incidentId))
-        incidentResult={
-          incidentId:existing.data.id,
-          incidentNumber:existing.data.incidentNumber,
-          existing:true
-        }
-      }catch{}
-    }
-
-    if(!incidentResult){
-      const normalizedIncident=(normalizedPayload.incident||{}) as Record<string,unknown>
-      const normalizedTimestamps=(normalizedPayload.timestamps||{}) as Record<string,unknown>
-      const created=await createIncident({
-        incidentDate:now.slice(0,10),
-        alarmAt:normalizedTimestamps.callReceived||now,
-        incidentSource:'CAD',
-        dispatchDescription:normalizedIncident.nature
-          ? String(normalizedIncident.nature)
-          : `CAD source incident ${sourceIncidentId}`
-      })
-      await linkCadIncident(created.data.id,{
-        cadConnectionId:connectionId,
-        sourceIncidentId,
-        sourceIncidentNumber:sourceIncidentId,
-        reason:'Standalone CAD simulator auto-dispatch'
-      })
-      incidentResult={
-        incidentId:created.data.id,
-        incidentNumber:created.data.incidentNumber,
-        existing:false
-      }
-    }
-  }
 
   return {
     data:{
       delivery:String(payload.delivery||'DIRECT_QUEUE'),
       scenarioId,
       rawMessageId,
-      payloadPreview:{sourceIncidentId},
-      ...(incidentResult?{incident:incidentResult}:{})
+      payloadPreview:{sourceIncidentId}
     },
     source:'demo'
   }
