@@ -185,10 +185,10 @@ export async function createCadConnection(payload:Record<string,unknown>):Promis
     vendor:String(payload.vendor||'GENERIC'),
     adapterKey:String(payload.adapterKey||'generic'),
     adapterVersion:String(payload.adapterVersion||'1.0'),
-    environment:String(payload.environment||'DEMO'),
-    transportType:String(payload.transportType||'WEBHOOK'),
+    environment:String(payload.environment||'SIMULATOR'),
+    transportType:String(payload.transportType||'SYNTHETIC_SIMULATOR'),
     status:'DISABLED',
-    intakeMode:String(payload.intakeMode||'WEBHOOK'),
+    intakeMode:String(payload.intakeMode||'HYBRID'),
     healthStatus:'UNKNOWN',
     recordVersion:1,
     hasCredentialsSecret:false,
@@ -208,7 +208,7 @@ export async function setCadConnectionEnabled(id:string,enabled:boolean):Promise
   const rows=local<CadConnection>('cad-connections');const index=rows.findIndex(x=>x.id===id)
   if(index<0)throw new ForgePlatformApiError('CAD connection not found.',404,'NOT_FOUND')
   const current=rows[index]
-  const updated={...current,status:enabled?'ENABLED':'DISABLED',recordVersion:current.recordVersion+1,updatedAt:new Date().toISOString()}
+  const updated={...current,status:enabled?'ACTIVE':'DISABLED',recordVersion:current.recordVersion+1,updatedAt:new Date().toISOString()}
   rows[index]=updated;writeForgeData('cad-connections',rows)
   return {data:updated,source:'demo'}
 }
@@ -248,7 +248,7 @@ export async function resolveCadConflict(id:string,payload:{resolutionAction:str
   const rows=local<CadConflict>('cad-conflicts');const index=rows.findIndex(x=>x.id===id)
   if(index<0)throw new ForgePlatformApiError('CAD conflict not found.',404,'NOT_FOUND')
   if(rows[index].recordVersion!==payload.recordVersion)throw new ForgePlatformApiError('CAD conflict was modified elsewhere.',412,'PRECONDITION_FAILED')
-  const updated={...rows[index],status:'RESOLVED',resolutionReason:payload.resolutionReason,recordVersion:rows[index].recordVersion+1}
+  const updated={...rows[index],status:payload.resolutionAction==='ESCALATE'?'ESCALATED':'MANUALLY_RESOLVED',resolutionReason:payload.resolutionReason,recordVersion:rows[index].recordVersion+1}
   rows[index]=updated;writeForgeData('cad-conflicts',rows)
   return {data:updated,source:'demo'}
 }
