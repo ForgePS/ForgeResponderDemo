@@ -22,6 +22,8 @@ export const FORGE_DATA_ENTITIES = [
   'hydrants',
   'incidents',
   'incident-narratives',
+  'incident-field-values',
+  'incident-specialty-sections',
   'incident-unit-assignments',
   'incident-personnel-assignments',
   'incident-review-comments',
