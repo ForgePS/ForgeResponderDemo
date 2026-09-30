@@ -9,6 +9,7 @@ import {
   forgePlatformGet,
   forgePlatformSend,
   getForgePlatformMode,
+  getForgeTenantId,
   recordVersionToIfMatch,
   type ForgePlatformResult
 } from '@/lib/forge-platform/server'
@@ -108,7 +109,7 @@ const SPECIALTY_MODULES:Record<string,{sectionKey:string;label:string;summary:st
   mod_personnel_injury:{sectionKey:'PERSONNEL_INJURY',label:'Personnel Injury',summary:'Personnel injury circumstances and outcomes.'}
 }
 
-function base(id:string){return `/api/v1/tenants/${process.env.FORGE_PLATFORM_TENANT_ID || 'forge-demo'}/neris/incidents/${id}`}
+function base(id:string){return `/api/v1/tenants/${getForgeTenantId()}/neris/incidents/${id}`}
 
 function fieldId(moduleKey:string,fieldKey:string){return `demo:${moduleKey}:${fieldKey}`}
 
@@ -222,6 +223,8 @@ export async function getFormDescriptor(incidentId:string):Promise<ForgePlatform
 }
 
 export async function listFieldValues(incidentId:string):Promise<ForgePlatformResult<Record<string,NerisFieldValueState>>>{
+  const mode=getForgePlatformMode()
+  if(mode==='connected')return {data:{},source:'platform'}
   const rows=readForgeData<StoredFieldValue[]>('incident-field-values').filter(x=>x.incidentId===incidentId)
   return {data:Object.fromEntries(rows.map(row=>[row.fieldId,row.value])),source:'demo'}
 }
