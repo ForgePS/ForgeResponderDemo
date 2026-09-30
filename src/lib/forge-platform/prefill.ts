@@ -225,7 +225,9 @@ async function cadCandidates(incidentId:string):Promise<PrefillCandidate[]>{
 
   const seen=new Set<string>()
   return out.filter(candidate=>{
-    const key=`${candidate.target||'FIELD'}|${candidate.fieldKey}|${JSON.stringify(candidate.value)}`
+    // Related messages are processed newest-first. Keep the first suggestion for each
+    // semantic field/resource so stale CAD updates cannot overwrite newer values.
+    const key=`${candidate.target||'FIELD'}|${candidate.fieldKey}`
     if(seen.has(key))return false
     seen.add(key)
     return true
