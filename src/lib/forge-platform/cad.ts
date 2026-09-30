@@ -283,7 +283,16 @@ export async function resolveCadUnknownUnit(id:string,payload:Record<string,unkn
   const mode=getForgePlatformMode()
   if(mode!=='demo'){try{return await forgePlatformSend<CadUnknownUnit>(`${tenantBase()}/cad/unknown-units/${id}/resolve`,'POST',payload)}catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}}
   const rows=local<CadUnknownUnit>('cad-unknown-units');const index=rows.findIndex(x=>x.id===id);if(index<0)throw new ForgePlatformApiError('Unknown CAD unit not found.',404,'NOT_FOUND')
-  const updated={...rows[index],status:'RESOLVED',recordVersion:rows[index].recordVersion+1};rows[index]=updated;writeForgeData('cad-unknown-units',rows);return {data:updated,source:'demo'}
+  const current=rows[index]
+  const expected=Number(payload.recordVersion||1)
+  if(current.recordVersion!==expected)throw new ForgePlatformApiError('Unknown CAD unit was modified elsewhere.',412,'PRECONDITION_FAILED')
+  const status=String(payload.status||'MAPPED')
+  if(status==='MAPPED'){
+    const mappings=local<Record<string,unknown>>('cad-unit-mappings')
+    const mapping={id:randomUUID(),sourceUnitId:current.sourceUnitId,sourceUnitCallsign:current.sourceUnitCallsign,forgeApparatusId:payload.forgeApparatusId||null,forgeUnitId:payload.forgeUnitId||null,mappingType:String(payload.mappingType||'APPARATUS'),externalAgency:Boolean(payload.externalAgency),notes:payload.notes||null,status:'ACTIVE',createdAt:new Date().toISOString()}
+    writeForgeData('cad-unit-mappings',[mapping,...mappings])
+  }
+  const updated={...current,status,recordVersion:current.recordVersion+1};rows[index]=updated;writeForgeData('cad-unknown-units',rows);return {data:updated,source:'demo'}
 }
 export async function listCadUnknownPersonnel():Promise<ForgePlatformResult<CadUnknownPersonnel[]>>{
   const mode=getForgePlatformMode()
@@ -294,7 +303,16 @@ export async function resolveCadUnknownPersonnel(id:string,payload:Record<string
   const mode=getForgePlatformMode()
   if(mode!=='demo'){try{return await forgePlatformSend<CadUnknownPersonnel>(`${tenantBase()}/cad/unknown-personnel/${id}/resolve`,'POST',payload)}catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}}
   const rows=local<CadUnknownPersonnel>('cad-unknown-personnel');const index=rows.findIndex(x=>x.id===id);if(index<0)throw new ForgePlatformApiError('Unknown CAD personnel not found.',404,'NOT_FOUND')
-  const updated={...rows[index],status:'RESOLVED',recordVersion:rows[index].recordVersion+1};rows[index]=updated;writeForgeData('cad-unknown-personnel',rows);return {data:updated,source:'demo'}
+  const current=rows[index]
+  const expected=Number(payload.recordVersion||1)
+  if(current.recordVersion!==expected)throw new ForgePlatformApiError('Unknown CAD personnel was modified elsewhere.',412,'PRECONDITION_FAILED')
+  const status=String(payload.status||'MAPPED')
+  if(status==='MAPPED'){
+    const mappings=local<Record<string,unknown>>('cad-personnel-mappings')
+    const mapping={id:randomUUID(),sourcePersonnelId:current.sourcePersonnelId,sourceName:current.sourceName,forgePersonId:payload.forgePersonId||null,forgePersonnelId:payload.forgePersonnelId||null,mappingType:String(payload.mappingType||'PERSONNEL'),externalAgency:Boolean(payload.externalAgency),notes:payload.notes||null,status:'ACTIVE',createdAt:new Date().toISOString()}
+    writeForgeData('cad-personnel-mappings',[mapping,...mappings])
+  }
+  const updated={...current,status,recordVersion:current.recordVersion+1};rows[index]=updated;writeForgeData('cad-unknown-personnel',rows);return {data:updated,source:'demo'}
 }
 export async function listCadMessages():Promise<ForgePlatformResult<CadRawMessageMeta[]>>{
   const mode=getForgePlatformMode()
@@ -374,4 +392,23 @@ export async function patchCadConnection(id:string,payload:Record<string,unknown
   rows[index]=updated
   writeForgeData('cad-connections',rows)
   return {data:updated,source:'demo'}
+}
+
+
+export async function listCadUnitMappings():Promise<ForgePlatformResult<Record<string,unknown>[]>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformGet<Record<string,unknown>[]>(`${tenantBase()}/cad/unit-mappings`)}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  return {data:local<Record<string,unknown>>('cad-unit-mappings'),source:'demo'}
+}
+
+export async function listCadPersonnelMappings():Promise<ForgePlatformResult<Record<string,unknown>[]>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformGet<Record<string,unknown>[]>(`${tenantBase()}/cad/personnel-mappings`)}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  return {data:local<Record<string,unknown>>('cad-personnel-mappings'),source:'demo'}
 }
