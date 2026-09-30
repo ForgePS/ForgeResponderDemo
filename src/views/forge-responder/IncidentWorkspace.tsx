@@ -15,6 +15,7 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 import NerisDynamicForm from '@views/forge-responder/NerisDynamicForm'
+import SpecialtyRecordsPanel from '@views/forge-responder/SpecialtyRecordsPanel'
 
 type Incident={
   id:string
@@ -231,6 +232,7 @@ export default function IncidentWorkspace({
           <Tab label='Overview'/>
           <Tab label='Units & Personnel'/>
           <Tab label='NERIS Forms'/>
+          <Tab label='Specialty Records'/>
           <Tab label='Narrative'/>
           <Tab label='Officer Review'/>
         </Tabs>
@@ -259,13 +261,15 @@ export default function IncidentWorkspace({
 
         {tab===2?<Box sx={{mt:4}}><NerisDynamicForm incidentId={incident.id} recordVersion={incident.recordVersion} onRecordVersion={version=>setIncident(current=>({...current,recordVersion:version}))}/></Box>:null}
 
-        {tab===3?<Box sx={{display:'grid',gap:3,mt:4}}>
+        {tab===3?<Box sx={{mt:4}}><SpecialtyRecordsPanel incidentId={incident.id}/></Box>:null}
+
+        {tab===4?<Box sx={{display:'grid',gap:3,mt:4}}>
           <TextField multiline minRows={14} label='Incident Narrative' value={narrative} onChange={e=>setNarrative(e.target.value)}/>
           <TextField label='Version Note' value={versionNote} onChange={e=>setVersionNote(e.target.value)} placeholder='Optional revision note'/>
           <Box sx={{display:'flex',justifyContent:'flex-end'}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void saveNarrative()}>Save Narrative</Button></Box>
         </Box>:null}
 
-        {tab===4?<Box sx={{mt:4,display:'grid',gap:3}}>
+        {tab===5?<Box sx={{mt:4,display:'grid',gap:3}}>
           <Box sx={{display:'flex',gap:2,flexWrap:'wrap'}}><Button variant='outlined' disabled={busy} onClick={()=>void validate()}>Run NERIS Validation</Button></Box>
           {findings.length?<Box sx={{display:'grid',gap:1}}>{findings.map((f,index)=><Alert key={`${f.code}-${index}`} severity={f.severity==='BLOCKING_ERROR'?'error':f.severity==='WARNING'?'warning':'info'}>{f.message}</Alert>)}</Box>:<Alert severity='info' variant='outlined'>Run validation to check the current incident for blocking errors, warnings, and guidance.</Alert>}
           <Divider/>
