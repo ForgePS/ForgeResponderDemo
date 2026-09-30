@@ -107,7 +107,8 @@ export async function applyIncidentPrefill(
   candidates:PrefillCandidate[],
   recordVersion:number
 ):Promise<ForgePlatformResult<{incident:Awaited<ReturnType<typeof getIncident>>['data'];applied:number;skipped:number}>>{
-  let incident=(await getIncident(incidentId)).data
+  const incidentResult=await getIncident(incidentId)
+  let incident=incidentResult.data
   if(incident.recordVersion!==recordVersion)throw new ForgePlatformApiError('Incident was modified before prefill could be applied.',412,'PRECONDITION_FAILED')
 
   let applied=0
@@ -152,5 +153,5 @@ export async function applyIncidentPrefill(
     }
   }
 
-  return {data:{incident,applied,skipped},source:getForgePlatformMode()==='connected'?'platform':'demo'}
+  return {data:{incident,applied,skipped},source:incidentResult.source}
 }
