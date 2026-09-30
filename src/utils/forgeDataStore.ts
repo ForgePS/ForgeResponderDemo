@@ -42,6 +42,7 @@ export const FORGE_DATA_ENTITIES = [
   'cad-personnel-mappings',
   'cad-messages',
   'cad-normalized-events',
+  'cad-field-provenance',
   'cad-outages',
   'cad-incident-links',
   'incident-unit-assignments',
