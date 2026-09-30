@@ -174,7 +174,9 @@ export default function NerisDynamicForm({
         fieldId:field.fieldId,
         fieldKey:field.fieldKey,
         sectionKey:activeSection,
-        ...toFieldState(field,drafts[field.fieldId])
+        ...toFieldState(field,drafts[field.fieldId]),
+        prefillSource:'MANUAL',
+        userConfirmed:true
       }))
       const response=await fetch(`/api/incidents/${incidentId}/field-values`,{
         method:'PATCH',
