@@ -57,13 +57,14 @@ export default function CadOperationsDashboard(){
   const [scenarioId,setScenarioId]=useState('STRUCTURE_FIRE')
   const [simConnectionId,setSimConnectionId]=useState('')
   const [simSourceIncidentId,setSimSourceIncidentId]=useState('SIM-INC-1001')
+  const [outages,setOutages]=useState<Record<string,unknown>[]>([])
   const [editingConnection,setEditingConnection]=useState<Connection|null>(null)
   const [connectionForm,setConnectionForm]=useState({name:'Demo CAD',vendor:'GENERIC',adapterKey:'generic',adapterVersion:'1.0',environment:'SIMULATOR',transportType:'SYNTHETIC_SIMULATOR',intakeMode:'HYBRID'})
 
   async function load(){
     setError('')
     try{
-      const [s,c,cf,u,uu,up,m,unitMap,personMap,units,personnel,scenarioData]=await Promise.all([
+      const [s,c,cf,u,uu,up,m,unitMap,personMap,units,personnel,scenarioData,outageData]=await Promise.all([
         json('/api/cad/summary'),
         json('/api/cad/connections'),
         json('/api/cad/conflicts?status=OPEN'),
@@ -75,12 +76,13 @@ export default function CadOperationsDashboard(){
         json('/api/cad/personnel-mappings'),
         json('/api/rms/units'),
         json('/api/rms/personnel'),
-        json('/api/cad/simulator/scenarios')
+        json('/api/cad/simulator/scenarios'),
+        json('/api/cad/simulator/outages')
       ])
       setSummary(s.data);setConnections(c.data||[]);setConflicts(cf.data||[]);setUnmapped(u.data||[])
       setUnknownUnits(uu.data||[]);setUnknownPersonnel(up.data||[]);setMessages(m.data||[])
       setUnitMappings(unitMap.data||[]);setPersonnelMappings(personMap.data||[])
-      setRmsUnits(units.data||[]);setRmsPersonnel(personnel.data||[]);setScenarios(scenarioData.data||[])
+      setRmsUnits(units.data||[]);setRmsPersonnel(personnel.data||[]);setScenarios(scenarioData.data||[]);setOutages(outageData.data||[])
       if(!simConnectionId&&(c.data||[])[0]?.id)setSimConnectionId((c.data||[])[0].id)
     }catch(err){setError(err instanceof Error?err.message:'Unable to load CAD operations.')}
   }
@@ -158,6 +160,18 @@ export default function CadOperationsDashboard(){
     catch(err){setError(err instanceof Error?err.message:'Unable to reprocess CAD message.')}finally{setBusy(false)}
   }
 
+  async function rotateSecret(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/connections/${id}/rotate-secret`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason})});await load();setMessage('CAD webhook secret rotated.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to rotate CAD secret.')}finally{setBusy(false)}
+  }
+
+  async function quarantine(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{await json(`/api/cad/messages/${id}/quarantine`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({reason})});await load();setMessage('CAD message quarantined.')}
+    catch(err){setError(err instanceof Error?err.message:'Unable to quarantine CAD message.')}finally{setBusy(false)}
+  }
+
   async function replay(){
     if(!selectedMessageIds.length)return
     setBusy(true);setError('');setMessage('')
@@ -233,6 +247,7 @@ export default function CadOperationsDashboard(){
         <Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:3}}>
           <Button variant='outlined' disabled={busy} onClick={()=>startEditConnection(row)}>Edit</Button>
           <Button variant='outlined' disabled={busy} onClick={()=>void actConnection(row.id,'TEST')}>Test</Button>
+          <Button variant='outlined' disabled={busy} onClick={()=>void rotateSecret(row.id)}>Rotate Secret</Button>
           {row.status==='ACTIVE'||row.status==='ENABLED'?<Button color='warning' variant='outlined' disabled={busy} onClick={()=>void actConnection(row.id,'DISABLE')}>Disable</Button>:<Button variant='contained' disabled={busy} onClick={()=>void actConnection(row.id,'ENABLE')}>Enable</Button>}
         </Box>
       </CardContent></Card>)}
@@ -285,7 +300,7 @@ export default function CadOperationsDashboard(){
           <Box><Typography fontWeight={700}>{row.sourceMessageId||row.id}</Typography><Typography variant='caption' color='text.secondary'>{new Date(row.receivedAt).toLocaleString()}</Typography></Box>
           <Typography>{row.sourceIncidentId||'No source incident'}</Typography>
           <Chip size='small' variant='tonal' color={row.processingStatus==='FAILED'||row.processingStatus==='DEAD_LETTER'?'error':row.processingStatus==='APPLIED'?'success':'warning'} label={row.processingStatus}/>
-          <Button size='small' disabled={busy} onClick={()=>void reprocess(row.id)}>Reprocess</Button>
+          <Box sx={{display:'flex',gap:1}}><Button size='small' disabled={busy} onClick={()=>void reprocess(row.id)}>Reprocess</Button><Button size='small' color='warning' disabled={busy} onClick={()=>void quarantine(row.id)}>Quarantine</Button></Box>
         </Box>)}
         {!messages.length?<Typography color='text.secondary'>No CAD messages recorded.</Typography>:null}
       </Box></CardContent></Card>
@@ -311,6 +326,7 @@ export default function CadOperationsDashboard(){
         </Box>
       </CardContent></Card>
       <Card><CardContent><Typography variant='h5'>Available Scenarios</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{scenarios.map((row:any)=>{const id=String(row.id||row.scenarioId||'');return <Box key={id} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Typography fontWeight={700}>{String(row.label||row.name||id)}</Typography><Typography color='text.secondary'>{String(row.description||row.summary||'Synthetic CAD scenario')}</Typography></Box>})}</Box></CardContent></Card>
+      <Card><CardContent><Typography variant='h5'>Outage History</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{outages.map((row:any)=><Box key={String(row.id)} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Typography fontWeight={700}>{String(row.status||'UNKNOWN')}</Typography><Typography>{String(row.reason||'No reason recorded')}</Typography><Typography variant='caption' color='text.secondary'>{row.startedAt?'Started '+new Date(String(row.startedAt)).toLocaleString():''}{row.endedAt?' · Ended '+new Date(String(row.endedAt)).toLocaleString():''}</Typography></Box>)}{!outages.length?<Typography color='text.secondary'>No simulator outages recorded.</Typography>:null}</Box></CardContent></Card>
     </Box>:null}
 
   </Box>
