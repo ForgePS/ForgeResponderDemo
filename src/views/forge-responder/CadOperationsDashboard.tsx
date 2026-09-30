@@ -44,6 +44,8 @@ export default function CadOperationsDashboard(){
   const [unknownUnits,setUnknownUnits]=useState<UnknownUnit[]>([])
   const [unknownPersonnel,setUnknownPersonnel]=useState<UnknownPerson[]>([])
   const [messages,setMessages]=useState<Message[]>([])
+  const [unitMappings,setUnitMappings]=useState<Record<string,unknown>[]>([])
+  const [personnelMappings,setPersonnelMappings]=useState<Record<string,unknown>[]>([])
   const [rmsUnits,setRmsUnits]=useState<Option[]>([])
   const [rmsPersonnel,setRmsPersonnel]=useState<Option[]>([])
   const [busy,setBusy]=useState(false)
@@ -57,7 +59,7 @@ export default function CadOperationsDashboard(){
   async function load(){
     setError('')
     try{
-      const [s,c,cf,u,uu,up,m,units,personnel]=await Promise.all([
+      const [s,c,cf,u,uu,up,m,unitMap,personMap,units,personnel]=await Promise.all([
         json('/api/cad/summary'),
         json('/api/cad/connections'),
         json('/api/cad/conflicts?status=OPEN'),
@@ -65,11 +67,14 @@ export default function CadOperationsDashboard(){
         json('/api/cad/unknown-units'),
         json('/api/cad/unknown-personnel'),
         json('/api/cad/messages'),
+        json('/api/cad/unit-mappings'),
+        json('/api/cad/personnel-mappings'),
         json('/api/rms/units'),
         json('/api/rms/personnel')
       ])
       setSummary(s.data);setConnections(c.data||[]);setConflicts(cf.data||[]);setUnmapped(u.data||[])
       setUnknownUnits(uu.data||[]);setUnknownPersonnel(up.data||[]);setMessages(m.data||[])
+      setUnitMappings(unitMap.data||[]);setPersonnelMappings(personMap.data||[])
       setRmsUnits(units.data||[]);setRmsPersonnel(personnel.data||[])
     }catch(err){setError(err instanceof Error?err.message:'Unable to load CAD operations.')}
   }
@@ -230,6 +235,26 @@ export default function CadOperationsDashboard(){
       <Card><CardContent><Typography variant='h5'>Unmapped Values</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{unresolvedUnmapped.map(row=><Box key={row.id} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Typography fontWeight={700}>{row.sourceField}: {row.sourceValue}</Typography><Typography variant='caption' color='text.secondary'>{row.category} · Seen {row.occurrenceCount} times</Typography><Box sx={{display:'flex',gap:1,mt:2}}><Button size='small' onClick={()=>void resolveUnmapped(row,'MAPPED')}>Mark Mapped</Button><Button size='small' color='warning' onClick={()=>void resolveUnmapped(row,'IGNORED_WITH_REASON')}>Ignore</Button><Button size='small' color='error' onClick={()=>void resolveUnmapped(row,'ESCALATED')}>Escalate</Button></Box></Box>)}</Box></CardContent></Card>
       <Card><CardContent><Typography variant='h5'>Unknown Units</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{unresolvedUnits.map(row=><Box key={row.id} sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr auto'},gap:2,alignItems:'center',p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Box><Typography fontWeight={700}>{row.sourceUnitCallsign||row.sourceUnitId}</Typography><Typography variant='caption'>Source ID: {row.sourceUnitId}</Typography></Box><TextField select size='small' label='Forge Unit' defaultValue='' onChange={e=>{if(e.target.value)void resolveUnknownUnit(row,e.target.value)}}><MenuItem value=''>Select mapping</MenuItem>{rmsUnits.map(unit=><MenuItem key={unit.id} value={unit.id}>{unit.callSign||unit.unitNumber||unit.name||unit.id}</MenuItem>)}</TextField><Button size='small' color='warning' onClick={()=>void resolveUnknownUnit(row,'','IGNORED_WITH_REASON')}>Ignore</Button></Box>)}</Box></CardContent></Card>
       <Card><CardContent><Typography variant='h5'>Unknown Personnel</Typography><Box sx={{display:'grid',gap:2,mt:2}}>{unresolvedPersonnel.map(row=><Box key={row.id} sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr auto'},gap:2,alignItems:'center',p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}><Box><Typography fontWeight={700}>{row.sourceName||row.sourcePersonnelId}</Typography><Typography variant='caption'>Source ID: {row.sourcePersonnelId}</Typography></Box><TextField select size='small' label='Forge Personnel' defaultValue='' onChange={e=>{if(e.target.value)void resolveUnknownPerson(row,e.target.value)}}><MenuItem value=''>Select mapping</MenuItem>{rmsPersonnel.map(person=><MenuItem key={person.id} value={person.id}>{person.displayName||person.personId||person.name||person.id}</MenuItem>)}</TextField><Button size='small' color='warning' onClick={()=>void resolveUnknownPerson(row,'','IGNORED_WITH_REASON')}>Ignore</Button></Box>)}</Box></CardContent></Card>
+      <Card><CardContent>
+        <Typography variant='h5'>Active Unit Mappings</Typography>
+        <Box sx={{display:'grid',gap:1,mt:2}}>
+          {unitMappings.map((row:any)=><Box key={String(row.id)} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}>
+            <Typography fontWeight={700}>{String(row.sourceUnitCallsign||row.sourceUnitId||'CAD Unit')}</Typography>
+            <Typography variant='caption' color='text.secondary'>{'Forge Unit: '+String(row.forgeUnitId||row.forgeApparatusId||'External / not linked')+' · '+String(row.mappingType||'MAPPING')}</Typography>
+          </Box>)}
+          {!unitMappings.length?<Typography color='text.secondary'>No active unit mappings.</Typography>:null}
+        </Box>
+      </CardContent></Card>
+      <Card><CardContent>
+        <Typography variant='h5'>Active Personnel Mappings</Typography>
+        <Box sx={{display:'grid',gap:1,mt:2}}>
+          {personnelMappings.map((row:any)=><Box key={String(row.id)} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}>
+            <Typography fontWeight={700}>{String(row.sourceName||row.sourcePersonnelId||'CAD Personnel')}</Typography>
+            <Typography variant='caption' color='text.secondary'>{'Forge Personnel: '+String(row.forgePersonnelId||row.forgePersonId||'External / not linked')+' · '+String(row.mappingType||'MAPPING')}</Typography>
+          </Box>)}
+          {!personnelMappings.length?<Typography color='text.secondary'>No active personnel mappings.</Typography>:null}
+        </Box>
+      </CardContent></Card>
     </Box>:null}
 
     {tab===4?<Box sx={{display:'grid',gap:3}}>
