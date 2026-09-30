@@ -1,8 +1,10 @@
 import 'server-only'
 
-import { createIncident, listIncidents } from '@/lib/forge-platform/incidents'
+import { addIncidentPersonnel, addIncidentUnit, createIncident, getIncident, listIncidents } from '@/lib/forge-platform/incidents'
 import { getCadIncidentStatus, linkCadIncident, listCadMessages } from '@/lib/forge-platform/cad'
-import type { ForgePlatformResult } from '@/lib/forge-platform/server'
+import { batchFieldValues, getFormDescriptor } from '@/lib/forge-platform/neris'
+import { listRmsMasterData } from '@/lib/forge-platform/rms'
+import { getForgePlatformMode, type ForgePlatformResult } from '@/lib/forge-platform/server'
 
 export async function createIncidentFromCadMessage(rawMessageId:string):Promise<ForgePlatformResult<{incidentId:string;incidentNumber:string;sourceIncidentId:string;existing:boolean;linkWarning?:string}>>{
   const messages=await listCadMessages()
@@ -29,8 +31,10 @@ export async function createIncidentFromCadMessage(rawMessageId:string):Promise<
 
   const incident=await createIncident({
     incidentDate:message.receivedAt.slice(0,10),
+    alarmAt:message.simulatedDispatchAt||message.receivedAt,
     incidentSource:'CAD',
-    dispatchDescription:`Created from CAD source incident ${message.sourceIncidentId}`
+    dispatchDescription:message.simulatedDescription||`Created from CAD source incident ${message.sourceIncidentId}`,
+    primaryIncidentTypeCode:message.simulatedCallType||undefined
   })
 
   let linkWarning:string|undefined
@@ -42,6 +46,61 @@ export async function createIncidentFromCadMessage(rawMessageId:string):Promise<
     })
   }catch(error){
     linkWarning=error instanceof Error?error.message:'Incident was created, but CAD linkage failed.'
+  }
+
+  if(getForgePlatformMode()==='demo'||incident.source==='demo'){
+    const [units,personnel]=await Promise.all([
+      listRmsMasterData<Record<string,unknown>&{id:string}>('units'),
+      listRmsMasterData<Record<string,unknown>&{id:string}>('personnel')
+    ])
+    const unitCallsigns=new Set(message.simulatedUnitCallsigns||[])
+    const matchingUnits=units.data.filter(row=>unitCallsigns.has(String(row.callSign||row.unitNumber||'')))
+    for(const [index,unit] of matchingUnits.entries()){
+      await addIncidentUnit(incident.data.id,{
+        unitId:unit.id,
+        isPrimary:index===0,
+        unitRole:index===0?'PRIMARY_RESPONSE':'CAD_RESPONSE',
+        ...(message.simulatedDispatchAt?{dispatchedAt:message.simulatedDispatchAt}:{})
+      })
+    }
+
+    const personnelIds=new Set(message.simulatedPersonnelIds||[])
+    const matchingPersonnel=personnel.data.filter(row=>personnelIds.has(String(row.id)))
+    for(const person of matchingPersonnel){
+      await addIncidentPersonnel(incident.data.id,{
+        personnelId:person.id,
+        role:'RESPONDER',
+        ...(person.rank?{rank:person.rank}:{})
+      })
+    }
+
+    const descriptor=(await getFormDescriptor(incident.data.id)).data
+    const fieldByKey=new Map(descriptor.modules.flatMap(module=>module.fields).map(field=>[field.fieldKey,field]))
+    const candidates:Array<{fieldKey:string;sectionKey:string;valueText?:string;valueTimestamp?:string;valueJson?:unknown}>=[
+      {fieldKey:'dispatch_internal_id',sectionKey:'DISPATCH',valueText:message.sourceIncidentId},
+      ...(message.simulatedCallType?[{fieldKey:'dispatch_incident_code',sectionKey:'DISPATCH',valueText:message.simulatedCallType}]:[]),
+      ...(message.receivedAt?[{fieldKey:'dispatch_time_call_arrival',sectionKey:'DISPATCH',valueTimestamp:message.receivedAt}]:[]),
+      ...(message.simulatedDispatchAt?[{fieldKey:'dispatch_time_call_create',sectionKey:'DISPATCH',valueTimestamp:message.simulatedDispatchAt}]:[]),
+      ...(message.simulatedComments?.length?[{fieldKey:'dispatch_comment',sectionKey:'DISPATCH',valueJson:message.simulatedComments}]:[])
+    ]
+    const values=candidates.flatMap(candidate=>{
+      const field=fieldByKey.get(candidate.fieldKey)
+      if(!field)return []
+      return [{
+        fieldId:field.fieldId,
+        fieldKey:field.fieldKey,
+        sectionKey:candidate.sectionKey,
+        valueText:candidate.valueText??null,
+        valueTimestamp:candidate.valueTimestamp??null,
+        valueJson:candidate.valueJson??null,
+        prefillSource:'CAD' as const,
+        userConfirmed:false
+      }]
+    })
+    if(values.length){
+      const latest=(await getIncident(incident.data.id)).data
+      await batchFieldValues(incident.data.id,values,latest.recordVersion)
+    }
   }
 
   return {
