@@ -118,15 +118,26 @@ export async function createIncidentOccupancyLink(
   const rows=readForgeData<OccupancyLink[]>('incident-occupancy-links')
   const existing=rows.find(row=>row.incidentId===incidentId&&row.occupancyId===input.occupancyId&&row.preplanId===input.preplanId)
   if(existing)return {data:existing,source:'demo'}
+  const occupancies=readForgeData<Occupancy[]>('occupancies')
+  const preplans=readForgeData<Preplan[]>('preplans')
+  const occupancy=input.occupancyId?occupancies.find(item=>item.id===input.occupancyId)||null:null
+  const preplan=input.preplanId?preplans.find(item=>item.id===input.preplanId)||null:null
+  const now=new Date().toISOString()
   const row:OccupancyLink={
     id:randomUUID(),
     incidentId,
     occupancyId:input.occupancyId,
     preplanId:input.preplanId,
     prefillSource:input.prefillSource,
-    createdAt:new Date().toISOString()
+    snapshotJson:{occupancy,preplan,capturedAt:now},
+    createdAt:now
   }
   writeForgeData('incident-occupancy-links',[row,...rows])
+  const events=readForgeData<Array<Record<string,unknown>>>('activity-events')
+  writeForgeData('activity-events',[
+    {id:randomUUID(),type:'occupancy_context',title:'Occupancy/preplan context linked',resourceType:'incident',resourceId:incidentId,occurredAt:now,detail:{occupancyId:input.occupancyId,preplanId:input.preplanId,prefillSource:input.prefillSource}},
+    ...events
+  ].slice(0,500))
   return {data:row,source:'demo'}
 }
 
@@ -270,7 +281,7 @@ export async function getIncidentIntelligence(incidentId:string):Promise<ForgePl
   if(!nearbyHydrants.length)warnings.push('No nearby hydrants were identified from the Responder-local hydrant dataset.')
   if(nearbyHydrants.some(row=>String(row.status||'').toLowerCase()!=='in service'))warnings.push('One or more nearby hydrants are not marked In Service.')
 
-  const source=context.source==='platform'&&occupanciesResult.source==='platform'&&preplansResult.source==='platform'?'platform':'demo'
+  const source=context.source==='platform'&&occupanciesResult.source==='platform'&&preplansResult.source==='platform'&&linksResult.source==='platform'?'platform':'demo'
   return {
     data:{
       incidentId,
