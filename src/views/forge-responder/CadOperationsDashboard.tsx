@@ -22,6 +22,7 @@ type Unmapped={id:string;category:string;sourceField:string;sourceValue:string;o
 type UnknownUnit={id:string;sourceUnitId:string;sourceUnitCallsign:string|null;occurrenceCount:number;status:string;recordVersion:number;lastSeenAt:string}
 type UnknownPerson={id:string;sourcePersonnelId:string;sourceName:string|null;occurrenceCount:number;status:string;recordVersion:number;lastSeenAt:string}
 type Message={id:string;receivedAt:string;transportType:string;sourceMessageId:string|null;sourceIncidentId:string|null;processingStatus:string;authenticationStatus:string;payloadSizeBytes:number|null;payloadHash:string|null;correlationId:string|null;cadConnectionId:string}
+type MessageDetail={message:Record<string,unknown>;normalizedEvents:Array<{id:string;normalizedEventType:string;normalizedEventTimestamp:string;sourceIncidentId?:string|null;sourceIncidentNumber?:string|null;mappingStatus?:string|null;incidentApplicationStatus?:string|null;normalizedPayload:Record<string,unknown>}>}
 type Option={id:string;callSign?:string;unitNumber?:string;name?:string;personId?:string;displayName?:string}
 
 const resolutionActions=['USE_CAD','KEEP_FORGE','MERGE','LINK','UNLINK','CREATE_NEW','IGNORE','ESCALATE','CORRECT_MAPPING']
@@ -46,6 +47,7 @@ export default function CadOperationsDashboard({lang}:{lang:string}){
   const [unknownUnits,setUnknownUnits]=useState<UnknownUnit[]>([])
   const [unknownPersonnel,setUnknownPersonnel]=useState<UnknownPerson[]>([])
   const [messages,setMessages]=useState<Message[]>([])
+  const [selectedMessageDetail,setSelectedMessageDetail]=useState<MessageDetail|null>(null)
   const [unitMappings,setUnitMappings]=useState<Record<string,unknown>[]>([])
   const [personnelMappings,setPersonnelMappings]=useState<Record<string,unknown>[]>([])
   const [rmsUnits,setRmsUnits]=useState<Option[]>([])
@@ -155,6 +157,15 @@ export default function CadOperationsDashboard({lang}:{lang:string}){
     setBusy(true);setError('');setMessage('')
     try{await json(`/api/cad/unknown-personnel/${row.id}/resolve`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resolutionReason:reason,recordVersion:row.recordVersion,status,forgePersonnelId:forgePersonnelId||null,mappingType:'PERSONNEL',externalAgency:false})});await load();setMessage('CAD personnel mapping updated.')}
     catch(err){setError(err instanceof Error?err.message:'Unable to resolve CAD personnel.')}finally{setBusy(false)}
+  }
+
+  async function inspectMessage(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{
+      const body=await json(`/api/cad/messages/${id}`)
+      setSelectedMessageDetail(body.data)
+    }catch(err){setError(err instanceof Error?err.message:'Unable to inspect CAD message.')}
+    finally{setBusy(false)}
   }
 
   async function createIncidentFromMessage(id:string){
@@ -326,10 +337,49 @@ export default function CadOperationsDashboard({lang}:{lang:string}){
           <Box><Typography fontWeight={700}>{row.sourceMessageId||row.id}</Typography><Typography variant='caption' color='text.secondary'>{new Date(row.receivedAt).toLocaleString()}</Typography></Box>
           <Typography>{row.sourceIncidentId||'No source incident'}</Typography>
           <Chip size='small' variant='tonal' color={row.processingStatus==='FAILED'||row.processingStatus==='DEAD_LETTER'?'error':row.processingStatus==='APPLIED'?'success':'warning'} label={row.processingStatus}/>
-          <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>{row.sourceIncidentId?<Button size='small' variant='contained' disabled={busy} onClick={()=>void createIncidentFromMessage(row.id)}>Create Incident</Button>:null}<Button size='small' disabled={busy} onClick={()=>void reprocess(row.id)}>Reprocess</Button><Button size='small' color='warning' disabled={busy} onClick={()=>void quarantine(row.id)}>Quarantine</Button></Box>
+          <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}><Button size='small' variant='outlined' disabled={busy} onClick={()=>void inspectMessage(row.id)}>Inspect</Button>{row.sourceIncidentId?<Button size='small' variant='contained' disabled={busy} onClick={()=>void createIncidentFromMessage(row.id)}>Create Incident</Button>:null}<Button size='small' disabled={busy} onClick={()=>void reprocess(row.id)}>Reprocess</Button><Button size='small' color='warning' disabled={busy} onClick={()=>void quarantine(row.id)}>Quarantine</Button></Box>
         </Box>)}
         {!messages.length?<Typography color='text.secondary'>No CAD messages recorded.</Typography>:null}
       </Box></CardContent></Card>
+      {selectedMessageDetail?<Card><CardContent>
+        <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:2,flexWrap:'wrap'}}>
+          <Box><Typography variant='h5'>Normalized Message Detail</Typography><Typography color='text.secondary'>Vendor-neutral CAD content available to Auto-Dispatch and reviewed prefill.</Typography></Box>
+          <Button size='small' onClick={()=>setSelectedMessageDetail(null)}>Close</Button>
+        </Box>
+        <Box sx={{display:'flex',gap:1,flexWrap:'wrap',mt:2}}>
+          <Chip variant='tonal' label={'Source: '+String(selectedMessageDetail.message.sourceIncidentId||'—')}/>
+          <Chip variant='tonal' label={'Status: '+String(selectedMessageDetail.message.processingStatus||'—')}/>
+          <Chip variant='tonal' label={String(selectedMessageDetail.normalizedEvents.length)+' normalized event'+(selectedMessageDetail.normalizedEvents.length===1?'':'s')}/>
+        </Box>
+        <Box sx={{display:'grid',gap:2,mt:3}}>
+          {selectedMessageDetail.normalizedEvents.map(event=>{
+            const payload=event.normalizedPayload||{}
+            const incident=(payload.incident||{}) as Record<string,unknown>
+            const location=(payload.location||{}) as Record<string,unknown>
+            const timestamps=(payload.timestamps||{}) as Record<string,unknown>
+            const units=Array.isArray(payload.units)?payload.units:[]
+            const personnel=Array.isArray(payload.personnel)?payload.personnel:[]
+            const comments=Array.isArray(payload.comments)?payload.comments:[]
+            return <Box key={event.id} sx={{p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}>
+              <Box sx={{display:'flex',justifyContent:'space-between',gap:2,flexWrap:'wrap'}}>
+                <Box><Typography fontWeight={800}>{event.normalizedEventType.replaceAll('_',' ')}</Typography><Typography variant='caption' color='text.secondary'>{new Date(event.normalizedEventTimestamp).toLocaleString()}</Typography></Box>
+                <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>{event.mappingStatus?<Chip size='small' variant='tonal' label={event.mappingStatus}/>:null}{event.incidentApplicationStatus?<Chip size='small' variant='tonal' label={event.incidentApplicationStatus}/>:null}</Box>
+              </Box>
+              <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'repeat(2,1fr)'},gap:2,mt:2}}>
+                <Box><Typography variant='caption' color='text.secondary'>Incident</Typography><Typography>{String(incident.callType||incident.nature||'—')}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Priority</Typography><Typography>{String(incident.priority||'—')}</Typography></Box>
+                <Box sx={{gridColumn:{md:'1 / -1'}}}><Typography variant='caption' color='text.secondary'>Location</Typography><Typography>{String(location.fullAddress||'—')}{location.city?', '+String(location.city):''}{location.state?', '+String(location.state):''}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Call Received</Typography><Typography>{timestamps.callReceived?new Date(String(timestamps.callReceived)).toLocaleString():'—'}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Dispatch</Typography><Typography>{timestamps.dispatch?new Date(String(timestamps.dispatch)).toLocaleString():'—'}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Units</Typography><Typography>{String(units.length)}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Personnel</Typography><Typography>{String(personnel.length)}</Typography></Box>
+                <Box><Typography variant='caption' color='text.secondary'>Comments</Typography><Typography>{String(comments.length)}</Typography></Box>
+              </Box>
+            </Box>
+          })}
+          {!selectedMessageDetail.normalizedEvents.length?<Alert severity='info' variant='outlined'>This CAD message has not produced a normalized event yet.</Alert>:null}
+        </Box>
+      </CardContent></Card>:null}
     </Box>:null}
     {tab===5?<Box sx={{display:'grid',gap:3}}>
       <Card><CardContent>
