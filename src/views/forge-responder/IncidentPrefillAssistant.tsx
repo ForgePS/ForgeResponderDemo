@@ -14,7 +14,39 @@ import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
 type Option={id:string;name?:string;addressLine1?:string;versionLabel?:string}
-type Candidate={fieldKey:string;sectionKey:string;value:unknown;prefillSource:string;informational?:boolean;label?:string}
+type Candidate={fieldKey:string;sectionKey:string;value:unknown;prefillSource:string;target?:'FIELD'|'INCIDENT'|'UNIT_ASSIGNMENT'|'PERSONNEL_ASSIGNMENT'|'CONTEXT';informational?:boolean;label?:string;sourceMessageId?:string|null;sourceEventId?:string|null}
+
+function targetLabel(candidate:Candidate){
+  const target=candidate.target||'FIELD'
+  if(target==='INCIDENT')return 'Incident'
+  if(target==='UNIT_ASSIGNMENT')return 'Unit Assignment'
+  if(target==='PERSONNEL_ASSIGNMENT')return 'Personnel Assignment'
+  if(target==='CONTEXT')return 'Context'
+  return 'NERIS Field'
+}
+
+function targetColor(candidate:Candidate):'default'|'primary'|'success'|'warning'|'info'{
+  const target=candidate.target||'FIELD'
+  if(target==='INCIDENT')return 'primary'
+  if(target==='UNIT_ASSIGNMENT'||target==='PERSONNEL_ASSIGNMENT')return 'success'
+  if(target==='CONTEXT')return 'info'
+  return 'default'
+}
+
+function displayValue(candidate:Candidate){
+  if(candidate.target==='UNIT_ASSIGNMENT'&&candidate.value&&typeof candidate.value==='object'){
+    const value=candidate.value as Record<string,unknown>
+    return [value.sourceUnitCallsign||value.sourceUnitId,value.dispatchedAt?'Dispatched '+new Date(String(value.dispatchedAt)).toLocaleTimeString():null].filter(Boolean).join(' · ')
+  }
+  if(candidate.target==='PERSONNEL_ASSIGNMENT'&&candidate.value&&typeof candidate.value==='object'){
+    const value=candidate.value as Record<string,unknown>
+    return [value.role,value.personnelId].filter(Boolean).join(' · ')
+  }
+  if(candidate.value&&typeof candidate.value==='object'){
+    try{return JSON.stringify(candidate.value)}catch{return String(candidate.value)}
+  }
+  return String(candidate.value)
+}
 
 export default function IncidentPrefillAssistant({incidentId,recordVersion,occupancies,preplans,onApplied}:{incidentId:string;recordVersion:number;occupancies:Option[];preplans:Option[];onApplied:(version:number,applied:number,skipped:number)=>void}){
   const [occupancyId,setOccupancyId]=useState('')
@@ -71,7 +103,7 @@ export default function IncidentPrefillAssistant({incidentId,recordVersion,occup
 
     <Card variant='outlined'><CardContent>
       <Box sx={{display:'flex',justifyContent:'space-between',gap:2,alignItems:'center',flexWrap:'wrap'}}>
-        <Box><Typography variant='h5'>Prefill Assist</Typography><Typography color='text.secondary'>Review suggested values from department defaults, occupancy/preplan context, personnel, and linked CAD context.</Typography></Box>
+        <Box><Typography variant='h5'>Prefill & Auto-Dispatch Assist</Typography><Typography color='text.secondary'>Review department, occupancy, preplan, and normalized CAD suggestions before Forge writes fields or creates resource assignments.</Typography></Box>
         <Chip variant='tonal' color='info' label='Officer confirmation required'/>
       </Box>
       <Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr auto'},gap:2,mt:3}}>
@@ -97,14 +129,14 @@ export default function IncidentPrefillAssistant({incidentId,recordVersion,occup
           <Box>{candidate.informational?<Chip size='small' variant='tonal' color='info' label='Context only'/>:<FormControlLabel control={<Checkbox checked={Boolean(selected[String(index)])} onChange={e=>setSelected(current=>({...current,[String(index)]:e.target.checked}))}/>} label='Include'/>}</Box>
           <Box>
             <Typography fontWeight={800}>{candidate.label||candidate.fieldKey.replaceAll('_',' ')}</Typography>
-            <Typography>{typeof candidate.value==='object'?JSON.stringify(candidate.value):String(candidate.value)}</Typography>
-            <Typography variant='caption' color='text.secondary'>{candidate.sectionKey.replaceAll('_',' ')} · {candidate.prefillSource.replaceAll('_',' ')}</Typography>
+            <Typography>{displayValue(candidate)}</Typography>
+            <Box sx={{display:'flex',gap:1,alignItems:'center',flexWrap:'wrap',mt:.5}}><Chip size='small' variant='outlined' color={targetColor(candidate)} label={targetLabel(candidate)}/><Typography variant='caption' color='text.secondary'>{candidate.sectionKey.replaceAll('_',' ')} · {candidate.prefillSource.replaceAll('_',' ')}{candidate.sourceMessageId?' · '+candidate.sourceMessageId:''}</Typography></Box>
           </Box>
           <Chip size='small' variant='tonal' color={candidate.prefillSource==='CAD'?'error':candidate.prefillSource==='OCCUPANCY'||candidate.prefillSource==='PREPLAN'?'success':'default'} label={candidate.prefillSource.replaceAll('_',' ')}/>
         </Box>)}
         {!candidates.length?<Alert severity='info' variant='outlined'>No prefill suggestions are currently available.</Alert>:null}
       </Box>
-      <Alert severity='warning' variant='outlined' sx={{mt:3}}>Prefilled schema values remain unconfirmed until reviewed or edited by an officer.</Alert>
+      <Alert severity='warning' variant='outlined' sx={{mt:3}}>NERIS prefill values remain unconfirmed until reviewed or edited by an officer. Unit/personnel suggestions create normal incident assignments only when a valid CAD-to-Forge mapping exists.</Alert>
       <Box sx={{display:'flex',justifyContent:'flex-end',mt:3}}><Button variant='contained' color='error' disabled={busy||!selectedCandidates.length} onClick={()=>void apply()}>Apply Selected Suggestions</Button></Box>
     </CardContent></Card>
   </Box>
