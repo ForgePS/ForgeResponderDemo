@@ -6,6 +6,7 @@ import { listRmsMasterData } from '@/lib/forge-platform/rms'
 import {
   ForgePlatformApiError,
   forgePlatformGet,
+  forgePlatformSend,
   getForgePlatformMode,
   getForgeTenantId,
   type ForgePlatformResult
@@ -67,6 +68,64 @@ type Hydrant=Record<string,unknown>&{
   nfpaClass?:string|null
   nfpaColor?:string|null
   waterProvider?:string|null
+}
+
+type OccupancyLink={
+  id:string
+  incidentId:string
+  occupancyId:string|null
+  preplanId:string|null
+  prefillSource:string
+  snapshotJson?:unknown
+  createdAt?:string
+}
+
+async function listIncidentOccupancyLinks(incidentId:string):Promise<ForgePlatformResult<OccupancyLink[]>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{
+      return await forgePlatformGet<OccupancyLink[]>(
+        `/api/v1/tenants/${getForgeTenantId()}/neris/incidents/${incidentId}/occupancy-links`
+      )
+    }catch(error){
+      if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error
+    }
+  }
+  return {
+    data:readForgeData<OccupancyLink[]>('incident-occupancy-links').filter(row=>row.incidentId===incidentId),
+    source:'demo'
+  }
+}
+
+export async function createIncidentOccupancyLink(
+  incidentId:string,
+  input:{occupancyId:string|null;preplanId:string|null;prefillSource:'OCCUPANCY'|'PREPLAN'|'MANUAL'}
+):Promise<ForgePlatformResult<OccupancyLink>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{
+      return await forgePlatformSend<OccupancyLink>(
+        `/api/v1/tenants/${getForgeTenantId()}/neris/incidents/${incidentId}/occupancy-links`,
+        'POST',
+        input
+      )
+    }catch(error){
+      if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error
+    }
+  }
+  const rows=readForgeData<OccupancyLink[]>('incident-occupancy-links')
+  const existing=rows.find(row=>row.incidentId===incidentId&&row.occupancyId===input.occupancyId&&row.preplanId===input.preplanId)
+  if(existing)return {data:existing,source:'demo'}
+  const row:OccupancyLink={
+    id:crypto.randomUUID(),
+    incidentId,
+    occupancyId:input.occupancyId,
+    preplanId:input.preplanId,
+    prefillSource:input.prefillSource,
+    createdAt:new Date().toISOString()
+  }
+  writeForgeData('incident-occupancy-links',[row,...rows])
+  return {data:row,source:'demo'}
 }
 
 export type IncidentIntelligence={
@@ -140,10 +199,11 @@ async function loadLocationContext(incidentId:string):Promise<ForgePlatformResul
 }
 
 export async function getIncidentIntelligence(incidentId:string):Promise<ForgePlatformResult<IncidentIntelligence>>{
-  const [context,occupanciesResult,preplansResult]=await Promise.all([
+  const [context,occupanciesResult,preplansResult,linksResult]=await Promise.all([
     loadLocationContext(incidentId),
     listRmsMasterData<Occupancy>('occupancies'),
-    listRmsMasterData<Preplan>('preplans')
+    listRmsMasterData<Preplan>('preplans'),
+    listIncidentOccupancyLinks(incidentId)
   ])
 
   const location=context.data.location
@@ -152,9 +212,11 @@ export async function getIncidentIntelligence(incidentId:string):Promise<ForgePl
   const preplans=preplansResult.data
   let occupancy:Occupancy|undefined
   let matchMethod:IncidentIntelligence['matchMethod']='NONE'
+  const durableLink=linksResult.data[0]
 
-  if(location?.occupancyId){
-    occupancy=occupancies.find(row=>row.id===location.occupancyId)
+  const linkedOccupancyId=durableLink?.occupancyId||location?.occupancyId
+  if(linkedOccupancyId){
+    occupancy=occupancies.find(row=>row.id===linkedOccupancyId)
     if(occupancy)matchMethod='LINKED'
   }
 
@@ -176,7 +238,7 @@ export async function getIncidentIntelligence(incidentId:string):Promise<ForgePl
   }
 
   let preplan:Preplan|undefined
-  const linkedPreplanId=location?.preplanId||occupancy?.preplanId
+  const linkedPreplanId=durableLink?.preplanId||location?.preplanId||occupancy?.preplanId
   if(linkedPreplanId)preplan=preplans.find(row=>row.id===linkedPreplanId)
   if(!preplan&&occupancy){
     preplan=preplans
