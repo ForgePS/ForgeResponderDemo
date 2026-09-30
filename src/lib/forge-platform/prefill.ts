@@ -52,16 +52,25 @@ async function localCandidates(
   if(query.occupancyId){
     const occupancy=occupancies.data.find(row=>row.id===query.occupancyId)
     if(occupancy){
-      if(occupancy.name)out.push({fieldKey:'location_name',sectionKey:'LOCATION',value:occupancy.name,prefillSource:'OCCUPANCY',label:'Location Name'})
-      if(occupancy.addressLine1)out.push({fieldKey:'address_line1',sectionKey:'LOCATION',value:occupancy.addressLine1,prefillSource:'OCCUPANCY',label:'Street Address'})
-      if(occupancy.city)out.push({fieldKey:'city',sectionKey:'LOCATION',value:occupancy.city,prefillSource:'OCCUPANCY',label:'City'})
-      if(occupancy.state)out.push({fieldKey:'state',sectionKey:'LOCATION',value:occupancy.state,prefillSource:'OCCUPANCY',label:'State'})
-      if(occupancy.postalCode)out.push({fieldKey:'postal_code',sectionKey:'LOCATION',value:occupancy.postalCode,prefillSource:'OCCUPANCY',label:'Postal Code'})
+      if(occupancy.name)out.push({fieldKey:'nl_site',sectionKey:'LOCATION',value:occupancy.name,prefillSource:'OCCUPANCY',label:'Site / Occupancy Name'})
+      const address=String(occupancy.addressLine1||occupancy.address||'').trim()
+      if(address){
+        const parts=address.split(/\s+/)
+        const number=parts[0]||''
+        const streetType=parts.length>2?parts[parts.length-1]:''
+        const streetName=parts.length>2?parts.slice(1,-1).join(' '):parts.slice(1).join(' ')
+        if(number)out.push({fieldKey:'an_complete',sectionKey:'LOCATION',value:number,prefillSource:'OCCUPANCY',label:'Address Number'})
+        if(streetName)out.push({fieldKey:'sn_street_name',sectionKey:'LOCATION',value:streetName,prefillSource:'OCCUPANCY',label:'Street Name'})
+        if(streetType)out.push({fieldKey:'sn_post_type',sectionKey:'LOCATION',value:streetType,prefillSource:'OCCUPANCY',label:'Street Type'})
+      }
+      if(occupancy.city)out.push({fieldKey:'csop_incorporated_muni',sectionKey:'LOCATION',value:occupancy.city,prefillSource:'OCCUPANCY',label:'Municipality'})
+      if(occupancy.state)out.push({fieldKey:'csop_state',sectionKey:'LOCATION',value:occupancy.state,prefillSource:'OCCUPANCY',label:'State'})
+      if(occupancy.postalCode)out.push({fieldKey:'csop_postal_code',sectionKey:'LOCATION',value:occupancy.postalCode,prefillSource:'OCCUPANCY',label:'Postal Code'})
     }
   }
   if(query.preplanId){
     const preplan=preplans.data.find(row=>row.id===query.preplanId)
-    if(preplan?.tacticalSummary)out.push({fieldKey:'tactical_summary',sectionKey:'LOCATION',value:preplan.tacticalSummary,prefillSource:'PREPLAN',label:'Tactical Summary'})
+    if(preplan?.tacticalSummary)out.push({fieldKey:'preplan_tactical_context',sectionKey:'LOCATION',value:preplan.tacticalSummary,prefillSource:'PREPLAN',informational:true,label:'Preplan Tactical Summary'})
   }
   for(const link of cad.data.links){
     out.push({fieldKey:'cad_source_incident_id',sectionKey:'DISPATCH',value:link.sourceIncidentId,prefillSource:'CAD',informational:true,label:'CAD Source Incident ID'})
