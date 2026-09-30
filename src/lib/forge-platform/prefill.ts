@@ -90,14 +90,16 @@ async function cadCandidates(incidentId:string):Promise<PrefillCandidate[]>{
   const unitMap=new Map<string,Record<string,unknown>>()
   for(const row of unitMappings.data){
     if(String(row.status||'ACTIVE')!=='ACTIVE')continue
-    if(row.sourceUnitId)unitMap.set(String(row.sourceUnitId),row)
-    if(row.sourceUnitCallsign)unitMap.set(String(row.sourceUnitCallsign),row)
+    const connectionId=String(row.cadConnectionId||'')
+    if(row.sourceUnitId)unitMap.set(`${connectionId}|${String(row.sourceUnitId)}`,row)
+    if(row.sourceUnitCallsign)unitMap.set(`${connectionId}|${String(row.sourceUnitCallsign)}`,row)
   }
 
   const personnelMap=new Map<string,Record<string,unknown>>()
   for(const row of personnelMappings.data){
     if(String(row.status||'ACTIVE')!=='ACTIVE')continue
-    if(row.sourcePersonnelId)personnelMap.set(String(row.sourcePersonnelId),row)
+    const connectionId=String(row.cadConnectionId||'')
+    if(row.sourcePersonnelId)personnelMap.set(`${connectionId}|${String(row.sourcePersonnelId)}`,row)
   }
 
   for(const link of activeLinks){
@@ -113,7 +115,7 @@ async function cadCandidates(incidentId:string):Promise<PrefillCandidate[]>{
       let detail
       try{detail=(await getCadMessageDetail(message.id)).data}catch{continue}
 
-      for(const event of detail.normalizedEvents){
+      for(const event of [...detail.normalizedEvents].sort((a,b)=>Date.parse(b.normalizedEventTimestamp)-Date.parse(a.normalizedEventTimestamp))){
         const payload=(event.normalizedPayload||{}) as CadPayload
         const incident=payload.incident||{}
         const location=payload.location||{}
@@ -170,7 +172,7 @@ async function cadCandidates(incidentId:string):Promise<PrefillCandidate[]>{
         for(const unit of payload.units||[]){
           const sourceUnitId=text(unit.sourceUnitId)
           const sourceUnitCallsign=text(unit.sourceUnitCallsign)
-          const mapping=unitMap.get(sourceUnitId)||unitMap.get(sourceUnitCallsign)
+          const mapping=unitMap.get(`${link.cadConnectionId}|${sourceUnitId}`)||unitMap.get(`${link.cadConnectionId}|${sourceUnitCallsign}`)
           const forgeUnitId=text(mapping?.forgeUnitId)
           if(!forgeUnitId){
             push(out,{fieldKey:`cad_unit:${sourceUnitId||sourceUnitCallsign}`,sectionKey:'UNITS_PERSONNEL',value:{sourceUnitId,sourceUnitCallsign,status:unit.status},prefillSource:'CAD',target:'CONTEXT',informational:true,label:`Unmapped CAD Unit ${sourceUnitCallsign||sourceUnitId}`,sourceMessageId,sourceEventId})
@@ -199,7 +201,7 @@ async function cadCandidates(incidentId:string):Promise<PrefillCandidate[]>{
 
         for(const person of payload.personnel||[]){
           const sourcePersonnelId=text(person.sourcePersonnelId)
-          const mapping=personnelMap.get(sourcePersonnelId)
+          const mapping=personnelMap.get(`${link.cadConnectionId}|${sourcePersonnelId}`)
           const forgePersonnelId=text(mapping?.forgePersonnelId)
           if(!forgePersonnelId){
             push(out,{fieldKey:`cad_person:${sourcePersonnelId}`,sectionKey:'UNITS_PERSONNEL',value:{sourcePersonnelId,sourceName:person.sourceName,role:person.role},prefillSource:'CAD',target:'CONTEXT',informational:true,label:`Unmapped CAD Personnel ${text(person.sourceName)||sourcePersonnelId}`,sourceMessageId,sourceEventId})
