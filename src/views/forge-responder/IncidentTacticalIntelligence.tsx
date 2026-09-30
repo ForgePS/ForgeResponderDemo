@@ -41,6 +41,14 @@ export default function IncidentTacticalIntelligence({incidentId,recordVersion,l
     if(!data?.occupancy&&!data?.preplan)return
     setBusy(true);setError('');setMessage('')
     try{
+      const linkResponse=await fetch('/api/incidents/'+incidentId+'/intelligence',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({occupancyId:data.occupancy?.id||null,preplanId:data.preplan?.id||null})
+      })
+      const linkBody=await linkResponse.json()
+      if(!linkResponse.ok)throw new Error(linkBody.error||'Unable to persist incident occupancy/preplan link.')
+
       const params=new URLSearchParams()
       if(data.occupancy?.id)params.set('occupancyId',data.occupancy.id)
       if(data.preplan?.id)params.set('preplanId',data.preplan.id)
