@@ -5,6 +5,7 @@ import { randomUUID } from 'node:crypto'
 import { readForgeData, writeForgeData } from '@/utils/forgeDataStore'
 import { listCadMessages } from '@/lib/forge-platform/cad'
 import { listRmsMasterData } from '@/lib/forge-platform/rms'
+import { listHydrants } from '@/lib/forge-platform/hydrants'
 import {
   ForgePlatformApiError,
   forgePlatformGet,
@@ -212,11 +213,12 @@ async function loadLocationContext(incidentId:string):Promise<ForgePlatformResul
 }
 
 export async function getIncidentIntelligence(incidentId:string):Promise<ForgePlatformResult<IncidentIntelligence>>{
-  const [context,occupanciesResult,preplansResult,linksResult]=await Promise.all([
+  const [context,occupanciesResult,preplansResult,linksResult,hydrantsResult]=await Promise.all([
     loadLocationContext(incidentId),
     listRmsMasterData<Occupancy>('occupancies'),
     listRmsMasterData<Preplan>('preplans'),
-    listIncidentOccupancyLinks(incidentId)
+    listIncidentOccupancyLinks(incidentId),
+    listHydrants()
   ])
 
   const location=context.data.location
@@ -263,7 +265,7 @@ export async function getIncidentIntelligence(incidentId:string):Promise<ForgePl
       })[0]
   }
 
-  const hydrants=readForgeData<Hydrant[]>('hydrants')
+  const hydrants=hydrantsResult.data as Hydrant[]
   let nearbyHydrants:Array<Hydrant&{distanceFeet:number}>=[]
   if(location?.latitude!=null&&location?.longitude!=null){
     nearbyHydrants=hydrants
@@ -279,9 +281,9 @@ export async function getIncidentIntelligence(incidentId:string):Promise<ForgePl
   if(occupancy&&!preplan)warnings.push('Matched occupancy does not have an available preplan.')
   if(preplan&&preplan.approvalStatus&&preplan.approvalStatus!=='APPROVED')warnings.push('Available preplan is not approved.')
   if(!nearbyHydrants.length)warnings.push('No nearby hydrants were identified from the Responder-local hydrant dataset.')
-  if(nearbyHydrants.some(row=>String(row.status||'').toLowerCase()!=='in service'))warnings.push('One or more nearby hydrants are not marked In Service.')
+  if(nearbyHydrants.some(row=>!['in service','in_service'].includes(String(row.status||'').toLowerCase())))warnings.push('One or more nearby hydrants are not marked In Service.')
 
-  const source=context.source==='platform'&&occupanciesResult.source==='platform'&&preplansResult.source==='platform'&&linksResult.source==='platform'?'platform':'demo'
+  const source=context.source==='platform'&&occupanciesResult.source==='platform'&&preplansResult.source==='platform'&&linksResult.source==='platform'&&hydrantsResult.source==='platform'?'platform':'demo'
   return {
     data:{
       incidentId,
