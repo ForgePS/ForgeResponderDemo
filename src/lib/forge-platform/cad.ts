@@ -66,6 +66,30 @@ export type CadMessageDetail={
   normalizedEvents:CadNormalizedEventDetail[]
 }
 
+export type CadFieldProvenance={
+  id:string
+  incidentId:string
+  fieldIdentifier:string
+  currentValueSource:string
+  sourceSystem:string
+  cadConnectionId:string|null
+  cadRawMessageId:string|null
+  cadNormalizedEventId:string|null
+  sourcePath:string|null
+  sourceValueHash:string|null
+  mappingProfileId:string|null
+  mappingVersion:number|null
+  appliedAt:string
+  appliedByUserId:string|null
+  manualOverrideAt:string|null
+  manualOverrideByUserId:string|null
+  manualOverrideReason:string|null
+  ownershipPolicy:string
+  recordVersion:number
+  createdAt:string
+  updatedAt:string
+}
+
 export type CadIncidentStatus={
   links:Array<{
     id:string
@@ -78,7 +102,14 @@ export type CadIncidentStatus={
     updatedAt:string
   }>
   openConflicts:CadConflict[]
-  operatingHints:{linked:boolean;conflictCount:number}
+  fieldProvenance:CadFieldProvenance[]
+  operatingHints:{linked:boolean;conflictCount:number;cadOwnedFieldCount?:number;manualOverrideCount?:number}
+}
+
+function localFieldProvenance(incidentId:string):CadFieldProvenance[]{
+  return local<CadFieldProvenance>('cad-field-provenance')
+    .filter(row=>row.incidentId===incidentId)
+    .sort((a,b)=>Date.parse(b.updatedAt)-Date.parse(a.updatedAt))
 }
 
 export async function getCadMessageDetail(rawMessageId:string):Promise<ForgePlatformResult<CadMessageDetail>>{
@@ -128,8 +159,19 @@ export async function getCadIncidentStatus(incidentId:string):Promise<ForgePlatf
       }))
     const openConflicts=readForgeData<CadConflict[]>('cad-conflicts')
       .filter(row=>row.incidentId===incidentId&&(row.status==='OPEN'||row.status==='ESCALATED'))
+    const fieldProvenance=localFieldProvenance(incidentId)
     return {
-      data:{links,openConflicts,operatingHints:{linked:links.some(link=>link.linkStatus==='ACTIVE'),conflictCount:openConflicts.length}},
+      data:{
+        links,
+        openConflicts,
+        fieldProvenance,
+        operatingHints:{
+          linked:links.some(link=>link.linkStatus==='ACTIVE'),
+          conflictCount:openConflicts.length,
+          cadOwnedFieldCount:fieldProvenance.filter(row=>row.currentValueSource==='CAD'&&!row.manualOverrideAt).length,
+          manualOverrideCount:fieldProvenance.filter(row=>Boolean(row.manualOverrideAt)).length
+        }
+      },
       source:'demo'
     }
   }
@@ -153,8 +195,19 @@ export async function getCadIncidentStatus(incidentId:string):Promise<ForgePlatf
         }))
       const openConflicts=readForgeData<CadConflict[]>('cad-conflicts')
         .filter(row=>row.incidentId===incidentId&&(row.status==='OPEN'||row.status==='ESCALATED'))
+      const fieldProvenance=localFieldProvenance(incidentId)
       return {
-        data:{links,openConflicts,operatingHints:{linked:links.some(link=>link.linkStatus==='ACTIVE'),conflictCount:openConflicts.length}},
+        data:{
+          links,
+          openConflicts,
+          fieldProvenance,
+          operatingHints:{
+            linked:links.some(link=>link.linkStatus==='ACTIVE'),
+            conflictCount:openConflicts.length,
+            cadOwnedFieldCount:fieldProvenance.filter(row=>row.currentValueSource==='CAD'&&!row.manualOverrideAt).length,
+            manualOverrideCount:fieldProvenance.filter(row=>Boolean(row.manualOverrideAt)).length
+          }
+        },
         source:'demo'
       }
     }
