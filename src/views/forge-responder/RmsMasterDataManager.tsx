@@ -21,7 +21,7 @@ import TableRow from '@mui/material/TableRow'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 
-type Kind = 'stations' | 'shifts' | 'apparatus' | 'units'
+type Kind = 'stations' | 'shifts' | 'apparatus' | 'units' | 'occupancies'
 
 type FieldDef = {
   key: string
@@ -79,6 +79,20 @@ const configs: Record<Kind, Config> = {
       { key: 'unitType', label: 'Unit Type', required: true },
       { key: 'apparatusId', label: 'Apparatus ID' },
       { key: 'stationId', label: 'Station ID' },
+      { key: 'status', label: 'Status', required: true }
+    ]
+  },
+  occupancies: {
+    label: 'Occupancies',
+    singular: 'Occupancy',
+    fields: [
+      { key: 'name', label: 'Name', required: true },
+      { key: 'addressLine1', label: 'Address' },
+      { key: 'city', label: 'City' },
+      { key: 'state', label: 'State' },
+      { key: 'postalCode', label: 'Postal Code' },
+      { key: 'occupancyType', label: 'Occupancy Type' },
+      { key: 'primaryContact', label: 'Primary Contact' },
       { key: 'status', label: 'Status', required: true }
     ]
   }
