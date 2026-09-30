@@ -31,6 +31,10 @@ export const FORGE_DATA_ENTITIES = [
   'relationships',
   'roles',
   'shift-trades',
+  'stations',
+  'shifts',
+  'units',
+  'rosters',
   'users'
 ] as const
 
@@ -65,7 +69,7 @@ export function readForgeData<T>(entity: string): T {
   if (fs.existsSync(persisted)) return parseJson<T>(persisted)
 
   const seed = seedPath(entity)
-  if (!fs.existsSync(seed)) throw new Error(`No Forge Responder data found for ${entity}`)
+  if (!fs.existsSync(seed)) return [] as T
 
   return parseJson<T>(seed)
 }
