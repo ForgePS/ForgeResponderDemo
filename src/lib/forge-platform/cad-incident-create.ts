@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { addIncidentPersonnel, addIncidentUnit, createIncident, getIncident, listIncidents } from '@/lib/forge-platform/incidents'
-import { getCadIncidentStatus, linkCadIncident, listCadMessages } from '@/lib/forge-platform/cad'
+import { getCadIncidentStatus, linkCadIncident, listCadMessages, markDemoCadMessageApplied } from '@/lib/forge-platform/cad'
 import { batchFieldValues, getFormDescriptor } from '@/lib/forge-platform/neris'
 import { listRmsMasterData } from '@/lib/forge-platform/rms'
 import { getForgePlatformMode, type ForgePlatformResult } from '@/lib/forge-platform/server'
@@ -101,6 +101,7 @@ export async function createIncidentFromCadMessage(rawMessageId:string):Promise<
       const latest=(await getIncident(incident.data.id)).data
       await batchFieldValues(incident.data.id,values,latest.recordVersion)
     }
+    markDemoCadMessageApplied(rawMessageId,incident.data.id)
   }
 
   return {
