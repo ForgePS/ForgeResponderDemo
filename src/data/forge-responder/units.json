@@ -1,0 +1,79 @@
+[
+  {
+    "id": "UNIT-R1",
+    "tenantId": "forge-demo",
+    "unitNumber": "Rescue 1",
+    "callSign": "Rescue 1",
+    "unitType": "ENGINE",
+    "apparatusId": "APP-001",
+    "stationId": null,
+    "status": "ACTIVE",
+    "recordVersion": 1
+  },
+  {
+    "id": "UNIT-E2",
+    "tenantId": "forge-demo",
+    "unitNumber": "Engine 2",
+    "callSign": "Engine 2",
+    "unitType": "ENGINE",
+    "apparatusId": "APP-002",
+    "stationId": null,
+    "status": "ACTIVE",
+    "recordVersion": 1
+  },
+  {
+    "id": "UNIT-E3",
+    "tenantId": "forge-demo",
+    "unitNumber": "Engine 3",
+    "callSign": "Engine 3",
+    "unitType": "ENGINE",
+    "apparatusId": "APP-003",
+    "stationId": null,
+    "status": "ACTIVE",
+    "recordVersion": 1
+  },
+  {
+    "id": "UNIT-M1",
+    "tenantId": "forge-demo",
+    "unitNumber": "Unit 1",
+    "callSign": "Unit 1",
+    "unitType": "MEDIC",
+    "apparatusId": "APP-004",
+    "stationId": null,
+    "status": "ACTIVE",
+    "recordVersion": 1
+  },
+  {
+    "id": "UNIT-T3",
+    "tenantId": "forge-demo",
+    "unitNumber": "Truck 3",
+    "callSign": "Truck 3",
+    "unitType": "TRUCK",
+    "apparatusId": "APP-010",
+    "stationId": null,
+    "status": "ACTIVE",
+    "recordVersion": 1
+  },
+  {
+    "id": "UNIT-M2",
+    "tenantId": "forge-demo",
+    "unitNumber": "Unit 2",
+    "callSign": "Unit 2",
+    "unitType": "MEDIC",
+    "apparatusId": "APP-011",
+    "stationId": null,
+    "status": "ACTIVE",
+    "recordVersion": 1
+  },
+  {
+    "id": "UNIT-M3",
+    "tenantId": "forge-demo",
+    "unitNumber": "Unit 3",
+    "callSign": "Unit 3",
+    "unitType": "MEDIC",
+    "apparatusId": "APP-012",
+    "stationId": null,
+    "status": "ACTIVE",
+    "recordVersion": 1
+  }
+]
