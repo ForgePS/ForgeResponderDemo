@@ -1,6 +1,8 @@
 import 'server-only'
 
-import { readForgeData } from '@/utils/forgeDataStore'
+import { randomUUID } from 'node:crypto'
+
+import { readForgeData, writeForgeData } from '@/utils/forgeDataStore'
 import { listCadMessages } from '@/lib/forge-platform/cad'
 import { listRmsMasterData } from '@/lib/forge-platform/rms'
 import {
@@ -117,7 +119,7 @@ export async function createIncidentOccupancyLink(
   const existing=rows.find(row=>row.incidentId===incidentId&&row.occupancyId===input.occupancyId&&row.preplanId===input.preplanId)
   if(existing)return {data:existing,source:'demo'}
   const row:OccupancyLink={
-    id:crypto.randomUUID(),
+    id:randomUUID(),
     incidentId,
     occupancyId:input.occupancyId,
     preplanId:input.preplanId,
