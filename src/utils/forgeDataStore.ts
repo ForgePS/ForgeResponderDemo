@@ -37,6 +37,8 @@ export const FORGE_DATA_ENTITIES = [
   'cad-unmapped-values',
   'cad-unknown-units',
   'cad-unknown-personnel',
+  'cad-unit-mappings',
+  'cad-personnel-mappings',
   'cad-messages',
   'cad-incident-links',
   'incident-unit-assignments',
