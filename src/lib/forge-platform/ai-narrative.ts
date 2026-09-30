@@ -109,7 +109,7 @@ async function localBundle(incidentId:string,requestType:AiNarrativeRequestType)
   const requestId=randomUUID()
   const draftId=randomUUID()
   const bundle:AiNarrativeBundle={
-    request:{id:requestId,status:'COMPLETED',requestType,product:'RMS',module:'INCIDENT_NARRATIVE',recordType:'NERIS_INCIDENT',recordId:incidentId,provider:'STANDALONE_RECORD_GROUNDED',createdAt:now},
+    request:{id:requestId,status:'COMPLETED',requestType,product:'RMS',module:'NERIS',recordType:'neris_incident',recordId:incidentId,provider:'STANDALONE_RECORD_GROUNDED',createdAt:now},
     drafts:[{
       id:draftId,
       draftText:draft,
@@ -138,8 +138,8 @@ export async function createAiNarrative(incidentId:string,requestType:AiNarrativ
     try{
       return await forgePlatformSend<AiNarrativeBundle>('/api/v1/ai/narratives','POST',{
         product:'RMS',
-        module:'INCIDENT_NARRATIVE',
-        recordType:'NERIS_INCIDENT',
+        module:'NERIS',
+        recordType:'neris_incident',
         recordId:incidentId,
         requestType,
         acknowledgeWarning:true,
