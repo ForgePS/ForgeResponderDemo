@@ -22,6 +22,8 @@ export type NerisFieldValueState = {
   valueTimestamp?: string | null
   valueOptionId?: string | null
   valueJson?: unknown
+  prefillSource?: 'TENANT_DEFAULT'|'USER_DEFAULT'|'ROSTER'|'PERSONNEL'|'APPARATUS'|'OCCUPANCY'|'PREPLAN'|'MANUAL'|'COMPUTED'|'CAD'|'FUTURE_CAD'|null
+  userConfirmed?: boolean
 }
 
 export type FormDescriptorField = {
@@ -254,7 +256,9 @@ export async function batchFieldValues(
       valueBoolean:item.valueBoolean??null,
       valueTimestamp:item.valueTimestamp??null,
       valueOptionId:item.valueOptionId??null,
-      valueJson:item.valueJson??null
+      valueJson:item.valueJson??null,
+      prefillSource:(item as NerisFieldValueState).prefillSource??'MANUAL',
+      userConfirmed:(item as NerisFieldValueState).userConfirmed??true
     }
     const index=rows.findIndex(row=>row.incidentId===incidentId&&row.fieldId===item.fieldId)
     const stored={id:index>=0?rows[index].id:randomUUID(),incidentId,fieldId:item.fieldId,fieldKey,sectionKey:item.sectionKey,value,updatedAt:now}
