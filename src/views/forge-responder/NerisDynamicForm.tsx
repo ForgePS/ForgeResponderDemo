@@ -21,6 +21,8 @@ type FieldValueState={
   valueTimestamp?:string|null
   valueOptionId?:string|null
   valueJson?:unknown
+  prefillSource?:string|null
+  userConfirmed?:boolean
 }
 
 type Field={
@@ -131,6 +133,7 @@ export default function NerisDynamicForm({
       const descriptorBody=await descriptorResponse.json()
       const valuesBody=await valuesResponse.json()
       if(!descriptorResponse.ok)throw new Error(descriptorBody.error||'Unable to load NERIS form.')
+      if(!valuesResponse.ok)throw new Error(valuesBody.error||'Unable to load saved NERIS field values.')
       setDescriptor(descriptorBody.data)
       setValues(valuesBody.data||{})
       const nav=(descriptorBody.data.navigationSections||descriptorBody.data.sections||[]).filter((x:string)=>CORE_DYNAMIC.includes(x)||!['OVERVIEW','NARRATIVE','ATTACHMENTS','REVIEW'].includes(x))
@@ -279,7 +282,10 @@ export default function NerisDynamicForm({
             {module.fields.filter(field=>field.visible&&!String(field.dataType||'').toLowerCase().includes('module')).map(field=>{
               const type=(field.dataType||'').toLowerCase()
               const value=currentValue(field)
-              const helper=[field.required?'Required':null,field.helpText].filter(Boolean).join(' · ')
+              const state=values[field.fieldId]
+              const provenance=state?.prefillSource?`Source: ${state.prefillSource.replaceAll('_',' ')}`:null
+              const confirmation=state?.prefillSource&&state.prefillSource!=='MANUAL'?(state.userConfirmed?'Confirmed':'Needs officer review'):null
+              const helper=[field.required?'Required':null,field.helpText,provenance,confirmation].filter(Boolean).join(' · ')
               if(type.includes('boolean')){
                 return <Box key={field.fieldId} sx={{p:1}}><FormControlLabel control={<Checkbox checked={Boolean(value)} onChange={e=>setDrafts(current=>({...current,[field.fieldId]:e.target.checked}))}/>} label={field.displayLabel}/><Typography variant='caption' color='text.secondary' display='block'>{helper}</Typography></Box>
               }
