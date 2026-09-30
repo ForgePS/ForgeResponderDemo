@@ -1,5 +1,7 @@
 import 'server-only'
 
+import { randomUUID } from 'node:crypto'
+
 import {
   addIncidentPersonnel,
   addIncidentUnit,
@@ -17,6 +19,7 @@ import {
 } from '@/lib/forge-platform/cad'
 import { getFormDescriptor, batchFieldValues, lookupValueSetOptions, type NerisFieldValueState } from '@/lib/forge-platform/neris'
 import { listRmsMasterData } from '@/lib/forge-platform/rms'
+import { readForgeData, writeForgeData } from '@/utils/forgeDataStore'
 import {
   ForgePlatformApiError,
   forgePlatformGet,
@@ -126,6 +129,7 @@ async function cadCandidates(incidentId:string):Promise<PrefillCandidate[]>{
 
         push(out,{fieldKey:'dispatch_internal_id',sectionKey:'DISPATCH',value:event.sourceIncidentId||link.sourceIncidentId,prefillSource:'CAD',label:'CAD Dispatch / Incident ID',sourceMessageId,sourceEventId})
         push(out,{fieldKey:'dispatch_incident_code',sectionKey:'DISPATCH',value:incident.callType,prefillSource:'CAD',label:'CAD Incident Code',sourceMessageId,sourceEventId})
+        push(out,{fieldKey:'primary_incident_type',sectionKey:'OVERVIEW',value:incident.callType,prefillSource:'CAD',target:'INCIDENT',label:'CAD Initial Incident Type',sourceMessageId,sourceEventId})
         push(out,{fieldKey:'cad_nature',sectionKey:'DISPATCH',value:incident.nature,prefillSource:'CAD',target:'CONTEXT',informational:true,label:'CAD Nature',sourceMessageId,sourceEventId})
         push(out,{fieldKey:'cad_priority',sectionKey:'DISPATCH',value:incident.priority,prefillSource:'CAD',target:'CONTEXT',informational:true,label:'CAD Priority',sourceMessageId,sourceEventId})
 
@@ -380,9 +384,17 @@ export async function applyIncidentPrefill(
     if(candidate.informational||target==='CONTEXT'){skipped+=1;continue}
     if(target==='INCIDENT'){
       if(candidate.fieldKey==='response_district'){
-        if(!incident.responseDistrict){header.responseDistrict=candidate.value;applied+=1}else skipped+=1
+        if(!incident.responseDistrict){
+          header.responseDistrict=candidate.value
+          header.__cadResponseDistrict=true
+          applied+=1
+        }else skipped+=1
       }else if(candidate.fieldKey==='primary_incident_type'){
-        if(!incident.primaryIncidentTypeCode){header.primaryIncidentTypeCode=candidate.value;applied+=1}else skipped+=1
+        if(!incident.primaryIncidentTypeCode){
+          header.primaryIncidentTypeCode=candidate.value
+          header.__cadPrimaryIncidentType=true
+          applied+=1
+        }else skipped+=1
       }else skipped+=1
       continue
     }
@@ -392,8 +404,49 @@ export async function applyIncidentPrefill(
   }
 
   if(Object.keys(header).length){
+    const cadPrimary=Boolean(header.__cadPrimaryIncidentType)
+    const cadDistrict=Boolean(header.__cadResponseDistrict)
+    delete header.__cadPrimaryIncidentType
+    delete header.__cadResponseDistrict
     const patched=await patchIncident(incidentId,header,incident.recordVersion)
     incident=patched.data
+
+    if(incidentResult.source==='demo'&&(cadPrimary||cadDistrict)){
+      const provenance=readForgeData<Array<Record<string,unknown>>>('cad-field-provenance')
+      const now=new Date().toISOString()
+      const upsert=(identifier:string)=>{
+        const index=provenance.findIndex(row=>row.incidentId===incidentId&&row.fieldIdentifier===identifier)
+        const current=index>=0?provenance[index]:null
+        const next={
+          id:current?.id||randomUUID(),
+          incidentId,
+          fieldIdentifier:identifier,
+          currentValueSource:'CAD',
+          sourceSystem:'CAD',
+          cadConnectionId:current?.cadConnectionId||null,
+          cadRawMessageId:current?.cadRawMessageId||null,
+          cadNormalizedEventId:current?.cadNormalizedEventId||null,
+          sourcePath:current?.sourcePath||null,
+          sourceValueHash:current?.sourceValueHash||null,
+          mappingProfileId:current?.mappingProfileId||null,
+          mappingVersion:current?.mappingVersion||null,
+          appliedAt:current?.appliedAt||now,
+          appliedByUserId:null,
+          manualOverrideAt:null,
+          manualOverrideByUserId:null,
+          manualOverrideReason:null,
+          ownershipPolicy:'CAD_UNTIL_MANUAL_EDIT',
+          recordVersion:Number(current?.recordVersion||0)+1,
+          createdAt:current?.createdAt||now,
+          updatedAt:now
+        }
+        if(index>=0)provenance[index]=next
+        else provenance.push(next)
+      }
+      if(cadPrimary)upsert('incident.primaryIncidentTypeCode')
+      if(cadDistrict)upsert('incident.responseDistrict')
+      writeForgeData('cad-field-provenance',provenance)
+    }
   }
 
   if(dynamic.length){
