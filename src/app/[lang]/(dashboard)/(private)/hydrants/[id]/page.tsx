@@ -13,17 +13,20 @@ import TableRow from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import PageHeader from '@views/forge-responder/PageHeader'
 import StatCard from '@views/forge-responder/StatCard'
-import { loadForgeSeed } from '@/utils/forgeSeed'
+import { getHydrant, listHydrantRecords } from '@/lib/forge-platform/hydrants'
 
 export default async function HydrantDetailPage({params}:{params:Promise<{lang:string,id:string}>}) {
   const {lang,id}=await params
-  const hydrants=loadForgeSeed<any[]>('hydrants')
-  const hydrant=hydrants.find(h=>h.id===id)
-  if(!hydrant) notFound()
-
-  const flowTests=loadForgeSeed<any[]>('hydrant-flow-tests').filter(t=>t.hydrantId===id || t.hydrant_id===id || t.hydrantId===hydrant.displayId)
-  const inspections=loadForgeSeed<any[]>('hydrant-inspections').filter(t=>t.hydrantId===id || t.hydrant_id===id || t.hydrantId===hydrant.displayId)
-  const damage=loadForgeSeed<any[]>('hydrant-damage-reports').filter(t=>t.hydrantId===id || t.hydrant_id===id || t.hydrantId===hydrant.displayId)
+  let hydrant:any
+  try{hydrant=(await getHydrant(id)).data}catch{return notFound()}
+  const [flowTestsResult,inspectionsResult,damageResult]=await Promise.all([
+    listHydrantRecords(id,'flow-tests'),
+    listHydrantRecords(id,'inspections'),
+    listHydrantRecords(id,'damage')
+  ])
+  const flowTests=flowTestsResult.data
+  const inspections=inspectionsResult.data
+  const damage=damageResult.data
 
   return <div>
     <Box sx={{mb:2}}><Button href={`/${lang}/hydrants`} startIcon={<i className='tabler-arrow-left'/>}>Hydrants</Button></Box>
