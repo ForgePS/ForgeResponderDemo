@@ -11,6 +11,7 @@ import {
   forgePlatformSend,
   getForgePlatformMode,
   getForgeTenantId,
+  recordVersionToIfMatch,
   type ForgePlatformResult
 } from '@/lib/forge-platform/server'
 
@@ -157,4 +158,38 @@ export async function uploadIncidentAttachment(
   }
   writeForgeData('incident-attachments',[row,...rows])
   return {data:row,source:'demo'}
+}
+
+
+export async function patchSpecialtyRecord(
+  kind:SpecialtyKind,
+  incidentId:string,
+  id:string,
+  payload:Record<string,unknown>,
+  recordVersion:number
+):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    const path=config[kind].path
+    const target=kind==='attachments'
+      ? `${root(incidentId)}/attachments/${id}`
+      : `${root(incidentId)}/${path}/${id}`
+    try{
+      return await forgePlatformSend<Record<string,unknown>>(target,'PATCH',payload,{ifMatch:recordVersionToIfMatch(recordVersion)})
+    }catch(error){
+      if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error
+    }
+  }
+
+  const entity=config[kind].entity
+  const rows=readForgeData<Array<Record<string,unknown>>>(entity)
+  const index=rows.findIndex(row=>row.id===id&&row.incidentId===incidentId)
+  if(index<0)throw new ForgePlatformApiError('Specialty record not found.',404,'NOT_FOUND')
+  const current=rows[index]
+  const currentVersion=Number(current.recordVersion||1)
+  if(currentVersion!==recordVersion)throw new ForgePlatformApiError('Specialty record was modified elsewhere.',412,'PRECONDITION_FAILED')
+  const updated={...current,...payload,id,incidentId,recordVersion:currentVersion+1,updatedAt:new Date().toISOString()}
+  rows[index]=updated
+  writeForgeData(entity,rows)
+  return {data:updated,source:'demo'}
 }
