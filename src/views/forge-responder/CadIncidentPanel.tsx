@@ -14,7 +14,8 @@ import Typography from '@mui/material/Typography'
 type CadStatus={
   links:Array<{id:string;cadConnectionId:string;sourceIncidentId:string;sourceIncidentNumber:string|null;linkStatus:string;linkMethod:string;recordVersion:number;updatedAt:string}>
   openConflicts:Array<{id:string;conflictType:string;status:string;severity:string;fieldIdentifier:string|null;resolutionReason:string|null;recordVersion:number;createdAt:string}>
-  operatingHints:{linked:boolean;conflictCount:number}
+  fieldProvenance:Array<{id:string;fieldIdentifier:string;currentValueSource:string;sourceSystem:string;cadConnectionId:string|null;cadRawMessageId:string|null;cadNormalizedEventId:string|null;appliedAt:string;manualOverrideAt:string|null;manualOverrideReason:string|null;ownershipPolicy:string;recordVersion:number;updatedAt:string}>
+  operatingHints:{linked:boolean;conflictCount:number;cadOwnedFieldCount?:number;manualOverrideCount?:number}
 }
 
 type Connection={id:string;name:string;vendor:string;status:string}
@@ -133,6 +134,28 @@ export default function CadIncidentPanel({incidentId,lang}:{incidentId:string;la
         <TextField label='Source Incident Number' value={sourceIncidentNumber} onChange={e=>setSourceIncidentNumber(e.target.value)}/>
         <Box sx={{gridColumn:{md:'1 / -1'},display:'flex',justifyContent:'flex-end'}}><Button variant='contained' color='error' disabled={busy||!connectionId||!sourceIncidentId.trim()} onClick={()=>void link()}>Link CAD Incident</Button></Box>
       </Box>:null}
+    </CardContent></Card>
+
+    <Card variant='outlined'><CardContent>
+      <Box sx={{display:'flex',justifyContent:'space-between',gap:2,alignItems:'center',flexWrap:'wrap',mb:2}}>
+        <Box><Typography variant='h5'>CAD Field Ownership</Typography><Typography color='text.secondary'>Tracks fields applied from CAD and fields later overridden by an officer.</Typography></Box>
+        <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>
+          <Chip variant='tonal' color='info' label={String(status.operatingHints.cadOwnedFieldCount??status.fieldProvenance.filter(row=>row.currentValueSource==='CAD'&&!row.manualOverrideAt).length)+' CAD owned'}/>
+          <Chip variant='tonal' color='warning' label={String(status.operatingHints.manualOverrideCount??status.fieldProvenance.filter(row=>Boolean(row.manualOverrideAt)).length)+' overridden'}/>
+        </Box>
+      </Box>
+      <Box sx={{display:'grid',gap:2}}>
+        {status.fieldProvenance.map(row=><Box key={row.id} sx={{display:'flex',justifyContent:'space-between',gap:2,alignItems:'center',flexWrap:'wrap',p:2,border:'1px solid',borderColor:'divider',borderRadius:2}}>
+          <Box>
+            <Typography fontWeight={800}>{row.fieldIdentifier.replaceAll('_',' ')}</Typography>
+            <Typography variant='body2'>{row.ownershipPolicy.replaceAll('_',' ')} · Source: {row.currentValueSource}</Typography>
+            <Typography variant='caption' color='text.secondary'>{row.manualOverrideAt?'Overridden '+new Date(row.manualOverrideAt).toLocaleString():'Applied '+new Date(row.appliedAt).toLocaleString()}</Typography>
+            {row.manualOverrideReason?<Typography variant='caption' color='text.secondary' display='block'>{row.manualOverrideReason}</Typography>:null}
+          </Box>
+          <Chip size='small' variant='tonal' color={row.manualOverrideAt?'warning':row.currentValueSource==='CAD'?'info':'default'} label={row.manualOverrideAt?'Officer Override':row.currentValueSource==='CAD'?'CAD':'Forge'}/>
+        </Box>)}
+        {!status.fieldProvenance.length?<Alert severity='info' variant='outlined'>No CAD-applied field provenance has been recorded for this incident.</Alert>:null}
+      </Box>
     </CardContent></Card>
 
     <Card variant='outlined'><CardContent>
