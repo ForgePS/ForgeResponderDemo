@@ -7,6 +7,7 @@ import { readForgeData, writeForgeData } from '@/utils/forgeDataStore'
 import {
   ForgePlatformApiError,
   forgePlatformGet,
+  forgePlatformSend,
   getForgePlatformMode,
   getForgeTenantId,
   type ForgePlatformResult
@@ -42,8 +43,22 @@ export type CadIncidentStatus={
 export async function getCadIncidentStatus(incidentId:string):Promise<ForgePlatformResult<CadIncidentStatus>>{
   const mode=getForgePlatformMode()
   if(mode==='demo'){
+    const links=readForgeData<Array<Record<string,unknown>>>('cad-incident-links')
+      .filter(row=>row.incidentId===incidentId&&['ACTIVE','SUSPENDED','CONFLICT'].includes(String(row.linkStatus||'ACTIVE')))
+      .map(row=>({
+        id:String(row.id),
+        cadConnectionId:String(row.cadConnectionId||''),
+        sourceIncidentId:String(row.sourceIncidentId||''),
+        sourceIncidentNumber:row.sourceIncidentNumber?String(row.sourceIncidentNumber):null,
+        linkStatus:String(row.linkStatus||'ACTIVE'),
+        linkMethod:String(row.linkMethod||'MANUAL'),
+        recordVersion:Number(row.recordVersion||1),
+        updatedAt:String(row.updatedAt||row.createdAt||new Date().toISOString())
+      }))
+    const openConflicts=readForgeData<CadConflict[]>('cad-conflicts')
+      .filter(row=>row.incidentId===incidentId&&(row.status==='OPEN'||row.status==='ESCALATED'))
     return {
-      data:{links:[],openConflicts:[],operatingHints:{linked:false,conflictCount:0}},
+      data:{links,openConflicts,operatingHints:{linked:links.some(link=>link.linkStatus==='ACTIVE'),conflictCount:openConflicts.length}},
       source:'demo'
     }
   }
@@ -53,8 +68,22 @@ export async function getCadIncidentStatus(incidentId:string):Promise<ForgePlatf
     )
   }catch(error){
     if(mode==='auto'&&error instanceof ForgePlatformApiError){
+      const links=readForgeData<Array<Record<string,unknown>>>('cad-incident-links')
+        .filter(row=>row.incidentId===incidentId&&['ACTIVE','SUSPENDED','CONFLICT'].includes(String(row.linkStatus||'ACTIVE')))
+        .map(row=>({
+          id:String(row.id),
+          cadConnectionId:String(row.cadConnectionId||''),
+          sourceIncidentId:String(row.sourceIncidentId||''),
+          sourceIncidentNumber:row.sourceIncidentNumber?String(row.sourceIncidentNumber):null,
+          linkStatus:String(row.linkStatus||'ACTIVE'),
+          linkMethod:String(row.linkMethod||'MANUAL'),
+          recordVersion:Number(row.recordVersion||1),
+          updatedAt:String(row.updatedAt||row.createdAt||new Date().toISOString())
+        }))
+      const openConflicts=readForgeData<CadConflict[]>('cad-conflicts')
+        .filter(row=>row.incidentId===incidentId&&(row.status==='OPEN'||row.status==='ESCALATED'))
       return {
-        data:{links:[],openConflicts:[],operatingHints:{linked:false,conflictCount:0}},
+        data:{links,openConflicts,operatingHints:{linked:links.some(link=>link.linkStatus==='ACTIVE'),conflictCount:openConflicts.length}},
         source:'demo'
       }
     }
@@ -328,4 +357,21 @@ export async function unlinkCadIncident(
   if(Number(current.recordVersion||1)!==payload.recordVersion)throw new ForgePlatformApiError('CAD incident link was modified elsewhere.',412,'PRECONDITION_FAILED')
   const updated={...current,linkStatus:'UNLINKED',manualOverrideReason:payload.reason,recordVersion:payload.recordVersion+1,updatedAt:new Date().toISOString()}
   rows[index]=updated;writeForgeData('cad-incident-links',rows);return {data:updated,source:'demo'}
+}
+
+
+export async function patchCadConnection(id:string,payload:Record<string,unknown>,recordVersion:number):Promise<ForgePlatformResult<CadConnection>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<CadConnection>(`${tenantBase()}/cad/connections/${id}`,'PATCH',{...payload,recordVersion})}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const rows=local<CadConnection>('cad-connections')
+  const index=rows.findIndex(x=>x.id===id)
+  if(index<0)throw new ForgePlatformApiError('CAD connection not found.',404,'NOT_FOUND')
+  if(rows[index].recordVersion!==recordVersion)throw new ForgePlatformApiError('CAD connection was modified elsewhere.',412,'PRECONDITION_FAILED')
+  const updated={...rows[index],...payload,id,recordVersion:recordVersion+1,updatedAt:new Date().toISOString()} as CadConnection
+  rows[index]=updated
+  writeForgeData('cad-connections',rows)
+  return {data:updated,source:'demo'}
 }
