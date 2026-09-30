@@ -1,6 +1,8 @@
 import 'server-only'
 
 import { randomUUID } from 'node:crypto'
+import fs from 'node:fs'
+import path from 'node:path'
 
 import { readForgeData, writeForgeData } from '@/utils/forgeDataStore'
 import {
@@ -50,6 +52,7 @@ export async function listSpecialtyRecords(kind:SpecialtyKind,incidentId:string)
 }
 
 export async function createSpecialtyRecord(kind:SpecialtyKind,incidentId:string,payload:Record<string,unknown>):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  if(kind==='attachments'&&getForgePlatformMode()!=='demo')throw new ForgePlatformApiError('Connected attachments must use the upload workflow.',400,'USE_ATTACHMENT_UPLOAD')
   const mode=getForgePlatformMode()
   if(mode!=='demo'){
     try{return await forgePlatformSend<Record<string,unknown>>(`${root(incidentId)}/${config[kind].path}`,'POST',payload)}
@@ -80,4 +83,78 @@ export async function archiveSpecialtyRecord(kind:SpecialtyKind,incidentId:strin
   rows[index]=updated
   writeForgeData(entity,rows)
   return {data:updated,source:'demo'}
+}
+
+
+export async function uploadIncidentAttachment(
+  incidentId:string,
+  file:File,
+  meta:{category:string;caption?:string;specialtySection?:string;securityClassification?:string}
+):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  const allowed=new Set(['image/jpeg','image/png','image/webp','image/heic','image/heif','application/pdf','image/gif'])
+  if(!allowed.has(file.type))throw new ForgePlatformApiError(`File type not allowed: ${file.type}`,400,'BAD_REQUEST')
+  if(file.size>50*1024*1024)throw new ForgePlatformApiError('File exceeds 50 MB limit.',400,'BAD_REQUEST')
+
+  if(mode!=='demo'){
+    try{
+      const init=await forgePlatformSend<Record<string,unknown>>(
+        `${root(incidentId)}/attachments/uploads`,
+        'POST',
+        {
+          category:meta.category||'OTHER',
+          caption:meta.caption||null,
+          specialtySection:meta.specialtySection||null,
+          originalFilename:file.name,
+          mimeType:file.type,
+          fileSizeBytes:file.size,
+          source:'RMS_WEB',
+          securityClassification:meta.securityClassification||'INTERNAL'
+        }
+      )
+      const uploadUrl=String(init.data.uploadUrl||'')
+      const attachmentId=String(init.data.attachmentId||'')
+      if(!uploadUrl||!attachmentId)throw new ForgePlatformApiError('Forge Platform did not return an upload URL.',502,'UPLOAD_INIT_FAILED')
+      const bytes=Buffer.from(await file.arrayBuffer())
+      const upload=await fetch(uploadUrl,{method:'PUT',headers:{'Content-Type':file.type,'Content-Length':String(file.size)},body:bytes})
+      if(!upload.ok)throw new ForgePlatformApiError(`Object upload failed with HTTP ${upload.status}.`,upload.status,'OBJECT_UPLOAD_FAILED')
+      const complete=await forgePlatformSend<Record<string,unknown>>(
+        `${root(incidentId)}/attachments/${attachmentId}/complete`,
+        'POST',
+        {}
+      )
+      return complete
+    }catch(error){
+      if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error
+    }
+  }
+
+  const dir=path.join(process.cwd(),'demo-persistence','attachments',incidentId)
+  fs.mkdirSync(dir,{recursive:true})
+  const safeName=file.name.replace(/[^a-zA-Z0-9._-]+/g,'_')
+  const storedName=`${randomUUID()}-${safeName}`
+  const target=path.join(dir,storedName)
+  fs.writeFileSync(target,Buffer.from(await file.arrayBuffer()))
+  const rows=readForgeData<Array<Record<string,unknown>>>('incident-attachments')
+  const now=new Date().toISOString()
+  const row={
+    id:randomUUID(),
+    incidentId,
+    category:meta.category||'OTHER',
+    caption:meta.caption||null,
+    specialtySection:meta.specialtySection||null,
+    originalFilename:file.name,
+    storedFilename:storedName,
+    mimeType:file.type,
+    fileSizeBytes:file.size,
+    securityClassification:meta.securityClassification||'INTERNAL',
+    uploadStatus:'COMPLETE',
+    malwareScanStatus:'DEMO_NOT_SCANNED',
+    source:'RMS_WEB',
+    recordVersion:1,
+    createdAt:now,
+    updatedAt:now
+  }
+  writeForgeData('incident-attachments',[row,...rows])
+  return {data:row,source:'demo'}
 }
