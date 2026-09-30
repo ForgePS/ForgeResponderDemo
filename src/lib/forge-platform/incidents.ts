@@ -346,3 +346,46 @@ export async function addIncidentPersonnel(id:string,payload:Record<string,unkno
   if(mode!=='demo'){try{return await forgePlatformSend(`${base(id)}/personnel`,'POST',payload)}catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}}
   const rows=readForgeData<Record<string,unknown>[]>('incident-personnel-assignments');const row={id:randomUUID(),incidentId:id,...payload,recordVersion:1};writeForgeData('incident-personnel-assignments',[row,...rows]);return {data:row,source:'demo'}
 }
+
+
+export async function listReviewComments(id:string):Promise<ForgePlatformResult<Record<string,unknown>[]>>{
+  const mode=getForgePlatformMode()
+  if(mode==='demo'){
+    return {data:readForgeData<Record<string,unknown>[]>('incident-review-comments').filter(x=>x.incidentId===id),source:'demo'}
+  }
+  try{return await forgePlatformGet(`${base(id)}/review-comments`)}
+  catch(error){
+    if(mode==='auto'&&error instanceof ForgePlatformApiError){
+      return {data:readForgeData<Record<string,unknown>[]>('incident-review-comments').filter(x=>x.incidentId===id),source:'demo'}
+    }
+    throw error
+  }
+}
+
+export async function addReviewComment(id:string,body:string):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend(`${base(id)}/review-comments`,'POST',{body})}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  if(!body.trim()) throw new ForgePlatformApiError('Review comment is required.',400,'VALIDATION_ERROR')
+  const rows=readForgeData<Record<string,unknown>[]>('incident-review-comments')
+  const row={id:randomUUID(),incidentId:id,body:body.trim(),authorUserId:'demo-user',status:'OPEN',createdAt:new Date().toISOString()}
+  writeForgeData('incident-review-comments',[row,...rows])
+  activity('Incident review comment added',id,{commentId:row.id})
+  return {data:row,source:'demo'}
+}
+
+export async function listStatusHistory(id:string):Promise<ForgePlatformResult<Record<string,unknown>[]>>{
+  const mode=getForgePlatformMode()
+  if(mode==='demo'){
+    return {data:readForgeData<Record<string,unknown>[]>('incident-status-history').filter(x=>x.incidentId===id),source:'demo'}
+  }
+  try{return await forgePlatformGet(`${base(id)}/status-history`)}
+  catch(error){
+    if(mode==='auto'&&error instanceof ForgePlatformApiError){
+      return {data:readForgeData<Record<string,unknown>[]>('incident-status-history').filter(x=>x.incidentId===id),source:'demo'}
+    }
+    throw error
+  }
+}
