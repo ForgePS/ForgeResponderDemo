@@ -217,7 +217,9 @@ export default function CadOperationsDashboard({lang}:{lang:string}){
       })
       await load()
       if(body.data?.incident?.incidentId){
-        setMessage(`CAD scenario applied to incident ${body.data.incident.incidentNumber}.`)
+        const applied=Number(body.data?.autoPrefill?.applied||0)
+        const skipped=Number(body.data?.autoPrefill?.skipped||0)
+        setMessage(`CAD scenario applied to incident ${body.data.incident.incidentNumber}. ${applied} Auto-Dispatch item${applied===1?'':'s'} applied; ${skipped} skipped for review.`)
         router.push(`/${lang}/incidents/${body.data.incident.incidentId}`)
         router.refresh()
         return
