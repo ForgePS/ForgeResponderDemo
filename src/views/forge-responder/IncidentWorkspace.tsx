@@ -18,6 +18,7 @@ import NerisDynamicForm from '@views/forge-responder/NerisDynamicForm'
 import SpecialtyRecordsPanel from '@views/forge-responder/SpecialtyRecordsPanel'
 import AiNarrativeAssistant from '@views/forge-responder/AiNarrativeAssistant'
 import CadIncidentPanel from '@views/forge-responder/CadIncidentPanel'
+import SpecialtyReviewSummary from '@views/forge-responder/SpecialtyReviewSummary'
 
 type Incident={
   id:string
@@ -276,6 +277,7 @@ export default function IncidentWorkspace({
         </Box>:null}
 
         {tab===6?<Box sx={{mt:4,display:'grid',gap:3}}>
+          <SpecialtyReviewSummary incidentId={incident.id}/>
           <Box sx={{display:'flex',gap:2,flexWrap:'wrap'}}><Button variant='outlined' disabled={busy} onClick={()=>void validate()}>Run NERIS Validation</Button></Box>
           {findings.length?<Box sx={{display:'grid',gap:1}}>{findings.map((f,index)=><Alert key={`${f.code}-${index}`} severity={f.severity==='BLOCKING_ERROR'?'error':f.severity==='WARNING'?'warning':'info'}>{f.message}</Alert>)}</Box>:<Alert severity='info' variant='outlined'>Run validation to check the current incident for blocking errors, warnings, and guidance.</Alert>}
           <Divider/>
