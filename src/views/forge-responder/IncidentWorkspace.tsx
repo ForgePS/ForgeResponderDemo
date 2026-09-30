@@ -261,7 +261,7 @@ export default function IncidentWorkspace({
           <Box sx={{gridColumn:{md:'1 / -1'},display:'flex',justifyContent:'flex-end'}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void saveOverview()}>Save Overview</Button></Box>
         </Box>:null}
 
-        {tab===1?<Box sx={{mt:4}}><IncidentPrefillAssistant incidentId={incident.id} recordVersion={incident.recordVersion} occupancies={occupancies} preplans={preplans} onApplied={(version,applied,skipped)=>{setIncident(current=>({...current,recordVersion:version}));setMessage(`${applied} prefill suggestion${applied===1?'':'s'} applied; ${skipped} skipped.`)}}/></Box>:null}
+        {tab===1?<Box sx={{mt:4}}><IncidentPrefillAssistant incidentId={incident.id} recordVersion={incident.recordVersion} occupancies={occupancies} preplans={preplans} onApplied={(version,applied,skipped)=>{setIncident(current=>({...current,recordVersion:version}));setMessage(`${applied} prefill suggestion${applied===1?'':'s'} applied; ${skipped} skipped.`);void refreshIncident();void loadRelated()}}/></Box>:null}
 
         {tab===2?<Box sx={{mt:4,display:'grid',gap:4}}>
           <Box><Typography variant='h5' sx={{mb:2}}>Unit Assignments</Typography>
