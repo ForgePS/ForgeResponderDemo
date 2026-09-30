@@ -137,6 +137,30 @@ export async function listRmsMasterData<T extends Record<string, unknown>>(
   }
 }
 
+
+export async function getRmsMasterData<T extends Record<string, unknown>>(
+  kind: RmsMasterDataKind,
+  id: string
+): Promise<ForgePlatformResult<T>> {
+  const mode = getForgePlatformMode()
+  if (mode === 'demo') {
+    const row = demoRows<T>(kind).data.find(item => item.id === id)
+    if (!row) throw new ForgePlatformApiError(`${kind} record not found.`, 404, 'NOT_FOUND')
+    return { data: row, source: 'demo' }
+  }
+
+  try {
+    return await forgePlatformGet<T>(rmsPath(kind, id))
+  } catch (error) {
+    if (mode === 'auto' && error instanceof ForgePlatformApiError) {
+      const row = demoRows<T>(kind).data.find(item => item.id === id)
+      if (!row) throw error
+      return { data: row, source: 'demo' }
+    }
+    throw error
+  }
+}
+
 export async function createRmsMasterData<T extends Record<string, unknown>>(
   kind: RmsMasterDataKind,
   payload: T
