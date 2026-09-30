@@ -59,6 +59,7 @@ export default function CadOperationsDashboard({lang}:{lang:string}){
   const [scenarioId,setScenarioId]=useState('STRUCTURE_FIRE')
   const [simConnectionId,setSimConnectionId]=useState('')
   const [simSourceIncidentId,setSimSourceIncidentId]=useState('SIM-INC-1001')
+  const [simAutoDispatch,setSimAutoDispatch]=useState(true)
   const [outages,setOutages]=useState<Record<string,unknown>[]>([])
   const [editingConnection,setEditingConnection]=useState<Connection|null>(null)
   const [connectionForm,setConnectionForm]=useState({name:'Demo CAD',vendor:'GENERIC',adapterKey:'generic',adapterVersion:'1.0',environment:'SIMULATOR',transportType:'SYNTHETIC_SIMULATOR',intakeMode:'HYBRID'})
@@ -197,8 +198,22 @@ export default function CadOperationsDashboard({lang}:{lang:string}){
   async function sendScenario(){
     if(!simConnectionId||!scenarioId)return
     setBusy(true);setError('');setMessage('')
-    try{await json('/api/cad/simulator/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({connectionId:simConnectionId,scenarioId,sourceIncidentId:simSourceIncidentId,delivery:'DIRECT_QUEUE'})});await load();setMessage('CAD simulator scenario injected.')}
-    catch(err){setError(err instanceof Error?err.message:'Unable to inject CAD simulator scenario.')}finally{setBusy(false)}
+    try{
+      const body=await json('/api/cad/simulator/send',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({connectionId:simConnectionId,scenarioId,sourceIncidentId:simSourceIncidentId,delivery:'DIRECT_QUEUE',autoDispatch:simAutoDispatch})
+      })
+      await load()
+      if(body.data?.incident?.incidentId){
+        setMessage(`CAD scenario applied to incident ${body.data.incident.incidentNumber}.`)
+        router.push(`/${lang}/incidents/${body.data.incident.incidentId}`)
+        router.refresh()
+        return
+      }
+      setMessage('CAD simulator scenario injected.')
+    }catch(err){setError(err instanceof Error?err.message:'Unable to inject CAD simulator scenario.')}
+    finally{setBusy(false)}
   }
 
   async function simulatorOutage(recover:boolean){
@@ -329,6 +344,7 @@ export default function CadOperationsDashboard({lang}:{lang:string}){
           </TextField>
           <TextField label='Source Incident ID' value={simSourceIncidentId} onChange={e=>setSimSourceIncidentId(e.target.value)}/>
           <TextField label='Outage / Recovery Reason' value={reason} onChange={e=>setReason(e.target.value)}/>
+          <FormControlLabel sx={{gridColumn:{md:'1 / -1'}}} control={<Checkbox checked={simAutoDispatch} onChange={e=>setSimAutoDispatch(e.target.checked)}/>} label='Auto-create/link Forge incident in standalone demo mode'/>
         </Box>
         <Box sx={{display:'flex',gap:2,flexWrap:'wrap',mt:3}}>
           <Button variant='contained' color='error' disabled={busy||!simConnectionId||!scenarioId} onClick={()=>void sendScenario()}>Inject Scenario</Button>
