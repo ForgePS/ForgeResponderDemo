@@ -279,6 +279,7 @@ export async function batchFieldValues(
   const fieldById=new Map(descriptor.modules.flatMap(m=>m.fields).map(field=>[field.fieldId,field]))
   const rows=readForgeData<StoredFieldValue[]>('incident-field-values')
   const now=new Date().toISOString()
+  let upserted=0
   for(const item of values){
     const known=fieldById.get(item.fieldId)
     const fieldKey=item.fieldKey||known?.fieldKey||item.fieldId
@@ -293,13 +294,19 @@ export async function batchFieldValues(
       userConfirmed:(item as NerisFieldValueState).userConfirmed??true
     }
     const index=rows.findIndex(row=>row.incidentId===incidentId&&row.fieldId===item.fieldId)
-    const stored={id:index>=0?rows[index].id:randomUUID(),incidentId,fieldId:item.fieldId,fieldKey,sectionKey:item.sectionKey,value,updatedAt:now}
+    const existing=index>=0?rows[index]:null
+    if(existing?.value.userConfirmed===true&&value.userConfirmed===false)continue
+    const stored={id:existing?.id||randomUUID(),incidentId,fieldId:item.fieldId,fieldKey,sectionKey:item.sectionKey,value,updatedAt:now}
     if(index>=0)rows[index]=stored
     else rows.push(stored)
+    upserted+=1
+  }
+  if(upserted===0){
+    return {data:{incident:(await getIncident(incidentId)).data,upserted:0},source:'demo'}
   }
   writeForgeData('incident-field-values',rows)
   const patched=await patchIncident(incidentId,{},recordVersion)
-  return {data:{incident:patched.data,upserted:values.length},source:'demo'}
+  return {data:{incident:patched.data,upserted},source:'demo'}
 }
 
 export async function updateSpecialtySection(
