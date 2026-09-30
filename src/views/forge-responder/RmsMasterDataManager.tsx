@@ -141,7 +141,9 @@ export default function RmsMasterDataManager() {
   async function save() {
     setError('')
     const payload = Object.fromEntries(
-      Object.entries(form).map(([key, value]) => [key, value.trim() === '' ? null : value.trim()])
+      Object.entries(form)
+        .map(([key, value]) => [key, value.trim()] as const)
+        .filter(([, value]) => value !== '')
     )
 
     try {
