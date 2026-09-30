@@ -26,7 +26,7 @@
     "validate:hydrant-gis": "node scripts/validate-hydrant-gis-theme.mjs",
     "validate:search-scheduling-demo": "node scripts/validate-search-scheduling-demo.mjs",
     "validate:booth": "node scripts/validate-booth-readiness.mjs",
-    "validate:all": "pnpm validate:persistent-branding && pnpm validate:server-boundaries && pnpm validate:build-cleanup && pnpm validate:server-cookie && pnpm validate:no-prisma-runtime && pnpm validate:demo-auth && pnpm validate:mui-alerts && pnpm validate:production-package && pnpm validate:forge && pnpm validate:prevention && pnpm validate:incident-ems && pnpm validate:neris-schema && pnpm validate:operations-depth && pnpm validate:admin-reports-map && pnpm validate:hydrant-gis && pnpm validate:search-scheduling-demo && pnpm validate:booth && pnpm validate:incident-intelligence",
+    "validate:all": "pnpm validate:persistent-branding && pnpm validate:server-boundaries && pnpm validate:build-cleanup && pnpm validate:server-cookie && pnpm validate:no-prisma-runtime && pnpm validate:demo-auth && pnpm validate:mui-alerts && pnpm validate:production-package && pnpm validate:forge && pnpm validate:prevention && pnpm validate:incident-ems && pnpm validate:neris-schema && pnpm validate:operations-depth && pnpm validate:admin-reports-map && pnpm validate:hydrant-gis && pnpm validate:search-scheduling-demo && pnpm validate:booth && pnpm validate:incident-intelligence && pnpm validate:hydrant-migration",
     "build:verified": "pnpm clean:legacy && pnpm clean:generated && pnpm validate:all && pnpm typecheck && pnpm build",
     "validate:production-package": "node scripts/validate-production-package.mjs",
     "validate:mui-alerts": "node scripts/validate-mui-alert-variants.mjs",
@@ -38,7 +38,8 @@
     "validate:build-cleanup": "node scripts/validate-build-cleanup.mjs",
     "validate:server-boundaries": "node scripts/validate-server-client-boundaries.mjs",
     "validate:persistent-branding": "node scripts/validate-persistent-branding.mjs",
-    "validate:incident-intelligence": "node scripts/validate-incident-intelligence.mjs"
+    "validate:incident-intelligence": "node scripts/validate-incident-intelligence.mjs",
+    "validate:hydrant-migration": "node scripts/validate-hydrant-migration.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "2.11.1",
