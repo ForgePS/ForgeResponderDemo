@@ -133,6 +133,8 @@ export default function SpecialtyRecordsPanel({incidentId}:{incidentId:string}){
   const [file,setFile]=useState<File|null>(null)
   const [category,setCategory]=useState('OTHER')
   const [caption,setCaption]=useState('')
+  const [editingId,setEditingId]=useState<string|null>(null)
+  const [editingVersion,setEditingVersion]=useState(1)
 
   const config=configs[kind]
 
@@ -146,9 +148,25 @@ export default function SpecialtyRecordsPanel({incidentId}:{incidentId:string}){
     }catch(err){setError(err instanceof Error?err.message:'Unable to load specialty records.')}
   }
 
-  useEffect(()=>{setForm({});setFile(null);setMessage('');void load()},[kind,incidentId])
+  useEffect(()=>{setForm({});setFile(null);setMessage('');setEditingId(null);setEditingVersion(1);void load()},[kind,incidentId])
 
   const activeRows=useMemo(()=>rows.filter(row=>String(row.status||'ACTIVE')!=='ARCHIVED'),[rows])
+
+  function startEdit(row:Record<string,unknown>){
+    if(kind==='attachments')return
+    const next:Record<string,unknown>={}
+    for(const field of config.fields)next[field.key]=row[field.key] ?? ''
+    setForm(next)
+    setEditingId(String(row.id))
+    setEditingVersion(Number(row.recordVersion||1))
+    window.scrollTo({top:0,behavior:'smooth'})
+  }
+
+  function cancelEdit(){
+    setForm({})
+    setEditingId(null)
+    setEditingVersion(1)
+  }
 
   async function create(){
     setBusy(true);setError('');setMessage('')
@@ -167,13 +185,13 @@ export default function SpecialtyRecordsPanel({incidentId}:{incidentId:string}){
       }else{
         const payload=Object.fromEntries(Object.entries(form).filter(([,value])=>value!==''&&value!==null&&value!==undefined))
         const response=await fetch(`/api/incidents/${incidentId}/specialty/${kind}`,{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify(payload)
+          method:editingId?'PATCH':'POST',
+          headers:{'Content-Type':'application/json',...(editingId?{'x-record-version':String(editingVersion)}:{})},
+          body:JSON.stringify(editingId?{id:editingId,...payload}:payload)
         })
         const body=await response.json()
         if(!response.ok)throw new Error(body.error||'Unable to create specialty record.')
-        setForm({})
+        setForm({});setEditingId(null);setEditingVersion(1)
       }
       await load();setMessage(`${config.label.slice(0,-1)||config.label} record saved.`)
     }catch(err){setError(err instanceof Error?err.message:'Unable to save specialty record.')}
@@ -205,7 +223,7 @@ export default function SpecialtyRecordsPanel({incidentId}:{incidentId:string}){
     </CardContent></Card>
 
     <Card variant='outlined'><CardContent>
-      <Typography variant='h5' sx={{mb:3}}>Add {config.label}</Typography>
+      <Box sx={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:2,mb:3}}><Typography variant='h5'>{editingId?'Edit':'Add'} {config.label}</Typography>{editingId?<Button size='small' onClick={cancelEdit}>Cancel Edit</Button>:null}</Box>
       {kind==='attachments'?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
         <TextField select label='Category' value={category} onChange={e=>setCategory(e.target.value)}>
           {['SCENE_PHOTO','FIRE_PHOTO','HAZMAT_PHOTO','RESCUE_PHOTO','EXPLOSION_PHOTO','EXPOSURE_PHOTO','ALARM_DOCUMENT','FIRE_PROTECTION_DOCUMENT','INVESTIGATION_REFERRAL','SKETCH','FLOOR_PLAN','PDF','OTHER'].map(value=><MenuItem key={value} value={value}>{value.replaceAll('_',' ')}</MenuItem>)}
@@ -218,7 +236,7 @@ export default function SpecialtyRecordsPanel({incidentId}:{incidentId:string}){
           ? <TextField key={field.key} select label={field.label} value={String(form[field.key]??'')} onChange={e=>setForm(v=>({...v,[field.key]:e.target.value==='true'}))}><MenuItem value=''>Not recorded</MenuItem><MenuItem value='true'>Yes</MenuItem><MenuItem value='false'>No</MenuItem></TextField>
           : <TextField key={field.key} required={field.required} type={field.type==='number'?'number':'text'} multiline={field.type==='textarea'} minRows={field.type==='textarea'?3:undefined} label={field.label} value={String(form[field.key]??'')} onChange={e=>setForm(v=>({...v,[field.key]:field.type==='number'&&e.target.value!==''?Number(e.target.value):e.target.value}))}/>)}
       </Box>}
-      <Box sx={{display:'flex',justifyContent:'flex-end',mt:3}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void create()}>{busy?'Saving…':kind==='attachments'?'Upload Attachment':`Add ${config.label.slice(0,-1)}`}</Button></Box>
+      <Box sx={{display:'flex',justifyContent:'flex-end',mt:3}}><Button variant='contained' color='error' disabled={busy} onClick={()=>void create()}>{busy?'Saving…':kind==='attachments'?'Upload Attachment':editingId?'Save Changes':`Add ${config.label.slice(0,-1)}`}</Button></Box>
     </CardContent></Card>
 
     <Card variant='outlined'><CardContent>
@@ -230,7 +248,7 @@ export default function SpecialtyRecordsPanel({incidentId}:{incidentId:string}){
             <Typography fontWeight={700}>{summary(kind,row)}</Typography>
             <Typography variant='caption' color='text.secondary'>{row.createdAt?new Date(String(row.createdAt)).toLocaleString():'Created time not returned'}{row.uploadStatus?` · ${row.uploadStatus}`:''}{row.malwareScanStatus?` · Scan: ${row.malwareScanStatus}`:''}</Typography>
           </Box>
-          <Button size='small' color='error' disabled={busy} onClick={()=>void archive(String(row.id))}>Archive</Button>
+          <Box sx={{display:'flex',gap:1}}>{kind!=='attachments'?<Button size='small' disabled={busy} onClick={()=>startEdit(row)}>Edit</Button>:null}<Button size='small' color='error' disabled={busy} onClick={()=>void archive(String(row.id))}>Archive</Button></Box>
         </Box>)}
         {!activeRows.length?<Typography color='text.secondary'>No active {config.label.toLowerCase()} records.</Typography>:null}
       </Box>
