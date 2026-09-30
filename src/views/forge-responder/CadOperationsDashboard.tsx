@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Alert from '@mui/material/Alert'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
@@ -35,7 +36,8 @@ async function json(url:string,init?:RequestInit){
   return body
 }
 
-export default function CadOperationsDashboard(){
+export default function CadOperationsDashboard({lang}:{lang:string}){
+  const router=useRouter()
   const [tab,setTab]=useState(0)
   const [summary,setSummary]=useState<Summary|null>(null)
   const [connections,setConnections]=useState<Connection[]>([])
@@ -152,6 +154,15 @@ export default function CadOperationsDashboard(){
     setBusy(true);setError('');setMessage('')
     try{await json(`/api/cad/unknown-personnel/${row.id}/resolve`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({resolutionReason:reason,recordVersion:row.recordVersion,status,forgePersonnelId:forgePersonnelId||null,mappingType:'PERSONNEL',externalAgency:false})});await load();setMessage('CAD personnel mapping updated.')}
     catch(err){setError(err instanceof Error?err.message:'Unable to resolve CAD personnel.')}finally{setBusy(false)}
+  }
+
+  async function createIncidentFromMessage(id:string){
+    setBusy(true);setError('');setMessage('')
+    try{
+      const body=await json(`/api/cad/messages/${id}/create-incident`,{method:'POST'})
+      router.push(`/${lang}/incidents/${body.data.incidentId}`)
+      router.refresh()
+    }catch(err){setError(err instanceof Error?err.message:'Unable to create incident from CAD message.');setBusy(false)}
   }
 
   async function reprocess(id:string){
@@ -300,7 +311,7 @@ export default function CadOperationsDashboard(){
           <Box><Typography fontWeight={700}>{row.sourceMessageId||row.id}</Typography><Typography variant='caption' color='text.secondary'>{new Date(row.receivedAt).toLocaleString()}</Typography></Box>
           <Typography>{row.sourceIncidentId||'No source incident'}</Typography>
           <Chip size='small' variant='tonal' color={row.processingStatus==='FAILED'||row.processingStatus==='DEAD_LETTER'?'error':row.processingStatus==='APPLIED'?'success':'warning'} label={row.processingStatus}/>
-          <Box sx={{display:'flex',gap:1}}><Button size='small' disabled={busy} onClick={()=>void reprocess(row.id)}>Reprocess</Button><Button size='small' color='warning' disabled={busy} onClick={()=>void quarantine(row.id)}>Quarantine</Button></Box>
+          <Box sx={{display:'flex',gap:1,flexWrap:'wrap'}}>{row.sourceIncidentId?<Button size='small' variant='contained' disabled={busy} onClick={()=>void createIncidentFromMessage(row.id)}>Create Incident</Button>:null}<Button size='small' disabled={busy} onClick={()=>void reprocess(row.id)}>Reprocess</Button><Button size='small' color='warning' disabled={busy} onClick={()=>void quarantine(row.id)}>Quarantine</Button></Box>
         </Box>)}
         {!messages.length?<Typography color='text.secondary'>No CAD messages recorded.</Typography>:null}
       </Box></CardContent></Card>
