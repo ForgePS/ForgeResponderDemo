@@ -472,5 +472,49 @@ export async function setCadSimulatorOutage(connectionId:string,reason:string,re
   const updated={...rows[index],status:recover?'ACTIVE':'DEGRADED',healthStatus:recover?'HEALTHY':'DEGRADED',lastErrorSummary:recover?null:reason,lastSuccessAt:recover?now:rows[index].lastSuccessAt,recordVersion:rows[index].recordVersion+1,updatedAt:now}
   rows[index]=updated
   writeForgeData('cad-connections',rows)
-  return {data:recover?{recovered:true,connection:updated}:{outageId:randomUUID(),connection:updated},source:'demo'}
+  const outages=local<Record<string,unknown>>('cad-outages')
+  if(recover){
+    const active=outages.findIndex(row=>row.cadConnectionId===connectionId&&row.status==='ACTIVE')
+    if(active>=0)outages[active]={...outages[active],status:'ENDED',endedAt:now,updatedAt:now}
+  }else{
+    outages.unshift({id:randomUUID(),cadConnectionId:connectionId,status:'ACTIVE',reason,startedAt:now,source:'SIMULATOR',createdAt:now,updatedAt:now})
+  }
+  writeForgeData('cad-outages',outages)
+  return {data:recover?{recovered:true,connection:updated}:{outageId:String(outages[0]?.id||randomUUID()),connection:updated},source:'demo'}
+}
+
+
+export async function listCadSimulatorOutages():Promise<ForgePlatformResult<Record<string,unknown>[]>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformGet<Record<string,unknown>[]>(`${tenantBase()}/cad/simulator/outages`)}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  return {data:local<Record<string,unknown>>('cad-outages'),source:'demo'}
+}
+
+export async function quarantineCadMessage(rawMessageId:string,reason:string):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<Record<string,unknown>>(`${tenantBase()}/cad/simulator/quarantine-message`,'POST',{rawMessageId,reason})}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const rows=local<CadRawMessageMeta>('cad-messages');const index=rows.findIndex(x=>x.id===rawMessageId)
+  if(index<0)throw new ForgePlatformApiError('CAD message not found.',404,'NOT_FOUND')
+  rows[index]={...rows[index],processingStatus:'QUARANTINED'}
+  writeForgeData('cad-messages',rows)
+  return {data:{quarantined:true,rawMessageId,reason},source:'demo'}
+}
+
+export async function rotateCadConnectionSecret(connectionId:string,reason:string):Promise<ForgePlatformResult<Record<string,unknown>>>{
+  const mode=getForgePlatformMode()
+  if(mode!=='demo'){
+    try{return await forgePlatformSend<Record<string,unknown>>(`${tenantBase()}/cad/connections/${connectionId}/rotate-secret`,'POST',{reason})}
+    catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
+  }
+  const rows=local<CadConnection>('cad-connections');const index=rows.findIndex(x=>x.id===connectionId)
+  if(index<0)throw new ForgePlatformApiError('CAD connection not found.',404,'NOT_FOUND')
+  const updated={...rows[index],hasWebhookSecret:true,webhookKeyId:`demo-${Date.now()}`,recordVersion:rows[index].recordVersion+1,updatedAt:new Date().toISOString()}
+  rows[index]=updated;writeForgeData('cad-connections',rows)
+  return {data:{rotated:true,connection:updated},source:'demo'}
 }
