@@ -271,7 +271,38 @@ export async function batchFieldValues(
   const mode=getForgePlatformMode()
   if(mode!=='demo'){
     try{
-      return await forgePlatformSend<{incident:Awaited<ReturnType<typeof getIncident>>['data'];upserted:number}>(`${base(incidentId)}/field-values`,'PATCH',{values},{ifMatch:recordVersionToIfMatch(recordVersion)})
+      const result=await forgePlatformSend<{
+        incident:Awaited<ReturnType<typeof getIncident>>['data']
+        upserted?:number
+        values?:Array<{
+          fieldId:string
+          sectionKey:string
+          repeatableItemId?:string|null
+          prefillSource?:string|null
+          userConfirmed?:boolean
+        }>
+      }>(`${base(incidentId)}/field-values`,'PATCH',{values},{ifMatch:recordVersionToIfMatch(recordVersion)})
+
+      let upserted=Number.isFinite(result.data.upserted)?Number(result.data.upserted):values.length
+      if(!Number.isFinite(result.data.upserted)&&Array.isArray(result.data.values)){
+        upserted=values.filter(requested=>{
+          const returned=result.data.values?.find(row=>
+            row.fieldId===requested.fieldId&&
+            row.sectionKey===requested.sectionKey
+          )
+          if(!returned)return false
+          if(requested.userConfirmed===false&&returned.userConfirmed===true)return false
+          if(requested.prefillSource&&returned.prefillSource&&requested.prefillSource!==returned.prefillSource)return false
+          return true
+        }).length
+      }
+
+      return {
+        data:{incident:result.data.incident,upserted},
+        source:result.source,
+        etag:result.etag,
+        meta:result.meta
+      }
     }catch(error){if(!(mode==='auto'&&error instanceof ForgePlatformApiError))throw error}
   }
 
