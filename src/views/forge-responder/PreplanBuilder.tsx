@@ -16,10 +16,11 @@ import Typography from '@mui/material/Typography'
 
 const steps=['Occupancy','Access & Utilities','Hazards & Protection','Review']
 
-type OccupancyOption={id:string;name?:string;addressLine1?:string|null;address?:string|null}
-type Props={occupancies:OccupancyOption[];initialOccupancyId?:string;lang:string}
+type OccupancyOption={id:string;name?:string;addressLine1?:string|null;address?:string|null;recordVersion?:number}
+type StationOption={id:string;name?:string;stationNumber?:string}
+type Props={occupancies:OccupancyOption[];stations:StationOption[];initialOccupancyId?:string;lang:string}
 
-export default function PreplanBuilder({occupancies,initialOccupancyId,lang}:Props){
+export default function PreplanBuilder({occupancies,stations,initialOccupancyId,lang}:Props){
   const router=useRouter()
   const firstId=initialOccupancyId&&occupancies.some(x=>x.id===initialOccupancyId)?initialOccupancyId:occupancies[0]?.id||''
   const [step,setStep]=useState(0)
@@ -44,6 +45,14 @@ export default function PreplanBuilder({occupancies,initialOccupancyId,lang}:Pro
       const response=await fetch('/api/rms/preplans',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
       const body=await response.json()
       if(!response.ok) throw new Error(body.error||'Unable to create preplan.')
+      const selected=occupancies.find(x=>x.id===occupancyId)
+      if(selected){
+        await fetch(`/api/rms/occupancies/${occupancyId}`,{
+          method:'PATCH',
+          headers:{'Content-Type':'application/json','x-record-version':String(selected.recordVersion||1)},
+          body:JSON.stringify({preplanId:body.data.id})
+        })
+      }
       router.push(`/${lang}/preplans/${body.data.id}`);router.refresh()
     }catch(err){setError(err instanceof Error?err.message:'Unable to create preplan.');setSaving(false)}
   }
@@ -54,12 +63,12 @@ export default function PreplanBuilder({occupancies,initialOccupancyId,lang}:Pro
     {step===0?<Box sx={{display:'grid',gap:3}}>
       <TextField select fullWidth label='Occupancy' value={occupancyId} onChange={e=>setOccupancyId(e.target.value)}>{occupancies.map(x=><MenuItem key={x.id} value={x.id}>{x.name||x.id} — {x.addressLine1||x.address||'No address'}</MenuItem>)}</TextField>
       <TextField fullWidth label='Version Label' value={versionLabel} onChange={e=>setVersionLabel(e.target.value)}/>
-      <TextField select fullWidth label='Approval Status' value={approvalStatus} onChange={e=>setApprovalStatus(e.target.value)}><MenuItem value='DRAFT'>Draft</MenuItem><MenuItem value='IN_REVIEW'>In Review</MenuItem><MenuItem value='APPROVED'>Approved</MenuItem><MenuItem value='RETIRED'>Retired</MenuItem></TextField>
+      <TextField select fullWidth label='Approval Status' value={approvalStatus} onChange={e=>setApprovalStatus(e.target.value)}><MenuItem value='DRAFT'>Draft</MenuItem><MenuItem value='APPROVED'>Approved</MenuItem><MenuItem value='SUPERSEDED'>Superseded</MenuItem></TextField>
     </Box>:null}
     {step===1?<Box sx={{display:'grid',gridTemplateColumns:{xs:'1fr',md:'1fr 1fr'},gap:3}}>
       <TextField multiline minRows={4} label='Access Notes' value={accessNotes} onChange={e=>setAccessNotes(e.target.value)} placeholder='Primary/secondary access, gates, apparatus access, Knox Box, staging...'/>
       <TextField multiline minRows={4} label='Utility Notes' value={utilityNotes} onChange={e=>setUtilityNotes(e.target.value)} placeholder='Electric, gas, water, sprinkler riser, FDC, shutoffs...'/>
-      <TextField label='Primary Station ID' value={primaryStationId} onChange={e=>setPrimaryStationId(e.target.value)} helperText='Optional Forge Platform station UUID' sx={{gridColumn:{md:'1 / -1'}}}/>
+      <TextField select label='Primary Station' value={primaryStationId} onChange={e=>setPrimaryStationId(e.target.value)} sx={{gridColumn:{md:'1 / -1'}}}><MenuItem value=''>Not assigned</MenuItem>{stations.map(station=><MenuItem key={station.id} value={station.id}>{station.name||station.stationNumber||station.id}</MenuItem>)}</TextField>
     </Box>:null}
     {step===2?<Box sx={{display:'grid',gap:3}}>
       <TextField multiline minRows={4} label='Hazards' value={hazards} onChange={e=>setHazards(e.target.value)} placeholder='Special hazards, hazardous materials, collapse concerns, occupancy-specific risks...'/>
