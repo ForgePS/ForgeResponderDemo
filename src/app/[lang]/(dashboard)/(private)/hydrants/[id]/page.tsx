@@ -37,6 +37,7 @@ export default async function HydrantDetailPage({params}:{params:Promise<{lang:s
     </Box>
 
     <Box sx={{display:'flex',gap:2,flexWrap:'wrap',mb:3}}>
+      <Button href={`/${lang}/hydrants/${id}/edit`} variant='outlined' startIcon={<i className='tabler-edit'/>}>Edit Hydrant</Button>
       <Button href={`/${lang}/hydrants/${id}/flow-test/new`} variant='contained' color='error' startIcon={<i className='tabler-gauge'/>}>Start Flow Test</Button>
       <Button href={`/${lang}/hydrants/${id}/inspection/new`} variant='tonal' startIcon={<i className='tabler-clipboard-check'/>}>Start Inspection</Button>
       <Button href={`/${lang}/hydrants/${id}/damage/new`} variant='outlined' startIcon={<i className='tabler-alert-triangle'/>}>Report Damage</Button>
