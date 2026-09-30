@@ -45,6 +45,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem href={href('/epcr')}>ePCR</MenuItem>
           </SubMenu>
           <MenuItem href={href('/neris')} icon={<i className='tabler-file-check'/>}>NERIS</MenuItem>
+          <MenuItem href={href('/cad')} icon={<i className='tabler-arrows-exchange'/>}>CAD Operations</MenuItem>
         </MenuSection>
         <MenuSection label='OPERATIONS'>
           <MenuItem href={href('/hydrants')} icon={<i className='tabler-droplet'/>}>Hydrants</MenuItem>
