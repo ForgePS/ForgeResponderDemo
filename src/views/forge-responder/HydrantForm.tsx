@@ -30,6 +30,16 @@ export default function HydrantForm({ hydrant, lang }: { hydrant?: Hydrant; lang
   const [saving,setSaving]=useState(false)
   const [error,setError]=useState('')
 
+  async function remove(){
+    if(!hydrant?.id||!window.confirm('Delete this hydrant?')) return
+    setSaving(true);setError('')
+    try{
+      const response=await fetch(`/api/hydrants/${hydrant.id}`,{method:'DELETE',headers:{'x-record-version':String(hydrant.recordVersion||1)}})
+      const body=await response.json(); if(!response.ok) throw new Error(body.error||'Unable to delete hydrant.')
+      router.push(`/${lang}/hydrants`);router.refresh()
+    }catch(err){setError(err instanceof Error?err.message:'Unable to delete hydrant.');setSaving(false)}
+  }
+
   async function save(){
     setSaving(true);setError('')
     try{
@@ -74,7 +84,7 @@ export default function HydrantForm({ hydrant, lang }: { hydrant?: Hydrant; lang
       <TextField label='Longitude' type='number' value={form.longitude} onChange={e=>setForm(v=>({...v,longitude:e.target.value}))}/>
     </Box>
     <Box sx={{display:'flex',justifyContent:'flex-end',gap:2,mt:4}}>
-      <Button href={`/${lang}/hydrants`}>Cancel</Button>
+      {hydrant?.id?<Button color='error' disabled={saving} onClick={()=>void remove()}>Delete</Button>:null}<Button href={`/${lang}/hydrants`}>Cancel</Button>
       <Button variant='contained' color='error' disabled={saving} onClick={()=>void save()}>{saving?'Saving...':hydrant?.id?'Save Changes':'Create Hydrant'}</Button>
     </Box>
   </CardContent></Card>
